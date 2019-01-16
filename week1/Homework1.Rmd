@@ -45,6 +45,12 @@ These problems are the intellectual property of the instructors and may not be r
 #####################################
 Load the **ISLR** library into R and look at the first few rows of the **Auto** data set.  
 ```{r echo=FALSE}
+#https://www.r-bloggers.com/installing-r-packages/
+install.packages("ISLR")
+library(ISLR)
+data("Auto")
+#https://stackoverflow.com/questions/2667673/select-first-4-rows-of-a-data-frame-in-r
+head(Auto, 5)
 ```
 
 What data mining strategy would you use to investigate the following questions?  [Note that the orderings for the answer choices on D2L might differ from those shown below.]
