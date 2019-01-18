@@ -58,3 +58,30 @@ for(i in 1:length(K)) {
   overall[i] = (mytable[1,2] + mytable[2,1])/3334
 }
 plot(K, overall, type="l", lwd=2)
+
+
+#k nearest neighbors to solve a regression problem
+#install.packages("FNN")
+library(FNN)
+ames = read.csv("C:/Users/matt/source/repos/ds740data/ameshousing.csv")
+head(ames)
+#standardize
+lot.std = scale(ames$Lot.Area)
+area.std = scale(ames$Gr.Liv.Area)
+xvals = cbind(lot.std, area.std)
+
+#set up training and test sets
+set.seed(111)
+train = sample(1:2930, 2000, replace=F)
+
+train.x = xvals[train,]
+train.y = ames$SalePrice[train]
+valid.x = xvals[-train,]
+
+#do the analysis
+predictions = knn.reg(train.x, valid.x, train.y, k=10)
+predictions$pred[1:10] #look at first 10
+
+#mean squared error
+mean((ames$SalePrice[-train] - predictions$pred)^2)
+#do for loop here and find K that produces lowest MSE
