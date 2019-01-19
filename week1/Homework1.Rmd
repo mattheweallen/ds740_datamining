@@ -1,6 +1,6 @@
 ---
 title: "Homework 1 R markdown"
-author: "(your name here)"
+author: "Matt Allen"
 date: '`r Sys.Date()`'
 output:
   html_document:
@@ -45,13 +45,14 @@ These problems are the intellectual property of the instructors and may not be r
 #####################################
 Load the **ISLR** library into R and look at the first few rows of the **Auto** data set.  
 ```{r echo=FALSE}
-#https://www.r-bloggers.com/installing-r-packages/
-install.packages("ISLR")
+#install.packages("ISLR")
 library(ISLR)
 data("Auto")
-#https://stackoverflow.com/questions/2667673/select-first-4-rows-of-a-data-frame-in-r
 head(Auto, 5)
 ```
+
+#https://www.r-bloggers.com/installing-r-packages/
+#https://stackoverflow.com/questions/2667673/select-first-4-rows-of-a-data-frame-in-r
 
 What data mining strategy would you use to investigate the following questions?  [Note that the orderings for the answer choices on D2L might differ from those shown below.]
 
@@ -59,14 +60,19 @@ What data mining strategy would you use to investigate the following questions? 
 <span style="color:green">**Multiple Choice Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of *Regression*, *Classification*, or *Unsupervised learning*
 
+Classification
+
 *   The manager of a used-car lot wants to arrange groups of similar cars on the lot.  The manager wants to understand the relationships between the year, engine displacement, and weight of cars to identify informative groupings.  
 <span style="color:green">**Multiple Choice Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of *Regression*, *Classification*, or *Unsupervised learning*
+
+Unsupervised
 
 *   You are building an app for a used-car website that will take information about the year, engine displacement, and weight of cars, and estimate their horsepower.  
 <span style="color:green">**Multiple Choice Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of *Regression*, *Classification*, or *Unsupervised learning*
 
+Regression
 
 ***  
 
@@ -77,6 +83,7 @@ We would like to use K-nearest neighbors to predict the gas mileage (MPG) of car
 
 <span style="color:green">**Text Answer**: </span>
  
+Standardizing the data gives all features equal weight. It prevents any one feature from having more influence on the prediction than another. In the auto data for example, if the data was not standardized weight might have a bigger influence on the prediction. Since K-nearest neighbors uses a distance in the feature space to determine similarities, the notion of distance has different meanings across the features if the values are not standardized. 
 
 #####################################
 #### Question 3: **<span style="color:Crimson">(1 point)</span>**
@@ -86,6 +93,8 @@ Create two new variables, **weight.std** and **year.std**, containing standardiz
 Enter your R code below.  
 <span style="color:green">**Code Answer**: </span>
 ```{r}
+weight.std = scale(Auto$weight)
+year.std = scale(Auto$year)
 ```
 
 
@@ -97,6 +106,8 @@ Create a data frame or matrix containing your new variables, **weight.std** and 
 Enter your R code below.  
 <span style="color:green">**Code Answer**: </span>
 ```{r}
+auto.std = data.frame(weight.std, year.std)
+write.csv(auto.std, file="C:/Users/matt/source/repos/ds740data/auto.std.csv")
 ```
 
 ***  
@@ -114,6 +125,19 @@ In addition, create two new variables, **weight.train.std** and **year.train.std
 Enter your R code below.  
 <span style="color:green">**Code Answer**: </span>
 ```{r}
+set.seed(1)
+
+#split into train and validation sets
+train = sample(1:392, 256, replace = F)
+train.auto.std = auto.std[train,]
+valid.auto.std = auto.std[-train,]
+
+weight.train.std = train.auto.std$weight.std
+year.train.std = train.auto.std$year.std
+
+weight.valid.std = valid.auto.std$weight.std
+year.valid.std = valid.auto.std$year.std
+
 ```
 
 
@@ -125,6 +149,17 @@ Use 1-nearest neighbor regression (fit on the standardized training data) to pre
 Enter your R code below.  
 <span style="color:green">**Code Answer**: </span>
 ```{r}
+#predictions = knn(train.auto.std, valid.auto.std, Auto$mpg[train], k = 1)
+
+#head(predictions)
+#todo needed use regression here
+library(FNN)
+#do the analysis
+predictions = knn.reg(train.auto.std, valid.auto.std, Auto$mpg[train], k=1)
+predictions$pred[1:10] #look at first 10
+
+#table(predictions, Auto$mpg[-train])
+mean((Auto$mpg[-train] - predictions$pred)^2)
 
 ```
 
@@ -139,7 +174,7 @@ Your Answer:
 <span style="color:green">**Numeric Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:
 
-
+15.65
 ***  
 
 #####################################
@@ -150,6 +185,13 @@ Use a for() loop to apply K-nearest neighbors regression to the same training an
 Enter your R code (just the code, not the plot) below.  
 <span style="color:green">**Code Answer**: </span>
 ```{r}
+K = seq(1, 20, by = 2)
+mse = numeric(length(K))
+for(i in 1:length(K)) {
+  predictions = knn.reg(train.auto.std, valid.auto.std, Auto$mpg[train], k = K[i])
+  mse[i] = mean((Auto$mpg[-train] - predictions$pred)^2)
+}
+plot(K, mse, type="l", lwd=2)
 ```
 
 
@@ -160,7 +202,7 @@ In your opinion, which value of k is the best choice?  Why?
 
 <span style="color:green">**Text Answer**: </span>
 
-
+k=13 appears to minimize the Mean Square Error.
 
 
 
