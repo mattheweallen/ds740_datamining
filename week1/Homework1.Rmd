@@ -233,6 +233,11 @@ Create a new variable, Sex01, which equals 0 for males and 1 for females.
 Enter your R code below.  
 <span style="color:green">**Code Answer**: </span>
 ```{r}
+census = read.csv("C:/Users/matt/source/repos/ds740data/Census_income.csv")
+census$Sex = trimws(census$Sex)
+Sex01 = rep(0, length(census$Sex))
+Sex01[which(census$Sex == "Female")] = 1
+head(Sex01)
 ```
 
 
