@@ -3,10 +3,10 @@ title: "Homework 1 R markdown"
 author: "Matt Allen"
 date: '`r Sys.Date()`'
 output:
-  html_document:
+  pdf_document:
     fig_height: 4
     fig_width: 4.5
-  pdf_document:
+  html_document:
     fig_height: 4
     fig_width: 4.5
   word_document:
@@ -202,7 +202,7 @@ In your opinion, which value of k is the best choice?  Why?
 
 <span style="color:green">**Text Answer**: </span>
 
-k=13 appears to minimize the Mean Square Error.
+k=13 is the best choice, because it minimizes the Mean Square Error in the validation set.
 
 
 
