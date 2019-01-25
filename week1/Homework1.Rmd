@@ -233,7 +233,8 @@ Create a new variable, Sex01, which equals 0 for males and 1 for females.
 Enter your R code below.  
 <span style="color:green">**Code Answer**: </span>
 ```{r}
-census = read.csv("C:/Users/matt/source/repos/ds740data/Census_income.csv")
+#census = read.csv("C:/Users/matt/source/repos/ds740data/Census_income.csv")
+census = read.csv("C:/Users/irgepi/source/repos/ds740data/Census_income.csv")
 census$Sex = trimws(census$Sex)
 Sex01 = rep(0, length(census$Sex))
 Sex01[which(census$Sex == "Female")] = 1
@@ -255,9 +256,19 @@ Use the same means and standard deviations (from the training data) to standardi
 Enter your R code below.  
 <span style="color:green">**Code Answer**: </span>
 ```{r echo=FALSE, eval=FALSE}
+set.seed(1)
+train = sample(1:32561, 20000, replace = F)
+
+Educ.train.std = scale(census$EducYears[train])
+Age.train.std = scale(census$Age[train])
+train.X.std = data.frame(Educ.train.std, Age.train.std, Sex01[train])
+
+Educ.valid.std = scale(census$EducYears[-train], center = attr(Educ.train.std, "scaled:center"), scale = attr(Educ.train.std, "scaled:scale"))
+Age.valid.std = scale(census$Age[-train], center = attr(Age.train.std, "scaled:center"), scale = attr(Age.train.std, "scaled:scale"))
+valid.X.std = data.frame(Educ.valid.std, Age.valid.std, Sex01[-train])
 ```
  
- 
+
 ***  
 
 
@@ -269,6 +280,10 @@ Use 25-nearest neighbor classification (fit on the training set) to predict whet
 Find the confusion matrix.  You should be able to produce a matrix table with two rows and two columns, similar to the one below.  Use the spaces below the table to indicate what appears in each part of your matrix that corresponds to the letters **[A]** through **[D]**. For example, if the matrix you create shows 5432 in the cell that corresponds to **[A]** in the matrix below, you would enter "5432" in the space next to "[A]".
 
 ```{r echo=FALSE}
+library(class)
+predictions = knn(train.X.std, valid.X.std, census$Income[train], k = 25)
+
+table(predictions, census$Income[-train])
 ```
 
 Please enter the information *exactly as it appears in R*.
@@ -281,10 +296,10 @@ Classified > 50K	| **[C]** | **[D]** |
 
 <span style="color:green">**Numeric Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
-[A] =  
-[B] =  
-[C] =  
-[D] =  
+[A] =  8838
+[B] =  1805
+[C] =  691
+[D] =  1227
 
  
 
@@ -294,9 +309,13 @@ Classified > 50K	| **[C]** | **[D]** |
 What is the overall error rate on the validation set? Enter your answer as a decimal between 0 and 1, rounded to 3 decimal places.
 
 ```{r echo=FALSE}
+(1805 + 691) / (12561)
+
 ```
 
-Your Answer:  
+To three decimal places: .199
+
+Your Answer:  .199
 <span style="color:green">**Numeric Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:
 
@@ -307,9 +326,11 @@ Your Answer:
 What proportion of people making > $50,000 were misclassified? Enter your answer as a decimal between 0 and 1, rounded to 3 decimal places.
 
 ```{r echo=FALSE}
+1805/(1805 + 1227) 
+
 ```
 
-Your Answer:  
+Your Answer:  .595
 <span style="color:green">**Numeric Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:
 
