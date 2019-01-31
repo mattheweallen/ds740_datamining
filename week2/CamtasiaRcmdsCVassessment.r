@@ -34,7 +34,7 @@ groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k))  #produces list of group labe
 
 set.seed(2)
 cvgroups = sample(groups,n)  #orders randomly, with seed (2) to determine starting point
-
+cvgroups
 #prediction via cross-validation
 allpredictedCV = rep(0,n)
 for (i in 1:k)  {
@@ -44,6 +44,7 @@ for (i in 1:k)  {
 }
 
 plot(Fullfit$fitted.values,BodyFatSiri)
+abline(0,1)
 points(allpredictedCV,BodyFatSiri,pch=20,col="red")
 
 #the cross-validation assessment part
