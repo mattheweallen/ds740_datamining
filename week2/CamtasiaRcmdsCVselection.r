@@ -60,6 +60,7 @@ allModels = list(Model1,Model2,Model3,Model4,Model5,Model6,Model7,
 #applying 10-fold cross-validation for model selection
 k = 10 
 groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k))  #produces list of group labels
+groups
 set.seed(2)
 cvgroups = sample(groups,n)  #orders randomly, with seed (2) to determine starting point
 
@@ -82,7 +83,7 @@ for (m in 1:14) {
   allmodelCV[m] = sum((allpredictedCV-BodyFatSiri)^2)/n
 }
 
-
+cbind(allmodelMSE,allmodelMSEadj,allmodelCV)
 
 
 
@@ -96,7 +97,8 @@ points(1:14,allmodelMSEadj,col="blue",pch=8)
 points(1:14,allmodelCV,col="red",pch=20)
 	# CV(10), adjusted for the number of predictors, plotted against number of predictors
 
-
+#select model with anywhere between 4 and 9 predictors
+#abs, weight, wrist, and forearm
 
 
 
