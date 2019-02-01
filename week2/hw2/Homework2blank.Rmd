@@ -54,7 +54,7 @@ Note that there are five predictors, some of which are transformations of the or
 
 
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**: According to the description of the data, the diameter in inches was mislabeled as girth. From geometry, the volume of a cylinder is a function of diamter and height, so it makes sense to have Volume as the response variable. </span>
 
 ***
 
@@ -66,29 +66,29 @@ Note that there are five predictors, some of which are transformations of the or
 
 
 ```{r}
-
+trees = read.csv("C:/Users/irgepi/source/repos/ds740_datamining/week2/hw2/Trees.csv")
+colnames(trees)
+tree_volume_model = (Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height)
+tree_volume_fit = lm(tree_volume_model,data=trees)
+summary(tree_volume_fit)
 ```
 
 <span style="color:green">**Numeric Answer**  </span>  
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
-$\beta_0 =$   
-$\beta_1 =$   
-$\beta_2 =$   
-$\beta_3 =$  
-$\beta_4 =$   
-$\beta_5 =$   
+$\beta_0 =$ 48.914179  
+$\beta_1 =$ -8.228180   
+$\beta_2 =$ -0.616152  
+$\beta_3 =$ 0.103075 
+$\beta_4 =$ 0.311160  
+$\beta_5 =$ -0.001764  
 
 ### <span style="color:DarkViolet">Question 8</span> **<span style="color:Crimson">(2 points)</span>**
 <span style="color:DarkViolet">How many of these predictor variables are significant?</span>
 
 <span style="color:green">**Multiple Choice Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
-0,    
-1,  
-2,  
-3,  
-4, or   
-5
+    
+0
 
 
 *** 
@@ -103,11 +103,7 @@ $\beta_5 =$
 <span style="color:green">**Multiple Choice Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
-1,  
-5,  
-6,  
-31, or   
-32
+5
 
 
 
