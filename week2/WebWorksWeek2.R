@@ -160,3 +160,48 @@ for (fold in 1:m) {
 }
 mean( (y - mfoldCVpredictions)^2 )
 
+#problem 5 bootstrap
+attach(Boston)
+log.crim = log(Boston$crim)
+BostonTrans = data.frame(age,rad,log.crim)
+
+Partialmodel = (log.crim ~ age + rad)
+Partialfit = lm(Partialmodel,data=Boston)
+summary(Partialfit)
+
+#Coefficients:
+#  Estimate Std. Error t value Pr(>|t|)    
+#(Intercept) -4.226193   0.107770  -39.22   <2e-16 ***
+#  age          0.026097   0.001634   15.97   <2e-16 ***
+#  rad          0.173432   0.005282   32.84   <2e-16 ***
+
+
+#Estimating standard deviations with bootstrap
+library(boot)  #need to install package
+#define functions that output coefficients (parameters to be estimated)
+beta.fn = function(inputdata,index) {
+  lmfitboot = lm(formula = Partialmodel,data=inputdata[index,])
+  return(lmfitboot$coef)
+}
+
+#run the boot function to simulate re-samples (with replacement)
+#and obtain the coefficients for each re-sample
+#partial model bootstrap
+set.seed(100)
+Partialbootoutput = boot(BostonTrans,beta.fn,R=5000)
+print(Partialbootoutput)
+
+sd((Partialbootoutput$t)[,1])  #standard error as estimated via simulation
+hist((Partialbootoutput$t)[,1])
+#(Partialbootoutput$t)[,1] is all 1000 coefficient estimates for intercept (1st term)
+summary(Partialfit)$coef[1,2]  #standard error as estimated mathematically
+
+sd((Partialbootoutput$t)[,2])  #standard error as estimated via simulation
+hist((Partialbootoutput$t)[,2])
+#(Partialbootoutput$t)[,2] is all 1000 coefficient estimates for "Abs" (2nd term)
+summary(Partialfit)$coef[2,2]   #standard error as estimated mathematically
+
+sd((Partialbootoutput$t)[,3])  #standard error as estimated via simulation
+hist((Partialbootoutput$t)[,3])
+#(Partialbootoutput$t)[,3] is all 1000 coefficient estimates for "Weight" (3rd term)
+summary(Partialfit)$coef[3,2]   #standard error as estimated mathematically
