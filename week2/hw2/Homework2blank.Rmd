@@ -341,12 +341,15 @@ $Volume = \beta_0+\beta_5\cdot Girth^2\cdot Height$
 
 <span style="color:green">**Numeric Answer** </span>  
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
-For Model 1, $CV_{(31)}$ =  
-For Model 2, $CV_{(31)}$ =  
-For Model 3, $CV_{(31)}$ =  
-For Model 4, $CV_{(31)}$ =  
-For Model 5, $CV_{(31)}$ =  
-For Model 6, $CV_{(31)}$ =  
+
+#         
+
+For Model 1, $CV_{(31)}$ = 8.957115  
+For Model 2, $CV_{(31)}$ = 18.157829  
+For Model 3, $CV_{(31)}$ = 7.904433  
+For Model 4, $CV_{(31)}$ = 8.037109  
+For Model 5, $CV_{(31)}$ = 7.075083 
+For Model 6, $CV_{(31)}$ = 6.649682 
 (use code space in next question)  
 
 ### <span style="color:DarkViolet">Question 31</span> **<span style="color:Crimson">(4 points)</span>**:
@@ -355,6 +358,22 @@ For Model 6, $CV_{(31)}$ =
 
 <span style="color:green">**Possible Answer**: </span>
 ```{r echo=TRUE}
+
+Model1=(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height)
+
+Model2=(Volume ~ Girth + Height)
+
+Model3=(Volume ~ Girth + Height + GirthHeight)
+
+Model4=(Volume ~ Girth + Height + Girth2 + Girth2Height)
+
+Model5=(Volume ~ Girth2 + Girth2Height)
+
+Model6=(Volume ~ Girth2Height)
+
+#Model4 = (BodyFatSiri ~ Abs+Weight+Wrist+Forearm)
+allModels = list(Model1,Model2,Model3,Model4,Model5,Model6)	
+
 #Q31
 
 #Q25
@@ -368,6 +387,36 @@ For Model 6, $CV_{(31)}$ =
 #Q29
 
 #Q30
+
+#applying 10-fold cross-validation for model selection
+#k = 10 
+#groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k))  #produces list of group labels
+#groups
+#set.seed(2)
+#cvgroups = sample(groups,n)  #orders randomly, with seed (2) to determine starting point
+
+#allmodelMSE = rep(NA,6)  #place-holder for results
+#allmodelMSEadj = rep(NA,6)  #place-holder for results
+allmodelCV31 = rep(NA,6) #place-holder for results
+	#fits for each model m, including predictors 1:m in order of forward step regression selection
+for (m in 1:6) {
+  
+  #prediction via cross-validation
+  allpredictedCV = rep(0,31)
+  
+  #####################################
+  for (i in 1:31)  {
+    lmfitCV = lm(formula = allModels[[m]],data=trees[-i,])
+    allpredictedCV[i] = predict.lm(lmfitCV,trees[i,])
+  }
+  
+ 
+  #####################################
+  
+  allmodelCV31[m] = sum((allpredictedCV-trees$Volume)^2)/31
+}
+allmodelCV31
+
 
 ```
 
@@ -383,7 +432,7 @@ Model 2,
 Model 3,  
 Model 4,  
 Model 5, or  
-Model 6  
+-> Model 6  
 
 ***
 
@@ -392,6 +441,7 @@ Model 6
 
 <span style="color:DarkViolet">Explain why you chose the model selected in the previous question. </span>
 
+Model 6 has the lowest training error.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -414,16 +464,40 @@ Model 6
 
 #Q39
 
+k=5
+groups = c(rep(1:k,6),1)
+set.seed(2)
+cvgroups = sample(groups,31)  #orders randomly, with seed (2) to determine starting point
+# Questions 11-12
+allmodelCV5 = rep(NA,6)
+
+
+
+for (m in 1:6) {
+  allpredictedCV = rep(0,31)
+  for (i in 1:k)  {
+    groupi = (cvgroups == i)
+    lmfitCV = lm(formula = allModels[[m]],data=trees,subset=!groupi)
+    allpredictedCV[groupi] = predict.lm(lmfitCV,trees[groupi,])
+  }
+
+  CV5 = sum((allpredictedCV-trees$Volume)^2)/31
+  allmodelCV5[m] = sum((allpredictedCV-trees$Volume)^2)/31
+}
+allmodelCV5
+
+
+
 ```
 
 <span style="color:green">**Numeric Answer** </span>  
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
-For Model 1, $CV_{(5)}$ =  
-For Model 2, $CV_{(5)}$ =  
-For Model 3, $CV_{(5)}$ =  
-For Model 4, $CV_{(5)}$ =  
-For Model 5, $CV_{(5)}$ =  
-For Model 6, $CV_{(5)}$ =  
+For Model 1, $CV_{(5)}$ = 19.741684 
+For Model 2, $CV_{(5)}$ = 19.973142 
+For Model 3, $CV_{(5)}$ = 10.012937 
+For Model 4, $CV_{(5)}$ = 13.323779 
+For Model 5, $CV_{(5)}$ = 10.034371 
+For Model 6, $CV_{(5)}$ = 9.243768 
 (use code space above)  
 
 
@@ -439,7 +513,7 @@ Model 2,
 Model 3,  
 Model 4,  
 Model 5, or  
-Model 6  
+->Model 6  
 
 
 ### <span style="color:DarkViolet">Question 41</span> **<span style="color:Crimson">(2 points)</span>**:
@@ -448,10 +522,14 @@ Model 6
 
 <span style="color:green">**Text Answer**: </span>
 
+Model 6 has the lowest error.
 
 ### <span style="color:DarkViolet">Question 42</span> **<span style="color:Crimson">(3 points)</span>**:
 
 <span style="color:DarkViolet">Considering the form of the model that was selected by cross-validation, why does this model make sense from a practical standpoint? </span>
+
+
+It is very easy to calculate.
 
 <span style="color:green">**Text Answer**: </span>
 
