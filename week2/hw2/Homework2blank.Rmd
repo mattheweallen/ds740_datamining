@@ -67,7 +67,7 @@ Note that there are five predictors, some of which are transformations of the or
 
 ```{r}
 trees = read.csv("C:/Users/irgepi/source/repos/ds740_datamining/week2/hw2/Trees.csv")
-colnames(trees)
+#colnames(trees)
 tree_volume_model = (Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height)
 tree_volume_fit = lm(tree_volume_model,data=trees)
 summary(tree_volume_fit)
@@ -119,9 +119,23 @@ Enter your R code below.</span>
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
 # Question 10
-
+k=5
+groups = c(rep(1:k,6),1)
+set.seed(2)
+cvgroups = sample(groups,31)  #orders randomly, with seed (2) to determine starting point
 # Questions 11-12
+allpredictedCV = rep(0,31)
 
+for (i in 1:k)  {
+  groupi = (cvgroups == i)
+  lmfitCV = lm(formula = tree_volume_model,data=trees,subset=!groupi)
+  allpredictedCV[groupi] = predict.lm(lmfitCV,trees[groupi,])
+}
+allpredictedCV[1]
+allpredictedCV[2]
+
+CV5 = sum((allpredictedCV-trees$Volume)^2)/31
+CV5
 ```
 
 
@@ -150,7 +164,8 @@ Enter your R code below.</span>
 
 ```{r}
 # Question 13
-
+CV5 = sum((allpredictedCV-trees$Volume)^2)/31
+CV5
 ```
 
 <span style="color:green">**Numeric Answer** </span>
@@ -166,7 +181,7 @@ Enter your R code below.</span>
 
 A) 	The MSE value is **greater**.
 
-B) 	The MSE value is **less**.
+-> B) 	The MSE value is **less**.
 
 C) 	The two values are about the **same**.
 
@@ -175,6 +190,7 @@ C) 	The two values are about the **same**.
 ### <span style="color:DarkViolet">Question 15</span> **<span style="color:Crimson">(2 points)</span>**
 <span style="color:DarkViolet">Is the MSE of 5.70 accurate?  **Explain why or why not.** </span>
 
+The MSE is not accurate. It is a calculation of the error based on an overfit of the data.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -202,6 +218,20 @@ Enter your R code below.</span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r echo=TRUE}
+library(boot)  #need to install package
+	#define functions that output coefficients (parameters to be estimated)
+beta.fn = function(inputdata,index) {
+  lmfitboot = lm(formula = tree_volume_model,data=inputdata[index,])
+  return(lmfitboot$coef)
+}
+
+	#run the boot function to simulate re-samples (with replacement)
+	#and obtain the coefficients for each re-sample
+	#partial model bootstrap
+set.seed(2)
+bootoutput = boot(trees,beta.fn,R=1000)
+print(bootoutput)
+
 # Question 17 
 
 # Question 18
@@ -234,6 +264,15 @@ $SE(\hat{\beta_5}) =$
 
 ### <span style="color:DarkViolet">Question 24</span> **<span style="color:Crimson">(2 points)</span>**:
 
+Bootstrap Statistics :
+        original        bias     std. error
+t1* 48.914178608 -13.961072182 130.03305599
+t2* -8.228180223   2.653216677  20.77020206
+t3* -0.616152497   0.173537338   1.80913201
+t4*  0.103075071  -0.033028970   0.28116241
+t5*  0.311160154  -0.128803517   0.81741639
+t6* -0.001764375   0.001611177   0.01070411
+
 <span style="color:DarkViolet">The standard errors estimated from usual linear regression methods are shown in the R output below:</span>
 
 $\texttt{Coefficients:				}$
@@ -260,7 +299,7 @@ $\texttt{Girth2Height	 -0.001764	 0.006621	-0.266	   0.792}$
 A) 	The estimates from usual linear regression methods are **greater**.
 
 	
-B)  The estimates from usual linear regression methods are **less**.
+->B)  The estimates from usual linear regression methods are **less**.
 
 	
 C) 	The two sets of estimates are about the **same**.
