@@ -568,8 +568,48 @@ $\texttt{groups = c(rep(1:10,39),1,2)}$
 
 <span style="color:green">**Code Answer**: </span>
 ```{r echo=TRUE}
+library(ISLR)
+library(FNN)
 
+data("Auto")
+set.seed(2)
 
+num_examples = dim(Auto)[1] #get the number of rows
+
+k = 10 #using 10-fold cross-validation
+groups = c(rep(1:k,floor(num_examples/k)),1:(num_examples-floor(num_examples/k)*k))  #produces list of group labels
+#groups
+cvgroups = sample(groups,num_examples)  #orders randomly, with seed (2) to determine starting point
+#prediction via cross-validation
+allpredictedCV = rep(0,num_examples)
+
+for (i in 1:k)  {
+  groupi = (cvgroups == i)
+  
+  train.x = Auto[!groupi,c("weight","year")]
+  train.y = Auto[!groupi,"mpg"]
+  valid.x = Auto[groupi,c("weight","year")]
+  
+  train.x.std = scale(train.x)
+  attr(train.x.std, "scaled:center")
+  attr(train.x.std, "scaled:scale")
+  
+  #standardize validation set with mean and standard deviation of the training set
+  valid.x.std = scale(valid.x, center = attr(train.x.std, "scaled:center"), scale = attr(train.x.std, "scaled:scale"))
+  
+  #do the analysis
+  predictions = knn.reg(train.x.std, valid.x.std, train.y, k=1)
+  #print(class(predictions$pred))
+  #print(predictions$pred)
+  #print(length(predictions$pred))
+  #print(length(Boston[groupi,"crim"]))
+  #allpredictedCV[i] = ((Boston[groupi,"crim"]-predictions$pred)^2)/length(predictions$pred)
+  #allpredictedCV[i] = mean((Boston[groupi,"crim"]-predictions$pred)^2)
+  allpredictedCV[groupi] = predictions$pred
+}
+
+#mean(allpredictedCV)
+mean( (Auto[,"mpg"] - allpredictedCV)^2 )
 ```
 
 
@@ -580,7 +620,7 @@ $\texttt{groups = c(rep(1:10,39),1,2)}$
 
 <span style="color:green">**Multiple Choice Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of 
-$CV_{(10)} > MSE$,  
+-> $CV_{(10)} > MSE$,  
 $CV_{(10)} < MSE$, or  
 $CV_{(10)} \approx MSE$
 
@@ -593,8 +633,42 @@ Upload your plot to Homework 2: CV(10) Plot.  </span>
 
 <span style="color:green">**Plot Answer - submit to D2L discussion board *Homework 2: CV(10) Plot* **: </span>
 ```{r echo=FALSE}
+num_groups = 10
+cv10Byk = rep(NA,30)
 
+for(k in 1:30) {
+  allpredictedCV = rep(0,num_examples)
+  for (i in 1:num_groups)  {
+    groupi = (cvgroups == i)
+  
+    train.x = Auto[!groupi,c("weight","year")]
+    train.y = Auto[!groupi,"mpg"]
+    valid.x = Auto[groupi,c("weight","year")]
+  
+    train.x.std = scale(train.x)
+    attr(train.x.std, "scaled:center")
+    attr(train.x.std, "scaled:scale")
+  
+  #standardize validation set with mean and standard deviation of the training set
+    valid.x.std = scale(valid.x, center = attr(train.x.std, "scaled:center"), scale = attr(train.x.std, "scaled:scale"))
+  
+  #do the analysis
+    predictions = knn.reg(train.x.std, valid.x.std, train.y, k=k)
+  #print(class(predictions$pred))
+  #print(predictions$pred)
+  #print(length(predictions$pred))
+  #print(length(Boston[groupi,"crim"]))
+  #allpredictedCV[i] = ((Boston[groupi,"crim"]-predictions$pred)^2)/length(predictions$pred)
+  #allpredictedCV[i] = mean((Boston[groupi,"crim"]-predictions$pred)^2)
+    allpredictedCV[groupi] = predictions$pred
+  }
 
+  #mean(allpredictedCV)
+  cv10Byk[k] = mean( (Auto[,"mpg"] - allpredictedCV)^2 )
+}
+cv10Byk
+
+plot(cv10Byk~seq(1, 30),xlab="k",ylab="CV10")
 ```
 
 
@@ -602,6 +676,7 @@ Upload your plot to Homework 2: CV(10) Plot.  </span>
 ### <span style="color:DarkViolet">Question 47</span> **<span style="color:Crimson">(2 points)</span>**:
 
 <span style="color:DarkViolet">Which k (number of nearest neighbors) would you select based on the values of $CV_{(10)}$ for 10-fold CV?
+k=20 looks like it has the least error.
 
  </span>
 
