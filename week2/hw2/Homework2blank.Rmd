@@ -103,7 +103,7 @@ $\beta_5 =$ -0.001764
 <span style="color:green">**Multiple Choice Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
-5
+1
 
 
 
@@ -676,7 +676,7 @@ plot(cv10Byk~seq(1, 30),xlab="k",ylab="CV10")
 ### <span style="color:DarkViolet">Question 47</span> **<span style="color:Crimson">(2 points)</span>**:
 
 <span style="color:DarkViolet">Which k (number of nearest neighbors) would you select based on the values of $CV_{(10)}$ for 10-fold CV?
-k=20 looks like it has the least error.
+k=19 looks like it has the least error.
 
  </span>
 
@@ -687,6 +687,8 @@ k=20 looks like it has the least error.
 ### <span style="color:DarkViolet">Question 48 </span> **<span style="color:Crimson">(1 point)</span>**:
 
 <span style="color:DarkViolet">Explain why you chose the k value specified in the previous question. *Comment on both model predictive ability and model complexity.*</span>
+
+k =20 has the minimum error, but it is better to have a k that is odd in case of ties, so k=19 was selected. Based on the error rate, k=19 is close to the minimum error rate, and so has good predictive ability. It is also large enough that the model will not over fit, and thus make it easier to interpret boundaries between points. There is also a rule of thumb for selecting k that is the square root of the number of examples. Here this is the square root 392, which happens to equal 19.8. Rounding down gives us 19.
 
 <span style="color:green">**Text Answer**: </span>
 
