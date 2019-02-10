@@ -93,6 +93,8 @@ hist(wisc$PERNP)
 hist(wisc$WKHP)
 hist(wisc$JWMNP)
 #total earnings and travel time to work appear to be right skewed
+wisc$PERNP = log(wisc$PERNP)
+wisc$JWMNP = log(wisc$JWMNP)
 ```
 
 ### <span style="color:DarkViolet">Question 3</span> **<span style="color:Crimson">(2 points)</span>**
@@ -102,7 +104,13 @@ If you log-transformed any variables in the previous question, use the **transfo
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
-
+library(leaps)
+regfit.full = regsubsets(PERNP~.,data=wisc,method="seqrep",nvmax=41)
+#plot(regfit.full)
+regfit.summary = summary(regfit.full)
+#regfit.summary$adjr2
+plot(regfit.summary$bic, xlab="Number of Variables", ylab = "BIC", type="l", lwd=2)
+which.min(regfit.summary$bic)
 ```
 
 ***
@@ -113,16 +121,21 @@ If you log-transformed any variables in the previous question, use the **transfo
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
 # Question 4
-
+#plot(regfit.full,scale="adjr2")
+plot(regfit.summary$adjr2, xlab="Number of Variables", ylab = "adjr2", type="l", lwd=2)
+which.max(regfit.summary$adjr2)
 ```
 
 ### <span style="color:DarkViolet">Question 5</span> **<span style="color:Crimson">(1 points)</span>**
 <span style="color:DarkViolet">How many variables (not counting the intercept) are in the best model, as measured by adjusted $R^2$?</span>
 
+36 variables  
+
 <span style="color:green">**Numeric Answer**  </span> **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
 ### <span style="color:DarkViolet">Question 6</span> **<span style="color:Crimson">(1 points)</span>**
 <span style="color:DarkViolet">How many variables (not counting the intercept) are in the best model, as measured by BIC?</span>
+19 variables
 
 <span style="color:green">**Numeric Answer**  </span> **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
