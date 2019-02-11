@@ -83,3 +83,6 @@ se[14]
 which(MSE <= MSE[14] + se[14])
 #based on one standard error rule choose 2, most parsimonious,
 coef(regfit,2)
+
+class(regfit)
+#i think when predict in the loop is called it looks for predict. + class(regfit) or predict.regsubsets
