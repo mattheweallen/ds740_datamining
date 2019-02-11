@@ -77,7 +77,7 @@ for(i in 1:k) {
 MSE = apply(group.error, 1, mean)
 plot(MSE)
 which.min(MSE)
-
+#14 is the min found, look for models within one std dev, pick one that has the fewest variables
 se = apply(group.error,1,sd)/sqrt(k)
 se[14]
 which(MSE <= MSE[14] + se[14])

@@ -105,9 +105,9 @@ If you log-transformed any variables in the previous question, use the **transfo
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
 library(leaps)
-regfit.full = regsubsets(PERNP~.,data=wisc,method="seqrep",nvmax=41)
+regfit = regsubsets(PERNP~.,data=wisc,method="seqrep",nvmax=41)
 #plot(regfit.full)
-regfit.summary = summary(regfit.full)
+regfit.summary = summary(regfit)
 #regfit.summary$adjr2
 plot(regfit.summary$bic, xlab="Number of Variables", ylab = "BIC", type="l", lwd=2)
 which.min(regfit.summary$bic)
@@ -151,8 +151,43 @@ Enter your R code below.</span>
 
 # Question 8
 
-```
+#define a predict() function for regsubset objects, try not running and see if predict function below works
+predict.regsubsets <- function(object, newdata, id, ...) {
+    form = as.formula(object$call[[2]])
+    mat = model.matrix(form, newdata)
+    coefi = coef(object, id=id)
+    xvars = names(coefi)
+    mat[,xvars] %*% coefi
+} #end function predict.regsubsets
 
+#cross validation of logistic regression
+n = dim(wisc)[1] #number of observations
+library(leaps)
+#n=42
+k = 10 #10 fold cross validation
+groups = c(rep(1:k,floor(n/k)), 1:(n-floor(n/k)*k))
+
+set.seed(3) # ensures replicable results
+cvgroups = sample(groups, n) #places observations in random groups
+group.error = matrix(,nr=41, nc=k) #row = number of variables, column = which fold
+
+for(i in 1:k) {
+  groupi = (cvgroups == i) #all observations in group i
+  
+  cv.fit = regsubsets(PERNP~.,data=wisc[!groupi,],method="seqrep",nvmax=41)
+  
+  for(j in 1:16) {
+    y.pred = predict(cv.fit, newdata = wisc[groupi,], id=j)
+    group.error[j,i] = mean((wisc$PERNP[groupi] - y.pred)^2) 
+  } #end iter over model size
+} #end iter over folds
+
+MSE = apply(group.error, 1, mean)
+plot(MSE)
+which.min(MSE)
+
+```
+number of variables == 15 gives lowest MSE
 ### <span style="color:DarkViolet">Question 8</span> **<span style="color:Crimson">(1 points)</span>**
 <span style="color:DarkViolet">Find the mean of the MSEs from all the folds with the same number of variables.  Which number of variables gives the lowest cross-validation MSE?</span>
 
@@ -166,17 +201,27 @@ Enter your R code below.</span>
 ```{r, echo=TRUE}
 # Question 9
 
+#find models within one standard deviation of best model. pick simplest one.
+se = apply(group.error,1,sd)/sqrt(k)
+se[15]
+which(MSE <= MSE[15] + se[15])
+#based on one standard error rule choose 5, most parsimonious,
+coef(regfit,5)
 ```
 
 ***
 
 ### <span style="color:DarkViolet">Question 10</span> **<span style="color:Crimson">(1 points)</span>**
 <span style="color:DarkViolet">How many variables (not counting the intercept) are in the most parsimonious model with a CV error within 1 standard error of the lowest?</span>
-
+5 variables is the most parsimonious model with a CV error within 1 standard error of the lowest.
 <span style="color:green">**Numeric Answer**  </span> **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
 ### <span style="color:DarkViolet">Question 11</span> **<span style="color:Crimson">(4 points)</span>**
 <span style="color:DarkViolet">Use $\texttt{regsubsets}$ to find the best model for the whole data set which has the number of variables you found in the previous question.  Write 4-6 sentences interpreting the signs of the coefficients.  Include possible explanations for the associations.  **Note**: It may be helpful to refer to the data dictionary and/or a map of Wisconsin, such as https://en.wikipedia.org/wiki/Wisconsin#/media/File:Wisconsin-counties-map.gif.  Refer to variables in plain English. </span>
+
+(Intercept)        COW6        MAR5        SEX2        WKHP   Education 
+ 8.19757196 -0.63769603 -0.24779279 -0.28139377  0.02987906  0.09413591 
+
 
 <span style="color:green">**Text Answer**: </span>
 .  
@@ -207,14 +252,19 @@ Enter your R code below.</span>
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
 # Question 12
+library(ISLR)
+data("Auto")
+Auto$mpg.bin = as.factor(ifelse(Auto$mpg >median(Auto$mpg), 1, 0))
+Auto$origin = as.factor(Auto$origin)
 
+pairs(Auto)
 ```
 
 ### <span style="color:DarkViolet">Question 13</span> **<span style="color:Crimson">(2 points)</span>**
 <span style="color:DarkViolet">Make a matrix of scatterplots of the variables in **Auto**.  Do you have any concerns about collinearity?  If so, for which variables?  Explain.</span>
 
 <span style="color:green">**Text Answer**: </span>
-
+Combinations of the variables displacement, horsepower, weight and acceleration all appear to have a strong linear relationship with each other.
 
 ***
 
@@ -224,21 +274,26 @@ Enter your R code below.</span>
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
 # Question 14
-
+fit = glm(mpg.bin ~ .-mpg-name, data=Auto, family = "binomial")
+#summary(fit)
 # Question 15
-
+#install.packages("car")
+library(car)
+vif(fit)
 ```
 
 
 ### <span style="color:DarkViolet">Question 15</span> **<span style="color:Crimson">(1 points)</span>**
 <span style="color:DarkViolet">Compute the variance inflation factor for each of the predictor variables in the model.  Which variable(s) have VIFs greater than or equal to 10?</span>
 
+The variable displacement has a VIF greater than 10.
+
 <span style="color:green">**Multiple SELECT Answer** </span>
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 cylinders,  
 
 	
-displacement,  
+->displacement,  
 
 	
 horsepower, and/or
@@ -254,7 +309,20 @@ Enter your R code below.</span>
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
 # Question 16
-
+#cross validation of logistic regression
+n = dim(Auto)[1] #number of observations
+k = 10 #10 fold cross validation
+groups = c(rep(1:k,floor(n/k)), 1:(n-floor(n/k)*k))
+set.seed(3) # ensures replicable results
+cvgroups = sample(groups, n) #places observations in random groups
+predictvals = rep(-1,n) #makes trouble shooting easier
+Auto$name <- NULL # remove name column
+for(i in 1:k) {
+  groupi = (cvgroups == i) #all observations in group i
+  fit = glm(mpg.bin ~ .-mpg-displacement, data=Auto[!groupi,], family = "binomial")
+  predictvals[groupi] = predict(fit, Auto[groupi,], type = "response") #response indicates to give predicted probability vs logit or log odds
+  
+}
 ```
 
 
@@ -267,9 +335,14 @@ Enter your R code below.</span>
 
 ```{r}
 #Question 17
-
+#install.packages("pROC")
+library(pROC)
+myroc = roc(response=Auto$mpg.bin, predictor = predictvals)
+plot.roc(myroc)
+myroc$auc
 ```
 
+Area under the curve: 0.9693
 
 ### <span style="color:DarkViolet">Question 18</span> **<span style="color:Crimson">(3 points)</span>**
 <span style="color:DarkViolet">Upload an image of your ROC curve to *Homework 3: ROC Curve* (discussion board on D2L).  As part of your discussion post, write 1-2 sentences assessing the model based on the ROC curve and AUC.</span>
