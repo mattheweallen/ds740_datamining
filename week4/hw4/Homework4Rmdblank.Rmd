@@ -82,14 +82,22 @@ boxplot(mpg~domestic, data=Auto, xlab="Domestic", ylab="MPG")
 
 ```{r,echo=FALSE}
 #Question 3  
-#Question 4  
+require(MASS)
+ldafit = lda(Auto$domestic~Auto$mpg)
+#Question 4
+ldafit
 ```
 
 
-<span style="color:DarkViolet"> Mean mpg for domestic vehicles =</span>
+#Group means:
+#  Auto$mpg
+#0 29.13333
+#1 20.03347
+
+<span style="color:DarkViolet"> Mean mpg for domestic vehicles = 20.03347</span>
 
 <span style="color:green">**Numeric Answer**  </span> **<span style="color:red">(AUTOGRADED on D2L)</span>**:   
-<span style="color:DarkViolet"> Mean mpg for foreign vehicles =</span>
+<span style="color:DarkViolet"> Mean mpg for foreign vehicles = 29.13333</span>
 
 <span style="color:green">**Numeric Answer**  </span> **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
@@ -104,6 +112,10 @@ boxplot(mpg~domestic, data=Auto, xlab="Domestic", ylab="MPG")
 
 <span style="color:green">**Text Answer**: </span>
 
+Normality Assumption:
+
+Equal Variance:
+
 ***
 
 #####################################
@@ -116,6 +128,7 @@ Number of domestic vehicles that are correctly classified = </span>
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:
 ```{r,echo=FALSE}
+
 ```
 
 
