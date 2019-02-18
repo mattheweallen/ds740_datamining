@@ -208,6 +208,9 @@ F) 	year
 <span style="color:green">**Graph Answer**  </span>: 
 (post to discussion board on D2L)
 ```{r,echo=FALSE}
+library(pROC)
+myroc = roc(response=Auto$domestic, predictor = Auto$weight)
+plot.roc(myroc, main="ROC of domestic car predicted by weight")
 ```
 
 #####################################
