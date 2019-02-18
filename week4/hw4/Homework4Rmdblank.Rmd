@@ -210,6 +210,7 @@ F) 	year
 ```{r,echo=FALSE}
 library(pROC)
 myroc = roc(response=Auto$domestic, predictor = Auto$weight)
+myroc$auc
 plot.roc(myroc, main="ROC of domestic car predicted by weight")
 ```
 
@@ -218,6 +219,8 @@ plot.roc(myroc, main="ROC of domestic car predicted by weight")
 #####################################
 
 <span style="color:DarkViolet"> The ROC curve and R output for using *mpg* to predict *Domestic* is shown in the image. Discuss whether you would use *mpg* or the variable you selected previously (among *cylinders*, *displacement*, *horsepower*, *weight*, *acceleration*, *year*) to predict *Domestic*.</span>
+
+Weight has a larger area under the curve than does mpg (0.8741 vs 0.8407). Based purely on AUC, weight should be selected. However, weight may violate the equal variance condition and the AUC between weight and mpg are not that much different, so I would keep mpg.
 
 [See D2L for image, not able to include in code.]  
 

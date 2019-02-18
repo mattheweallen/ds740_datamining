@@ -106,7 +106,7 @@ If you log-transformed any variables in the previous question, use the **transfo
 ```{r, echo=TRUE}
 library(leaps)
 regfit = regsubsets(PERNP~.,data=wisc,method="seqrep",nvmax=41)
-#plot(regfit.full)
+plot(regfit)
 regfit.summary = summary(regfit)
 #regfit.summary$adjr2
 plot(regfit.summary$bic, xlab="Number of Variables", ylab = "BIC", type="l", lwd=2)
@@ -176,7 +176,7 @@ for(i in 1:k) {
   
   cv.fit = regsubsets(PERNP~.,data=wisc[!groupi,],method="seqrep",nvmax=41)
   
-  for(j in 1:16) {
+  for(j in 1:41) {
     y.pred = predict(cv.fit, newdata = wisc[groupi,], id=j)
     group.error[j,i] = mean((wisc$PERNP[groupi] - y.pred)^2) 
   } #end iter over model size
@@ -187,7 +187,7 @@ plot(MSE)
 which.min(MSE)
 
 ```
-number of variables == 15 gives lowest MSE
+number of variables == 39  gives lowest MSE
 ### <span style="color:DarkViolet">Question 8</span> **<span style="color:Crimson">(1 points)</span>**
 <span style="color:DarkViolet">Find the mean of the MSEs from all the folds with the same number of variables.  Which number of variables gives the lowest cross-validation MSE?</span>
 
@@ -203,26 +203,34 @@ Enter your R code below.</span>
 
 #find models within one standard deviation of best model. pick simplest one.
 se = apply(group.error,1,sd)/sqrt(k)
-se[15]
-which(MSE <= MSE[15] + se[15])
-#based on one standard error rule choose 5, most parsimonious,
-coef(regfit,5)
+se[39]
+which(MSE <= MSE[39] + se[39])
+#based on one standard error rule choose 6, most parsimonious,
+coef(regfit,6)
+
+#find factors
+summary(wisc)
+levels(wisc$COW)
+levels(wisc$MAR)
 ```
 
 ***
 
 ### <span style="color:DarkViolet">Question 10</span> **<span style="color:Crimson">(1 points)</span>**
 <span style="color:DarkViolet">How many variables (not counting the intercept) are in the most parsimonious model with a CV error within 1 standard error of the lowest?</span>
-5 variables is the most parsimonious model with a CV error within 1 standard error of the lowest.
+6 variables is the most parsimonious model with a CV error within 1 standard error of the lowest.
 <span style="color:green">**Numeric Answer**  </span> **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
 ### <span style="color:DarkViolet">Question 11</span> **<span style="color:Crimson">(4 points)</span>**
 <span style="color:DarkViolet">Use $\texttt{regsubsets}$ to find the best model for the whole data set which has the number of variables you found in the previous question.  Write 4-6 sentences interpreting the signs of the coefficients.  Include possible explanations for the associations.  **Note**: It may be helpful to refer to the data dictionary and/or a map of Wisconsin, such as https://en.wikipedia.org/wiki/Wisconsin#/media/File:Wisconsin-counties-map.gif.  Refer to variables in plain English. </span>
 
-(Intercept)        COW6        MAR5        SEX2        WKHP   Education 
- 8.19757196 -0.63769603 -0.24779279 -0.28139377  0.02987906  0.09413591 
+LOG_PERNP   (Intercept)        COW6        MAR5        SEX2        WKHP   Education 
+              8.19757196 -0.63769603 -0.24779279 -0.28139377  0.02987906  0.09413591 
+
+Total person's earnings (PERNP) has been log transformed, so to get the real effect of each variable in dollars both sides need to be exponentiated. The sign on education is positive, so each additional year of education has a positive effect on total earnings. The sign on sex(SEX2) is negative. Male is coded as 1 and female is coded as 2, which would mean that being female has more of a negative effect on total person's earning than being male. Usual hours worked(WHKP) is positive, which makes sense. The more hours you work the more your total earnings. Marital status(MAR5) is negative. Married is coded as 1 the lowest value, so married people tend to make more than non married people. Class of worker is also negative with the lowest value of 1 indicating the person works in the private for profit sector. Workers in the private sector tend to make more than state, federal and non profit employees.
 
 
+PERNP(Total person's earnings) = COW6(Class of worker) + MAR5(Marital status) + SEX2(Sex) + WKHP(Usual hours worked per week past 12 months) + Education(Years of education, not counting kindergarten.)
 <span style="color:green">**Text Answer**: </span>
 .  
 .  
