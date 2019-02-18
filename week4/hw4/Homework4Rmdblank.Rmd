@@ -243,7 +243,7 @@ Weight has a larger area under the curve than does mpg (0.8741 vs 0.8407). Based
 
 <span style="color:DarkViolet">Make a scatterplot of *mpg* and *displacement*, marked by *origin*.  Upload your plot to **Homework 4: Scatterplot of mpg and displacement** discussion. </span>
 #https://stackoverflow.com/questions/17551193/r-color-scatter-plot-points-based-on-values
-
+#https://stackoverflow.com/questions/41704404/r-plot-color-legend-by-factor
 #todo should displacement have been used instead of weight for problem 1?
 <span style="color:green">**Graph Answer**  </span>: 
 (post to discussion board on D2L)
@@ -256,8 +256,10 @@ Auto$Colour="black"
 Auto$Colour[Auto$origin==3]="red"
 Auto$Colour[Auto$origin==1]="blue"
 # Plot all points at once, using newly generated colours
-plot(Auto$mpg,Auto$displacement, col=Auto$Colour)
-
+{
+plot(Auto$mpg~Auto$displacement, col=Auto$Colour, xlab="displacement", ylab = "mpg", pch=16)
+legend("topright", legend=c("American","European","Japanese"), pch=16, col=c("blue","black","red"))
+}
 ```
 
 
@@ -268,20 +270,24 @@ plot(Auto$mpg,Auto$displacement, col=Auto$Colour)
 <span style="color:DarkViolet">Fit the linear discriminant analysis, using the predictors mpg, cylinders, displacement, horsepower, and weight to predict the response origin. Report the mean mpg for each group.</span>   
 
 ```{r,echo=FALSE}
-#Question 14
-#Question 15
-#Question 16
+library(MASS)
+attach(Auto)
+ldafit = lda(origin~mpg+cylinders+displacement+horsepower+weight)
+ldafit
+#Question 14, 20.03347
+#Question 15, 27.60294
+#Question 16, 30.45063
 ```
 
-Mean mpg for American vehicles =  
+Mean mpg for American vehicles = 20.03347  
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
-Mean mpg for European vehicles =  
+Mean mpg for European vehicles = 27.60294 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
-Mean mpg for Japanese vehicles =  
+Mean mpg for Japanese vehicles = 30.45063  
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
@@ -296,20 +302,28 @@ Mean mpg for Japanese vehicles =
 
 
 ```{r,echo=FALSE}
+fittedclass = predict(ldafit,data=Auto)$class
+table(Auto$origin,fittedclass)
+diag(table(Auto$origin,fittedclass))
+
+n = dim(Auto)[1]
+ErrorLDA = sum(origin != fittedclass)/n
+ErrorLDA
+
 #Question 17
 #Question 18
 #Question 19
 ```
 
-Number of American vehicles that are correctly classified =  
+Number of American vehicles that are correctly classified = 208 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
-Number of European vehicles that are correctly classified =  
+Number of European vehicles that are correctly classified = 27 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
  
-Number of Japanese vehicles that are correctly classified =  
+Number of Japanese vehicles that are correctly classified = 57 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
@@ -329,11 +343,18 @@ Number of Japanese vehicles that are correctly classified =
 predict whether the vehicle is American, European, or Japanese.
 </span>
 
+```{r,echo=FALSE}
+#Auto$mpg+Auto$cylinders+Auto$displacement+Auto$horsepower+Auto$weight
+ldafit
+newdata = data.frame(mpg = 20, cylinders = 8, displacement = 320, horsepower = 280, weight = 3600)
+predict(ldafit,newdata)$class
+```
+
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 American,  
 European,  
-Japanese  
+->Japanese  
 
 ***
 
@@ -345,20 +366,30 @@ Japanese
 **Note**: overall error rate is 0.2245.    
 
 ```{r,echo=FALSE}
+qdafit = qda(origin~mpg+cylinders+displacement+horsepower+weight)
+qdafit
+
+fittedclassQDA = predict(qdafit,data=Auto)$class
+table(Auto$origin,fittedclassQDA)
+diag(table(Auto$origin,fittedclassQDA))
+
+n = dim(Auto)[1]
+ErrorQDA = sum(origin != fittedclassQDA)/n
+ErrorQDA
 #Question 21
 #Question 22
 #Question 23
 ```
 
-Number of American vehicles that are correctly classified =  
+Number of American vehicles that are correctly classified = 206 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
-Number of European vehicles that are correctly classified =  
+Number of European vehicles that are correctly classified = 29 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
  
-Number of Japanese vehicles that are correctly classified =  
+Number of Japanese vehicles that are correctly classified = 69 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
 
@@ -379,6 +410,13 @@ predict whether the vehicle is American, European, or Japanese.
 </span>
 
 
+```{r,echo=FALSE}
+#Auto$mpg+Auto$cylinders+Auto$displacement+Auto$horsepower+Auto$weight
+#ldafit
+newdata = data.frame(mpg = 20, cylinders = 8, displacement = 320, horsepower = 280, weight = 3600)
+predict(qdafit,newdata)$class
+```
+
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 American,  
@@ -393,7 +431,24 @@ Japanese
 
 <span style="color:DarkViolet"> Describe how the predictive abilities (as assessed on the original data) compare between LDA and QDA fits.</span>
 
+   fittedclassQDA
+      1   2   3
+  1 206  15  24
+  2   6  29  33
+  3   6   4  69
 
+   fittedclassLDA
+      1   2   3
+  1 208   9  28
+  2  12  27  29
+  3   1  21  57
+
+
+The QDA fit overall is a little better. It is significantly better at predicting Japanese origin.
+
+```{r,echo=FALSE}
+
+```
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -421,40 +476,47 @@ Model 6:  QDA using the predictors mpg, cylinders, displacement, horsepower, and
 #####################################
 
 <span style="color:DarkViolet">Determine the number of parameters that must be estimated for each model.  </span>
-
+#todo look at slide
+#https://piazza.com/class/jptvgleimyv268?cid=86
 
 ```{r,echo=FALSE}
 #Question 26
+K=3; p=1; K+K*p+p*(p+1)/2
 #Question 27
+K=3; p=2; K+K*p+p*(p+1)/2
 #Question 28
+K=3; p=5; K+K*p+p*(p+1)/2
 #Question 29
+K=3; p=1; K+K*p+K*p*(p+1)/2
 #Question 30
+K=3; p=2; K+K*p+K*p*(p+1)/2
 #Question 31
+K=3; p=5; K+K*p+K*p*(p+1)/2
 ```
 
 
-Model 1: # of parameters =  
+Model 1: # of parameters =  7
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
-Model 2: # of parameters =  
+Model 2: # of parameters = 12 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
-Model 3: # of parameters =  
+Model 3: # of parameters = 33  
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
-Model 4: # of parameters =  
+Model 4: # of parameters = 9  
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
 
-Model 5: # of parameters =  
+Model 5: # of parameters = 18  
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
-Model 6: # of parameters =  
+Model 6: # of parameters = 63  
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
