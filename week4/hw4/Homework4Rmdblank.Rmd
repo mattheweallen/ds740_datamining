@@ -112,9 +112,7 @@ ldafit
 
 <span style="color:green">**Text Answer**: </span>
 
-Normality Assumption:
-
-Equal Variance:
+Normality plots of mpg look pretty close to normal, which satisfies the normality assumption for each group. The variance of the two groups looks similar, which satisfies the assumption of equal variance between the groups.
 
 ***
 
@@ -123,12 +121,15 @@ Equal Variance:
 #####################################
 
 <span style="color:DarkViolet"> Predict the classifications from the LDA fit. Tabulate the variable Domestic with the LDA classification, and report the number of correctly classified domestic vehicles.
-Number of domestic vehicles that are correctly classified = </span>
+Number of domestic vehicles that are correctly classified = 294</span>
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:
 ```{r,echo=FALSE}
-
+fittedclass = predict(ldafit,data=Auto)$class
+confusion.matrix = table(Auto$domestic,fittedclass)
+confusion.matrix
+sum(diag(confusion.matrix))
 ```
 
 
@@ -140,16 +141,20 @@ Number of domestic vehicles that are correctly classified = </span>
 <span style="color:DarkViolet"> Report the sensitivity and specificity of this LDA classification of Domestic.</span>
 
 ```{r,echo=FALSE}
-#Question 7
-#Question 8
+#Question 7, sensitivity  = TP / TP + FN = TP/P
+sensitivity = confusion.matrix[2,2]/(confusion.matrix[2,2] + confusion.matrix[1,2])
+sensitivity
+#Question 8, specificity = TN / TN + FP = TN/N
+specificity = confusion.matrix[1,1]/(confusion.matrix[1,1] + confusion.matrix[2,1])
+specificity
 ```
 
 
-<span style="color:DarkViolet"> sensitivity (as a percentage) =</span>
+<span style="color:DarkViolet"> sensitivity (as a percentage) = 78.16092 %</span>
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
-<span style="color:DarkViolet"> specificity (as a percentage) =</span>
+<span style="color:DarkViolet"> specificity (as a percentage) = 68.70229 %</span>
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
@@ -163,7 +168,12 @@ Number of domestic vehicles that are correctly classified = </span>
 <span style="color:DarkViolet">There are six other possible predictors of *Domestic*: variables *cylinders*, *displacement*, *horsepower*, *weight*, *acceleration*, *year*.  Use plots to explore how these variables are related to *Domestic*, and select **one** that appears more discriminating between foreign and domestic vehicles. </span>
 
 ```{r}
-
+boxplot(cylinders~domestic, data=Auto, xlab="Domestic", ylab="cylinders")
+boxplot(displacement~domestic, data=Auto, xlab="Domestic", ylab="displacement")
+boxplot(horsepower~domestic, data=Auto, xlab="Domestic", ylab="horsepower")
+boxplot(weight~domestic, data=Auto, xlab="Domestic", ylab="weight")
+boxplot(acceleration~domestic, data=Auto, xlab="Domestic", ylab="acceleration")
+boxplot(year~domestic, data=Auto, xlab="Domestic", ylab="year")
 ```
 
 
@@ -172,7 +182,7 @@ Number of domestic vehicles that are correctly classified = </span>
 A) 	cylinders,  
 B) 	displacement,  
 C) 	horsepower,  
-D) 	weight,  
+->D) 	weight,  
 E) 	acceleration,  
 F) 	year
 
@@ -185,7 +195,7 @@ F) 	year
 
 <span style="color:DarkViolet"> Would you prefer to use LDA or QDA when using the variable selected in the previous question to predict Domestic? Explain your reasoning.</span>
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**: I would prefer to use QDA, because the equal variance assumption does not appear to be met. </span>
 
 
 
