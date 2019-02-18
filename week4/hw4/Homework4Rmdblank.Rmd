@@ -242,11 +242,12 @@ Weight has a larger area under the curve than does mpg (0.8741 vs 0.8407). Based
 #####################################
 
 <span style="color:DarkViolet">Make a scatterplot of *mpg* and *displacement*, marked by *origin*.  Upload your plot to **Homework 4: Scatterplot of mpg and displacement** discussion. </span>
-
+#https://stackoverflow.com/questions/17551193/r-color-scatter-plot-points-based-on-values
 
 <span style="color:green">**Graph Answer**  </span>: 
 (post to discussion board on D2L)
 ```{r,echo=FALSE}
+
 ```
 
 
