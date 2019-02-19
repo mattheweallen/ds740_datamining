@@ -1,0 +1,46 @@
+
+fieldset.dfs_m {
+	border: none 0;
+	padding: 0;
+	margin: 0;
+	display: inline;
+}
+
+
+legend.dfs_l, legend.dfs_l_f {
+	padding: 0;
+	margin: 0;
+	border: none 0;
+}
+
+.daylight legend.dfs_l,
+.daylight legend.dfs_l_f {
+	color: #565A5C;
+}
+
+
+div.dfs_c, div.dfs_c_f  {
+	padding-top: 0.3em;
+}
+
+
+legend.dfs_l_f {
+	position: relative;
+	float: left;
+	text-align: right;
+	white-space: normal !important;
+	font-weight: bold;
+}
+
+.daylight legend.dfs_l_f {
+	text-shadow: 0 1px 0 #FFFFFF;
+}
+
+
+div.dfs_c_f {
+	padding-top: 0;
+}
+
+.daylight div.dfs_c_f input[type="checkbox"] {
+	margin-right: 0.5rem;
+}

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<!-- saved from url=(0083)https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/viewContent/27122297/View -->
+<html lang="en-us" data-lang-default="en-us"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<title>Homework 4: Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining</title>
+		<link rel="icon" href="https://uwli.courses.wisconsin.edu/favicon.ico">
+		<link rel="stylesheet" type="text/css" href="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/bsi.min.css">
+		<link rel="stylesheet" type="text/css" href="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/reset.css">
+		<link rel="stylesheet" type="text/css" href="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LP.Web.Desktop.default.css">
+		<link rel="stylesheet" type="text/css" href="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LP.Web.Desktop.DaylightOff.default.css">
+		<link rel="stylesheet" type="text/css" href="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LE.Content.Web.Desktop.default.css">
+		<link rel="stylesheet" type="text/css" href="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LE.ToolIntegration.Content.default.css">
+		<link rel="stylesheet" type="text/css" href="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/35444">
+		<link rel="stylesheet" type="text/css" href="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LP.Web.Desktop.Print.default.css" media="print">
+		<style type="text/css">
+		/*<![CDATA[*/
+			.vui-typography{ font-family:verdana, sans-serif; font-size:11px; }
+			.d2l_1_11_488 {background-color:#c9cacc;}
+			.d2l_1_12_115 {table-layout: Inherit;}
+			.d2l_1_13_109 {vertical-align:middle;}
+			.d2l_1_14_340 {background-image:url('/d2l/img/0/sprites/D2L.LP.Main.3F43558721F73E6004B2528E202B61DD.png');background-position:0 -738px;background-repeat:no-repeat;width:9px;height:18px;}
+			.d2l_1_15_127 {float:left;}
+			.d2l_1_17_437 {background-image:url('/d2l/img/0/sprites/D2L.LP.Main.3F43558721F73E6004B2528E202B61DD.png');background-position:0 -355px;background-repeat:no-repeat;width:10px;height:10px;}
+			.d2l_1_18_51 {max-width:375px;}
+			.d2l_1_19_540 {min-width:375px;}
+			.d2l_1_21_140 {background-image:url('/d2l/img/0/sprites/D2L.LP.Main.3F43558721F73E6004B2528E202B61DD.png');background-position:0 -96px;background-repeat:no-repeat;width:16px;height:16px;}
+			.d2l_1_22_354 {max-width:350px;}
+			.d2l_1_23_962 {min-width:350px;}
+			.d2l_1_25_784 {padding:0px 10px;}
+			.d2l_1_26_810 {margin:5px;}
+			.d2l_1_27_652 {background-image:url('/d2l/img/0/Pager.Main.iconPager.gif?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:16px;height:16px;}
+			.d2l_1_28_406 {float:right;}
+			.d2l_1_29_333 {background-image:url('/d2l/img/0/Email.Main.actNavBarLinkEmail.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:16px;height:16px;}
+			.d2l_1_30_207 {background-image:url('/d2l/img/0/sprites/D2L.LP.Main.3F43558721F73E6004B2528E202B61DD.png');background-position:0 -64px;background-repeat:no-repeat;width:16px;height:16px;}
+			.d2l_1_32_536 {background-image:url('/d2l/img/0/sprites/D2L.LP.Main.3F43558721F73E6004B2528E202B61DD.png');background-position:0 -32px;background-repeat:no-repeat;width:16px;height:16px;}
+			.d2l_1_34_971 {background-image:url('/d2l/img/0/sprites/D2L.LP.Main.3F43558721F73E6004B2528E202B61DD.png');background-position:0 -492px;background-repeat:no-repeat;width:22px;height:22px;}
+			.d2l_1_36_990 {margin:10px;}
+			.d2l_1_37_451 {vertical-align:top;}
+			.d2l_1_38_443 {width:1%;}
+			.d2l_1_40_20 {width:500px;}
+			.d2l_1_41_576 {background-position:left top;}
+			.d2l_1_42_866 {padding:1em;}
+			.d2l_1_43_397 {background-image:url('/d2l/img/0/Auth.SessionExpiry.actAlert.png?v=10.6.12.5941-513');}
+			.d2l_1_44_944 {background-position:right top;}
+			.d2l_1_45_68 {padding-right:75px;}
+			.d2l_1_46_769 {min-height:115px;}
+			.d2l_1_47_418 {background-image:url('/d2l/img/0/Auth.SessionExpiry.actCheck.png?v=10.6.12.5941-513');}
+			.d2l_1_48_651 {padding:3.4em;}
+			.d2l_1_49_746 {vertical-align:baseline;}
+			.d2l_1_50_164 {width:100%;}
+			.d2l_1_52_127 {margin-top:0.5em;margin-bottom:10px;}
+			.d2l_1_53_623 {table-layout: Fixed;}
+			.d2l_1_54_923 {width:34px;}
+			.d2l_1_55_340 {margin-right:10px;}
+			.d2l_1_56_397 {background-image:url('/d2l/img/0/D2L_LE_Core.ActivityTypes.infQuiz24.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:24px;height:24px;}
+			.d2l_1_59_565 {background-image:url('/d2l/img/0/Quizzes.Main.actNavBarLinkQuizzing.png?v=10.6.12.5941-513');}
+			.d2l_1_61_492 {background-image:url('/d2l/img/0/Quizzes.Main.actSubmissions.gif?v=10.6.12.5941-513');}
+			.d2l_1_63_301 {background-image:url('/d2l/img/0/Shared.Main.actReports.gif?v=10.6.12.5941-513');}
+			.d2l_1_65_297 {background-image:url('/d2l/img/0/Content.Main.actLeaveFeedback.gif?v=10.6.12.5941-513');}
+			.d2l_1_67_86 {background-image:url('/d2l/img/0/sprites/D2L.LP.Main.3F43558721F73E6004B2528E202B61DD.png');background-position:0 -365px;background-repeat:no-repeat;width:10px;height:7px;}
+			.d2l_1_68_137 {margin:5px 5px 0px 5px;}
+			.d2l_1_72_993 {background-image:url('/d2l/img/0/Content.Main.actBookmarkTopic24.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:36px;height:28px;}
+			.d2l_1_73_246:hover,.d2l_1_73_246:focus,.d2l_1_73_246:active {background-image:url('/d2l/img/0/Content.Main.actBookmarkTopicHover24.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:36px;height:28px;}
+			.d2l_1_74_519 {background-image:url('/d2l/img/0/Content.Main.actRemoveBookmark24.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:36px;height:28px;}
+			.d2l_1_75_991:hover,.d2l_1_75_991:focus,.d2l_1_75_991:active {background-image:url('/d2l/img/0/Content.Main.actRemoveBookmarkHover24.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:36px;height:28px;}
+			.d2l_1_76_273 {margin-left:10px;}
+			.d2l_1_77_955 {background-image:url('/d2l/img/0/Framework.Iterator.actPrevMvc.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:16px;height:16px;}
+			.d2l_1_78_17 {background-image:url('/d2l/img/0/Framework.Iterator.actNextMvc.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:16px;height:16px;}
+			.d2l_1_79_224 {margin-bottom:10px;}
+			.d2l_1_81_391 {height:580px;}
+			.d2l_1_82_0 {padding:20px 0px 0px 0px;}
+			.d2l_1_83_659 {padding:20px 0px;}
+			.d2l_1_86_427 {padding:10px;}
+			.d2l_1_87_911 {border-right:1px solid #DDD;border-bottom:1px solid #DDD;border-left:1px solid #DDD;}
+			.d2l_1_88_104 {padding:10px 0px 0px 0px;}
+			.d2l_1_89_631 {border-top:1px dotted #D0D0D0;}
+			.d2l_1_90_613 {padding-top:5px;}
+			.d2l_1_91_313 {margin:0px 0px 4px 0px;}
+			.d2l_1_92_119 {background-image:url('/d2l/img/0/D2L_LE_Core.EditDateRange.infDueDate.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:12px;height:12px;}
+			.d2l_1_93_876 {margin:5px 10px 5px 0px;}
+			.d2l_1_94_683 {background-image:url('/d2l/img/0/D2L_LE_Core.EditDateRange.infRestrictions.png?v=10.6.12.5941-513');background-position:0 0;background-repeat:no-repeat;width:12px;height:12px;}
+		/*]]>*/
+		</style>
+	</head>
+	<body class="d2l-body d2l-typography vui-typography d2l-flag-no-defer-mvc-onload" style="overflow: hidden;">
+		<div class="d2l-background-global"><div></div>
+		</div>
+		<div class="d2l-background-left"><div><div></div>
+			</div>
+		</div>
+		<div class="d2l-background-right"><div><div></div>
+			</div>
+		</div>
+		<a href="https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/viewContent/27122297/View#d2l_1_10_851" class="d2l-skipnav" id="d2l_skipnav">skip to main content</a>
+		<header><div class="d2l-minibar-placeholder d2l-minibar-placeholder-fixed" id="d2l_minibar_placeholder" aria-label="Minibar" style="height: 32px;">
+			<div class="d2l-minibar d2l-min-width d2l-minibar-dark d2l_1_11_488" id="d2l_minibar">
+				<div class="d2l-max-width">
+					<div class="d2l-minibar-padding">
+						<div class="d2l-box-layout d2l_1_12_115">
+							<div class="d2l-box d2l-box-h d2l_1_13_109">
+								<a class="d2l-minibar-home vui-link d2l-link" href="https://uwli.courses.wisconsin.edu/d2l/lp/ouHome/defaultHome.d2l"><img class="" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/1px_trans.png" alt=""><span class="d2l-minibar-home-text">My Home</span></a><span class="d2l-minibar-breadcrumb"><span class="d2l_1_14_340"></span><span class="d2l-menuflyout-spacer">&nbsp;</span></span><div class="d2l-menuflyout-link d2l-menuflyout-closed d2l-menuflyout-dark d2l_1_15_127" id="d2l_1_16_354">
+									<div class="d2l-menuflyout-link-hover">
+										<a class="d2l-menuflyout-link-link" title="DS740SP19SEC01 - Data Mining" href="https://uwli.courses.wisconsin.edu/d2l/home/4313159">DS740SP19SEC01 - Data Mining</a><a class="d2l-menuflyout-opener d2l-clickable" title="Select a course..." onclick="return false;" tabindex="0" role="button" aria-controls="d2l_1_20_569" aria-labelledby="d2l_c_6_417"><div class="d2l-textblock d2l-offscreen" id="d2l_c_6_417">Select a course...</div>
+										<span class="d2l-menuflyout-link-arrow d2l_1_17_437"></span><span class="d2l-menuflyout-spacer">&nbsp;</span></a><div class="d2l-clear"></div>
+									</div>
+									<div class="d2l-menuflyout-contents d2l_1_18_51 d2l_1_19_540" id="d2l_1_20_569" aria-hidden="true" aria-expanded="false" tabindex="0" aria-live="assertive" aria-labelledby="d2l_c_6_417" style="max-height: 878px;">
+										<div class="d2l-menuflyout-group-container">
+											<div id="courseSelectorId" class="d2l-placeholder d2l-placeholder-live" aria-live="assertive">
+												<div class="d2l-loading"><div class="d2l-textblock d2l-offscreen">Loading...</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="d2l-box d2l-box-h d2l-minibar-right d2l_1_13_109">
+								<div class="d2l-minibar-activity">
+									<div class="d2l-menuflyout d2l-menuflyout-closed d2l-menuflyout-dark d2l_1_15_127" id="d2l_1_7_848">
+										<a class="d2l-menuflyout-opener d2l-clickable" title="Message alerts" onclick="return false;" aria-haspopup="true" tabindex="0" role="button" aria-controls="d2l_1_24_293" aria-labelledby="d2l_c_1_261">
+											<span class="d2l-menuflyout-text d2l-offscreen" id="d2l_c_1_261">Message alerts</span><div class="d2l-minibar-activity-buckethandle alert_bucket_Messages">
+												<div class="d2l-minibar-activity-message-new d2l-hidden"></div><img src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="" class="Alert d2l_1_21_140"><img src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="" class="OpenAlert d2l-hidden d2l_1_21_140"><span class="d2l-menuflyout-spacer">&nbsp;</span></div>
+											<div class="d2l-clear"></div>
+										</a>
+										<div class="d2l-menuflyout-contents d2l-menuflyout-contents-left d2l_1_22_354 d2l_1_23_962" id="d2l_1_24_293" aria-hidden="true" aria-expanded="false" tabindex="0" aria-live="assertive" aria-labelledby="d2l_c_1_261" style="max-height: 878px;">
+											<div class="d2l-menuflyout-group-container">
+												<div class="d2l_1_25_784">
+													<div>
+														<div class=" d2l-messagebucket-button-container d2l-body-compact">
+															<a class="d2l-text-imagelink d2l_1_15_127 d2l_1_26_810" onclick="D2L.O(&quot;__g1&quot;,0)();return false;" title="Go to Pager" href="javascript:void(0);">
+																<img class="d2l-text-imagelink-img d2l_1_27_652" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt=""><span class="d2l-text-imagelink-text">Pager</span>
+															</a>
+															<a class="d2l-text-imagelink d2l_1_28_406 d2l_1_26_810" href="https://uwli.courses.wisconsin.edu/d2l/lms/email/frame.d2l?ou=4313159" title="Go to Email">
+																<img class="d2l-text-imagelink-img d2l_1_29_333" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt=""><span class="d2l-text-imagelink-text">Email</span>
+															</a>
+															<div class="d2l-clear"></div>
+														</div>
+														<div id="AB_DL_PH_Messages" class="d2l-placeholder d2l-placeholder-live" aria-live="assertive">
+															<div class="d2l-loading"><div class="d2l-textblock d2l-offscreen">Loading...</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="d2l-minibar-separator"></div><div class="d2l-menuflyout d2l-menuflyout-closed d2l-menuflyout-dark d2l_1_15_127" id="d2l_1_8_634">
+										<a class="d2l-menuflyout-opener d2l-clickable" title="Update alerts" onclick="return false;" aria-haspopup="true" tabindex="0" role="button" aria-controls="d2l_1_31_554" aria-labelledby="d2l_c_2_568">
+											<span class="d2l-menuflyout-text d2l-offscreen" id="d2l_c_2_568">Update alerts</span><div class="d2l-minibar-activity-buckethandle alert_bucket_Grades">
+												<div class="d2l-minibar-activity-message-new d2l-hidden"></div><img src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="" class="Alert d2l_1_30_207"><img src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="" class="OpenAlert d2l-hidden d2l_1_30_207"><span class="d2l-menuflyout-spacer">&nbsp;</span></div>
+											<div class="d2l-clear"></div>
+										</a>
+										<div class="d2l-menuflyout-contents d2l-menuflyout-contents-left d2l_1_22_354 d2l_1_23_962" id="d2l_1_31_554" aria-hidden="true" aria-expanded="false" tabindex="0" aria-live="assertive" aria-labelledby="d2l_c_2_568" style="max-height: 878px;">
+											<div class="d2l-menuflyout-group-container">
+												<div class="d2l_1_25_784">
+													<div>
+														<div id="AB_DL_PH_Grades" class="d2l-placeholder d2l-placeholder-live" aria-live="assertive">
+															<div class="d2l-loading"><div class="d2l-textblock d2l-offscreen">Loading...</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="d2l-minibar-separator"></div><div class="d2l-menuflyout d2l-menuflyout-closed d2l-menuflyout-dark d2l_1_15_127" id="d2l_1_9_446">
+										<a class="d2l-menuflyout-opener d2l-clickable" title="Subscription alerts" onclick="return false;" aria-haspopup="true" tabindex="0" role="button" aria-controls="d2l_1_33_29" aria-labelledby="d2l_c_3_819">
+											<span class="d2l-menuflyout-text d2l-offscreen" id="d2l_c_3_819">Subscription alerts</span><div class="d2l-minibar-activity-buckethandle alert_bucket_Alerts">
+												<div class="d2l-minibar-activity-message-new d2l-hidden"></div><img src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="" class="Alert d2l_1_32_536"><img src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="" class="OpenAlert d2l-hidden d2l_1_32_536"><span class="d2l-menuflyout-spacer">&nbsp;</span></div>
+											<div class="d2l-clear"></div>
+										</a>
+										<div class="d2l-menuflyout-contents d2l-menuflyout-contents-left d2l_1_22_354 d2l_1_23_962" id="d2l_1_33_29" aria-hidden="true" aria-expanded="false" tabindex="0" aria-live="assertive" aria-labelledby="d2l_c_3_819" style="max-height: 878px;">
+											<div class="d2l-menuflyout-group-container">
+												<div class="d2l_1_25_784">
+													<div>
+														<div id="AB_DL_PH_Alerts" class="d2l-placeholder d2l-placeholder-live" aria-live="assertive">
+															<div class="d2l-loading"><div class="d2l-textblock d2l-offscreen">Loading...</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div><div class="d2l-menuflyout d2l-menuflyout-closed d2l-menuflyout-dark">
+									<a class="d2l-menuflyout-opener d2l-clickable" onclick="return false;" aria-haspopup="true" tabindex="0" role="button" aria-controls="d2l_1_35_12" aria-labelledby="d2l_c_4_903">
+										<img class="d2l-image d2l-menuflyout-icon d2l-menuflyout-icon-open d2l_1_34_971" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="">
+										<span class="d2l-menuflyout-text" id="d2l_c_4_903">Matthew Allen</span><span class="d2l-menuflyout-arrow d2l_1_17_437"></span>
+										<div class="d2l-clear"></div>
+									</a>
+									<div class="d2l-menuflyout-contents d2l-menuflyout-contents-left" id="d2l_1_35_12" aria-hidden="true" aria-expanded="false" tabindex="0" aria-live="assertive" aria-labelledby="d2l_c_4_903" style="max-height: 878px;">
+										<div class="d2l-menuflyout-group-container">
+											<div>
+												<ul class="d2l-list">
+													<li>
+														<ul style="list-style:none;margin:10px;padding:0;">
+															<li>
+																<span style="white-space:nowrap;"><a class="vui-link d2l-link" href="https://uwli.courses.wisconsin.edu/d2l/lp/profile/profile_edit.d2l?ou=4313159" onclick="D2L.O(&quot;__g1&quot;,1)();">Profile</a>
+																</span></li>
+															<li>
+																<span style="white-space:nowrap;"><a class="vui-link d2l-link" href="https://uwli.courses.wisconsin.edu/d2l/Notifications/Settings?ou=4313159" onclick="D2L.O(&quot;__g1&quot;,2)();">Notifications</a>
+																</span></li>
+															<li>
+																<span style="white-space:nowrap;"><a class="vui-link d2l-link" href="https://uwli.courses.wisconsin.edu/d2l/lp/preferences/preferences_main/preferences_main.d2l?ou=4313159" onclick="D2L.O(&quot;__g1&quot;,3)();">Account Settings</a>
+																</span></li>
+														</ul>
+														<hr class="d2l-minibar-menu-separator"></li>
+													<li>
+														<span style="white-space:nowrap;"><a class="vui-link d2l-link d2l_1_36_990" href="javascript:void(0);" onclick="D2L.O(&quot;__g1&quot;,4)();return false;">Log Out</a>
+														</span></li>
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="d2l-clear"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="d2l_navbar" class="d2l-navbar d2l-font-inverse d2l-min-width" role="navigation">
+			<h2 class="d2l-offscreen">Navigation</h2>
+			<div class="d2l-navbar-container d_nb_cFull">
+				<div class="d2l-max-width">
+					<div class="d2l-navbar-container d_nb_cGlobal">
+						<div class="d2l-box-layout d2l_1_12_115">
+							<div class="d2l-box d2l-box-v d2l_1_37_451">
+								<div class="d2l-box-layout d2l_1_12_115">
+									<div class="d2l-box d2l-box-h d2l_1_38_443 d2l_1_37_451">
+										<img class="d2l-navbar-image d2l-navbar-image-left d2l_1_15_127" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/DS_Logo_Horizontal-D2L.png" alt=""><div class="d2l-clear"></div>
+									</div>
+									<div class="d2l-box d2l-box-h d2l_1_37_451">
+										<div class="d2l-navbar-container d_nb_cMiddle">
+											<div class="d2l-navbar-area d_nb_pMainLinks">
+												<div class="d_nb_pd">
+													<div class="d_nb_i">
+														<ul class="d2l-navbar-area-list">
+															<li>
+																<div class="d2l-navbar-item">
+																	<a class="d2l-navbar-link" href="https://uwli.courses.wisconsin.edu/d2l/lp/navbars/4313159/customlinks/external/93853"><span>DS740SP19SEC01</span></a></div>
+																<span class="d2l-navbar-sep"></span>
+															</li>
+															<li class="d2l-navbar-area-list-item-last">
+																<div class="d2l-navbar-item">
+																	<span class="d2l-navbar-text">
+																		<span>DS740SP19SEC01 - Data Mining</span></span>
+																</div>
+																<span class="d2l-navbar-sep"></span>
+															</li>
+														</ul>
+													</div>
+													<div class="d2l-clear"></div>
+												</div>
+											</div>
+											<div class="d2l-clear"></div>
+										</div>
+									</div>
+									<div class="d2l-box d2l-box-h d2l_1_38_443 d2l_1_37_451">
+									</div>
+								</div>
+							</div>
+							<div class="d2l-box d2l-box-v d2l_1_37_451">
+								<div class="d2l-navbar-container d_nb_cBottom">
+									<div class="d2l-navbar-area d_nb_pBottomLinks">
+										<div class="d_nb_pd">
+											<div class="d_nb_i">
+												<ul class="d2l-navbar-area-list">
+													<li>
+														<div class="d2l-navbar-item">
+															<a class="d2l-navbar-link" href="https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/Home"><span>Content</span></a></div>
+														<span class="d2l-navbar-sep"></span>
+													</li>
+													<li>
+														<div class="d2l-navbar-item">
+															<a class="d2l-navbar-link" href="https://uwli.courses.wisconsin.edu/d2l/le/4313159/discussions/List"><span>Discussions</span></a></div>
+														<span class="d2l-navbar-sep"></span>
+													</li>
+													<li>
+														<div class="d2l-navbar-item">
+															<a class="d2l-navbar-link" href="https://uwli.courses.wisconsin.edu/d2l/lms/dropbox/dropbox.d2l?ou=4313159"><span>Dropbox</span></a></div>
+														<span class="d2l-navbar-sep"></span>
+													</li>
+													<li>
+														<div class="d2l-navbar-item">
+															<a class="d2l-navbar-link" href="https://uwli.courses.wisconsin.edu/d2l/lms/quizzing/quizzing.d2l?ou=4313159"><span>Quizzes</span></a></div>
+														<span class="d2l-navbar-sep"></span>
+													</li>
+													<li>
+														<div class="d2l-navbar-item">
+															<a class="d2l-navbar-link" href="https://uwli.courses.wisconsin.edu/d2l/lms/grades/index.d2l?ou=4313159"><span>Grades</span></a></div>
+														<span class="d2l-navbar-sep"></span>
+													</li>
+													<li>
+														<div class="d2l-navbar-item">
+															<a class="d2l-navbar-link" href="https://uwli.courses.wisconsin.edu/d2l/lms/classlist/classlist.d2l?ou=4313159"><span>Classlist</span></a></div>
+														<span class="d2l-navbar-sep"></span>
+													</li>
+													<li>
+														<div class="d2l-navbar-item">
+															<a class="d2l-navbar-link" href="https://uwli.courses.wisconsin.edu/d2l/le/calendar/4313159"><span>Calendar</span></a></div>
+														<span class="d2l-navbar-sep"></span>
+													</li>
+													<li class="d2l-navbar-area-list-item-last">
+														<div class="d2l-navbar-item d2l-navbar-group">
+															<div class="d2l-menuflyout d2l-menuflyout-closed d2l-menuflyout-dark">
+																<a class="d2l-menuflyout-opener d2l-clickable" onclick="return false;" aria-haspopup="true" tabindex="0" role="button" aria-controls="d2l_1_39_803" aria-labelledby="d2l_c_5_585">
+																	<span class="d2l-menuflyout-text" id="d2l_c_5_585">More Tools</span><span class="d2l-menuflyout-arrow d2l_1_17_437"></span>
+																	<div class="d2l-clear"></div>
+																</a>
+																<div class="d2l-menuflyout-contents" id="d2l_1_39_803" aria-hidden="true" aria-expanded="false" tabindex="0" aria-live="assertive" aria-labelledby="d2l_c_5_585">
+																	<div class="d2l-menuflyout-group-container">
+																		<ul class="d2l-navbar-group-inner">
+																			<li>
+																				<a class="vui-link d2l-link vui-outline" href="https://uwli.courses.wisconsin.edu/d2l/lms/survey/surveys.d2l?ou=4313159"><span>Surveys</span></a></li>
+																			<li>
+																				<a class="vui-link d2l-link vui-outline" href="https://uwli.courses.wisconsin.edu/d2l/lms/chat/chat_list.d2l?ou=4313159"><span>Chat</span></a></li>
+																			<li>
+																				<a class="vui-link d2l-link vui-outline" href="https://uwli.courses.wisconsin.edu/d2l/lms/checklist/checklists.d2l?ou=4313159"><span>Checklist</span></a></li>
+																			<li>
+																				<a class="vui-link d2l-link vui-outline" href="https://uwli.courses.wisconsin.edu/d2l/lms/group/group_list.d2l?ou=4313159"><span>Groups</span></a></li>
+																			<li>
+																				<a class="vui-link d2l-link vui-outline" href="https://uwli.courses.wisconsin.edu/d2l/lms/links/view_links.d2l?ou=4313159"><span>Links</span></a></li>
+																			<li>
+																				<a class="vui-link d2l-link vui-outline" href="https://uwli.courses.wisconsin.edu/d2l/im/onlinerooms/roomlist.d2l?ou=4313159"><span>Online Rooms</span></a></li>
+																			<li>
+																				<a class="vui-link d2l-link vui-outline" href="https://uwli.courses.wisconsin.edu/d2l/lp/rubrics/list.d2l?ou=4313159"><span>Rubrics</span></a></li>
+																		</ul>
+																	</div>
+																</div>
+															</div>
+														</div>
+														<span class="d2l-navbar-sep"></span>
+													</li>
+												</ul>
+											</div>
+											<div class="d2l-clear"></div>
+										</div>
+									</div>
+									<div class="d2l-clear"></div>
+								</div>
+							</div>
+						</div>
+						<div class="d2l-clear"></div>
+					</div>
+				</div>
+				<div class="d2l-clear"></div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			
+(function(){
+var hpn=function(){
+if(window == window.parent) {return false;}
+var win = window.parent;
+try {while(true) {
+if(win.document === undefined) {return false;}
+var n= win.document.getElementById('d2l_navbar');
+var m = win.document.getElementById('d2l_minibar');
+if(n !== null || m !== null) {return true;}
+if(win == win.parent) {return false;}
+win = win.parent;
+}} catch(e) {}
+return false;};
+if(!hpn()) {return;}
+var rm=function(n) {if(n&&n.parentNode){n.parentNode.removeChild(n);}};
+var d=document;
+rm(d.getElementById('d2l_navbar'));
+rm(d.getElementById('d2l_minibar'));
+rm(d.getElementById('d2l_minibar_placeholder'));
+rm(d.getElementById('d2l_skipnav'));
+})();
+</script>
+		</header><span class="d2l-fragment"><a name="d2l_1_10_851" tabindex="-1" style="top: -44px;"></a></span>
+		<div class="d2l-page-message-container"><div class="d2l-page-message d2l_1_40_20" id="d2l_sessionExpiryWarning"><div style="display:none;" id="d2l_sessionExpiryAlert" role="alert"><div class="d2l-container-icon d2l_1_41_576 d2l_1_42_866">
+			<div class="d2l-container-icon-inner d2l_1_43_397 d2l_1_44_944 d2l_1_45_68 d2l_1_46_769">
+				<h2 class="d2l-heading vui-heading-2">Are You Still There?</h2>
+				<div class="d2l-textblock">Your session expires after 180 minutes of inactivity, which protects your information in case you've left your device without logging out.<br>
+<br>
+<strong>Hit a key or click anywhere to stay logged in.</strong></div>
+			</div>
+		</div>
+		</div><div style="display:none;" id="d2l_sessionExpiryCheck" role="alert"><div class="d2l-container-icon d2l_1_41_576 d2l_1_42_866">
+			<div class="d2l-container-icon-inner d2l_1_47_418 d2l_1_44_944 d2l_1_45_68 d2l_1_46_769">
+				<div class="d2l_1_48_651">
+					<h2 class="d2l-heading vui-heading-2 d2l-heading-none">Oh, There You Are!</h2>
+				</div>
+			</div>
+		</div>
+		</div></div>
+		</div>
+		<div class="d2l-page-bg">
+			<div>
+			</div>
+		</div>
+		<div class="d2l-page-main d2l-min-width d2l-max-width" role="main">
+			<div class="d2l-page-collapsepane-container" style="min-height: 789px; top: 131px;"><div class="d2l-page-collapsepane-shadow" title="Expand side panel"><div></div></div><div class="d2l-page-collapsepane" data-openfirst="D2L.O(&quot;__g1&quot;,5)();"><span tabindex="-1" class="d2l-offscreen"></span><div class="d2l-page-collapsepane-handle"><h2 class="d2l-heading vui-offscreen">Side Panel</h2>
+			<a class="d2l-page-collapsepane-handle-link" tabindex="0" title="Expand side panel" role="button"><span class="d2l-page-collapsepane-handle-expand d2l-offscreen">Expand side panel</span><span class="d2l-page-collapsepane-handle-collapse d2l-offscreen">Collapse side panel</span></a></div><div class="d2l-page-collapsepane-content"><div class="d2l-page-collapsepane-content-inner d2l-scrollbar" style="max-height: 765px;"><div class="d2l-page-collapsepane-content-padding"><div id="ContentNavigator" class="d2l-placeholder d2l-placeholder-live" aria-live="assertive">
+				<div class="d2l-loading"><div class="d2l-textblock d2l-offscreen">Loading...</div>
+				</div>
+			</div>
+			</div></div></div><div class="d2l-page-collapsepane-end"></div><span tabindex="-1" class="d2l-offscreen"></span></div></div><div class="d2l-page-main-padding" style="padding-bottom: 0px;">
+				<div class="d2l-page-header d2l-header-responsive-collapse-layout">
+					<div class="d2l-box-layout d2l_1_12_115">
+						<div class="d2l-box d2l-box-v d2l-header-top d2l_1_49_746">
+							<div class="d2l-box-layout d2l_1_12_115">
+								<div class="d2l-box d2l-box-h d2l_1_50_164 d2l_1_37_451">
+									<nav aria-labelledby="d2l_1_51_640">
+										<h2 class="d2l-heading vui-offscreen" id="d2l_1_51_640">Breadcrumb:</h2>
+										<ol class="vui-breadcrumbs d2l_1_52_127" aria-labelledby="d2l_1_51_640">
+											<li><a class="vui-link d2l-link" href="javascript:void(0);" onclick="D2L.O(&quot;__g1&quot;,6)();return false;">Table of Contents</a>
+											</li><li><a class="vui-link d2l-link" href="https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/Home?itemIdentifier=D2L.LE.Content.ContentObject.ModuleCO-27122158">Lesson 4: Linear Discriminant Analysis</a>
+											</li><li><a class="vui-link d2l-link" href="https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/Home?itemIdentifier=D2L.LE.Content.ContentObject.ModuleCO-27122188">Lesson 4: Show What You're Learning</a>
+											</li><li class="d2l-page-breadcrumb-title"><span class="d2l-breadcrumb-text">Homework 4: Linear Discriminant Analysis and Quadratic Discriminant Analysis</span></li></ol>
+									</nav>
+								</div>
+							</div>
+						</div>
+						<div class="d2l-box d2l-box-v d2l-header-bottom-box-responsive d2l_1_49_746">
+							<div class="d2l-box-layout d2l_1_12_115">
+								<div class="d2l-box d2l-box-h d2l_1_50_164 d2l_1_37_451">
+									<div class="d2l-page-title-c"><div class="d2l-box-layout d2l_1_53_623">
+										<div class="d2l-box d2l-box-h d2l_1_54_923 d2l_1_37_451">
+											<img class="d2l-image d2l_1_55_340 d2l_1_56_397" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="">
+										</div>
+										<div class="d2l-box d2l-box-h d2l_1_50_164 d2l_1_37_451">
+											<h1 class="d2l-page-title d2l-heading vui-heading-1 bsi-set-solid">Homework 4: Linear Discriminant Analysis and Quadratic Discriminant Analysis</h1>
+											<div id="d2l_1_57_676" class="d2l-floating-container d2l-hidden vui-dropdown-menu d2l-floating-container-autoclose" role="menu" tabindex="-1">
+												<ul id="d2l_pageTitleActions" class="d2l-contextmenu" role="presentation">
+													<li id="d2l_pageTitleActions_quiz_summary" class="d2l-contextmenu-item d2l-hidden" role="presentation">
+														<a class="d2l_1_59_565 vui-dropdown-menu-item-link" tabindex="-1" role="menuitem"><span>View Summary</span></a>
+													</li>
+													<li id="d2l_pageTitleActions_quiz_submissions" class="d2l-contextmenu-item" role="presentation">
+														<a class="d2l_1_61_492 vui-dropdown-menu-item-link" tabindex="-1" role="menuitem"><span>View Submissions</span></a>
+													</li>
+													<li id="d2l_pageTitleActions_quiz_reports" class="d2l-contextmenu-item" role="presentation">
+														<a class="d2l_1_63_301 vui-dropdown-menu-item-link" tabindex="-1" role="menuitem"><span>View Reports</span></a>
+													</li>
+													<li id="d2l_1_64_238" class="d2l-contextmenu-item" role="presentation">
+														<a class="d2l_1_65_297 vui-dropdown-menu-item-link" tabindex="-1" role="menuitem"><span>Submit Feedback</span></a>
+													</li>
+												</ul>
+											</div><a id="d2l_1_5_930" class="d2l-contextmenu-ph" data-contextmenuid="d2l_pageTitleActions" role="button" aria-haspopup="true" title="Actions for &#39;Homework 4: Linear Discriminant Analysis and Quadratic Discriminant Analysis&#39;" onclick="D2L.O(&quot;__g1&quot;,7)();return false;" href="javascript:void(0);">
+												<img src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" class="d2l_1_67_86" alt="">
+												<span class="d2l-offscreen">Actions for 'Homework 4: Linear Discriminant Analysis and Quadratic Discriminant Analysis'</span>
+											</a>
+											<div class="d2l-clear"></div>
+										</div>
+									</div>
+									</div></div>
+								<div class="d2l-box d2l-box-h d2l_1_49_746">
+									<div class="d2l-page-header-side">
+										<div class="d2l_1_68_137 d2l-inline">
+											<span class="d2l-toggle" id="d2l_1_69_328" tabindex="-1"><a class="d2l-imagelink d2l_1_72_993 d2l_1_73_246 vui-outline" id="d2l_1_70_136" href="javascript:void(0);" onclick="return false;" data-hoverclassname="d2l_1_73_246" title="Add Bookmark" aria-label="Add Bookmark" role="button"></a>
+											<a class="d2l-imagelink d2l-hidden d2l_1_74_519 d2l_1_75_991 vui-outline" id="d2l_1_71_901" href="javascript:void(0);" onclick="return false;" data-hoverclassname="d2l_1_75_991" title="Remove Bookmark" aria-label="Remove Bookmark" role="button"></a>
+											</span></div>
+										<div class="d2l_1_76_273 d2l-inline">
+											<div class="d2l-iterator">
+												<a class="d2l-iterator-button vui-button d2l-iterator-button-prev d2l-iterator-button-notext" role="button" href="https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/navigateContent/449/Previous?pId=27122188" title="Previous "><img class="d2l-image d2l_1_77_955" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt=""><span class="d2l-offscreen">Previous </span>&nbsp;</a><a class="d2l-iterator-button vui-button d2l-iterator-button-next d2l-iterator-button-notext" role="button" href="https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/navigateContent/449/Next?pId=27122188" title="Next"><span class="d2l-offscreen">Next</span>&nbsp;<img class="d2l-image d2l_1_78_17" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt=""></a></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="d2l-messagearea d2l_1_79_224" id="d2l_messagearea" role="alert" tabindex="0"></div><div id="ContentView" class="d2l-placeholder d2l-placeholder-live" aria-live="assertive">
+					<div id="QuizContentViewPlaceHolder" class="d2l-placeholder d2l-placeholder-inner d2l-placeholder-live" aria-live="assertive">
+						<div class="d2l-iframe-loading-container d2l_1_50_164 d2l_1_81_391" style="display: none;">
+						</div>
+						<iframe class="d2l-iframe d2l-iframe-fullscreen d2l_1_50_164 d2l_1_81_391" id="d2l_1_80_14" name="d2l_1_80_14" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/quiz_summary.html" title="Homework 4: Linear Discriminant Analysis and Quadratic Discriminant Analysis" frameborder="0" scrolling="auto" allowfullscreen="" onload="this.m_loaded=true;" data-default-height="580" style="height: 674px;"></iframe>
+					</div>
+				</div>
+				<div class="d2l_1_82_0">
+					<div class="d2l_1_15_127">
+					</div>
+					<div class="d2l_1_28_406">
+						<div class="d2l_1_76_273 d2l-inline">
+							<div class="d2l-iterator">
+								<a class="d2l-iterator-button vui-button d2l-iterator-button-prev d2l-iterator-button-notext" role="button" href="https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/navigateContent/449/Previous?pId=27122188" title="Previous "><img class="d2l-image d2l_1_77_955" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt=""><span class="d2l-offscreen">Previous </span>&nbsp;</a><a class="d2l-iterator-button vui-button d2l-iterator-button-next d2l-iterator-button-notext" role="button" href="https://uwli.courses.wisconsin.edu/d2l/le/content/4313159/navigateContent/449/Next?pId=27122188" title="Next"><span class="d2l-offscreen">Next</span>&nbsp;<img class="d2l-image d2l_1_78_17" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt=""></a></div>
+						</div>
+					</div>
+					<div class="d2l-clear"></div>
+				</div>
+				<div class="d2l_1_83_659">
+					<div id="AdditionalInfoPlaceholder" class="d2l-placeholder d2l-placeholder-live" aria-live="assertive">
+						<ul class="vui-tabmenu" role="tablist" id="d2l_1_84_169">
+							<li class="vui-tabmenu-item vui-tabmenu-item-select" role="presentation" style="width: 100%;">
+								<a id="d2l_1_85_566" href="javascript:void(0);" role="tab" aria-selected="true" tabindex="0" data-tabmenu-onclick="D2L.O(&quot;__g1&quot;,10)();">
+									Activity Details<span class="vui-tabmenu-item-blue">
+									</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="d2l_1_86_427 d2l_1_87_911">
+						<div id="ActivityDetailsTabId">
+							<div class="d2l-box-layout d2l_1_12_115">
+								<div class="d2l-box d2l-box-h d2l_1_50_164 d2l_1_49_746">
+									<div class="d2l_1_88_104 d2l_1_89_631">
+										<div class="d2l_1_15_127">
+											<div id="d2l_1_3_625" class="d2l-placeholder d2l-placeholder-live" aria-live="assertive">
+												<form data-method="post" data-scope="restrictions$" class="d2l-form d2l-form-primary" id="d2l_1_1_752" onsubmit="return false;">
+													<div>
+														<div class=" d2l-inline">
+															<div class="d2l_1_90_613">
+																<img class="d2l-image d2l_1_91_313 d2l_1_92_119" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="">
+																<span class="d2l-textblock vui-emphasis d2l_1_93_876">Due <abbr class="d2l-fuzzydate" data-date="1550728740000" title="Feb 20, 2019 11:59 PM" aria-live="off">February 20 at 11:59 PM</abbr></span></div>
+														</div>
+														<div class="d2l_1_90_613 d2l-inline">
+															<img class="d2l-image d2l_1_91_313 d2l_1_94_683" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/pixel.gif" alt="">
+															<span class="d2l-textblock vui-emphasis d2l_1_93_876">Starts Jan 24, 2019 12:00 AM</span><span class="d2l-textblock vui-emphasis d2l_1_93_876">Ends Feb 22, 2019 11:59 PM</span></div>
+													</div>
+												<input type="text" class="d2l-hidden"></form>
+											</div>
+										</div>
+										<div class="d2l-clear"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class=" d2l-hidden" id="ResultsDetailsTabId">
+							<div id="ResultDetails" class="d2l-placeholder d2l-placeholder-inner d2l-placeholder-live" aria-live="assertive">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/jquery.min.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/jquery-ui.min.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/bsi.min.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LP.Web.Desktop.default.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LE.Content.ContentViewer.default.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LE.Content.Web.Desktop.default.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/D2L.LE.ToolIntegration.Content.default.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/tock.min.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/ifvisible.min.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/d2l-nav-host-base.js.download"></script>
+		<script type="text/javascript" src="./Homework 4_ Linear Discriminant Analysis and Quadratic Discriminant Analysis - DS740SP19SEC01 - Data Mining_files/d2l-nav-docked-host.js.download"></script>
+		<script type="text/javascript">
+		//<![CDATA[
+			D2L.LP.Web.UI.Events.OnInit.AddListener( function() {
+D2L.O("__g1",11)();
+D2L.O("__g1",12)();
+D2L.O("__g1",13)();
+D2L.O("__g1",14)();
+D2L.O("__g1",15)();
+D2L.O("__g1",16)();
+D2L.O("__g1",17)();
+D2L.O("__g1",18)();
+D2L.O("__g1",19)();
+D2L.O("__g1",20)();
+D2L.O("__g1",21)();
+D2L.O("__g1",22)();
+} );
+
+			D2L.LP.Web.UI.Events.OnLoad.AddListener( function() {
+D2L.O("__g1",23)();
+D2L.O("__g1",24)();
+} );
+
+			D2L.OR={
+"d2l_1_16_354":{"MenuFlyout.OpenFirstFunction":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"courseSelectorId\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"courseSelectorId\"},\"GET\",{\"_type\":\"url\",\"Url\":\"\/d2l\/lp\/courseSelector\/4313159\/InitPartial\"},{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Web.UI.Rpc.RpcOptions\",\"keepAlive\":true,\"includeXsrfHeader\":false}],\"D\":true},0,false],\"D\":true}"}
+,
+"courseSelectorId":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\"}"}
+,
+"d2l_1_7_848":{"MenuFlyout.OpenFunction":"{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.JavaScript.If\",\"P\":[{\"_type\":\"call\",\"N\":\"D2L.LP.Web.UI.Html.JavaScript.CompareBoolean\",\"P\":[1,{\"_type\":\"call\",\"N\":\"D2L.VG\",\"P\":[\"ab_status_Messages\"]},true]},{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"AB_DL_PH_Messages\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"AB_DL_PH_Messages\"},\"GET\",{\"_type\":\"call\",\"N\":\"D2L.LP.Web.Mvc.RouteLocation.Create\",\"P\":[\"\/d2l\/MiniBar\/{orgUnitId}\/ActivityFeed\/{action}\",{\"_type\":\"D2L.LP.Util.Dictionary\",\"Category\":2},{\"_type\":\"D2L.LP.Util.Dictionary\",\"action\":\"GetAlerts\",\"orgUnitId\":4313159}]},{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Web.UI.Rpc.RpcOptions\",\"keepAlive\":true,\"includeXsrfHeader\":false}],\"D\":true},0,false],\"D\":true}]}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.VS\",\"P\":[\"ab_status_Messages\",false]},{\"_type\":\"func\",\"N\":\"D2L.LP.ActivityBar.OpenBucket\",\"P\":[\"alert_bucket_Messages\"]}]}",
+"MenuFlyout.CloseFunction":"{\"_type\":\"func\",\"N\":\"D2L.LP.ActivityBar.CloseBucket\",\"P\":[\"alert_bucket_Messages\"]}"}
+,
+"alert_bucket_Messages":{"aria-message":"\"You have new Messages\"",
+"title":"\"Message alerts\"",
+"new-alert-title":"\"Message alerts - You have new alerts\"",
+"flyout-id":"{\"_type\":\"id\",\"Value\":\"d2l_1_7_848\"}"}
+,
+"__g1":{"0":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.OpenWindow\",\"P\":[\"D2L.LE.Pager\",{\"_type\":\"url\",\"Url\":\"\/d2l\/p\/le\/pager\/4313159\"},650,730,false,false]}",
+"1":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.ReturnPoints.Set\",\"P\":[\"D2L.UXP.Profile.1973553\"]}",
+"2":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.ReturnPoints.Set\",\"P\":[\"D2L.LP.Notification.Settings.4313159\"]}",
+"3":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.ReturnPoints.Set\",\"P\":[\"D2L.UXP.Preferences.4313159\"]}",
+"4":"{\"_type\":\"func\",\"N\":\"D2L.PT.Auth.Logout\",\"P\":[\"\/d2l\/logout\"]}",
+"5":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"ContentNavigator\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"ContentNavigator\"},\"GET\",{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/content\/4313159\/viewobject\/27122297\/PartialNavigator?mId=27122188\"},{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Web.UI.Rpc.RpcOptions\",\"keepAlive\":true,\"includeXsrfHeader\":false}],\"D\":true},0,false],\"D\":true}",
+"6":"{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.Navigate\",\"P\":[{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/content\/4313159\/Home?itemIdentifier=TOC\"}]}]}",
+"7":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.Open\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},{\"_type\":\"id\",\"Value\":\"d2l_1_5_930\"},\"d2l_1_66_951\",null]}",
+"8":"{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.SetIsDisplayed\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_71_901\"},true]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.SetIsDisplayed\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_70_136\"},false]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.Focus\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_71_901\"}]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.Connect\",\"P\":[\"POST\",{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/content\/4313159\/viewContent\/27122297\/ToggleBookmark?bookmarkStatus=1\"}],\"D\":true}]}",
+"9":"{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.SetIsDisplayed\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_70_136\"},true]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.SetIsDisplayed\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_71_901\"},false]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.Focus\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_70_136\"}]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.Connect\",\"P\":[\"POST\",{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/content\/4313159\/viewContent\/27122297\/ToggleBookmark?bookmarkStatus=0\"}],\"D\":true}]}",
+"10":"{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.SetIsDisplayed\",\"P\":[{\"_type\":\"id\",\"Value\":\"ActivityDetailsTabId\"},true]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.SetIsDisplayed\",\"P\":[{\"_type\":\"id\",\"Value\":\"EvaluationSummaryTabId\"},false]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Dom.SetIsDisplayed\",\"P\":[{\"_type\":\"id\",\"Value\":\"ResultsDetailsTabId\"},false]}]}",
+"11":"{\"_type\":\"func\",\"N\":\"D2L.VS\",\"P\":[\"ab_status_Messages\",true]}",
+"12":"{\"_type\":\"func\",\"N\":\"D2L.VS\",\"P\":[\"ab_status_Grades\",true]}",
+"13":"{\"_type\":\"func\",\"N\":\"D2L.VS\",\"P\":[\"ab_status_Alerts\",true]}",
+"14":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.FloatingContainer.Init\"}",
+"15":"{\"_type\":\"func\",\"N\":\"D2L.PT.Auth.SessionTimeout.Init\",\"P\":[\"1973553\",180,5,{\"_type\":\"id\",\"Value\":\"d2l_sessionExpiryWarning\"},\"d2l_sessionExpiryAlert\",\"d2l_sessionExpiryCheck\",{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectObject\",\"P\":[\"POST\",{\"_type\":\"url\",\"Url\":\"\/d2l\/lp\/auth\/session\/extend\"}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.MasterPages.Dialog.OpenHelper\",\"P\":[{\"_type\":\"call\",\"N\":\"D2L.LP.Web.UI.Html.Dom.GetActiveElement\"},{\"_type\":\"url\",\"Url\":\"\/d2l\/lp\/auth\/session\/Expired?isUsernamePasswordLogin=1&isLogout=0\"}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.MasterPages.Dialog.OpenHelper\",\"P\":[{\"_type\":\"call\",\"N\":\"D2L.LP.Web.UI.Html.Dom.GetActiveElement\"},{\"_type\":\"url\",\"Url\":\"\/d2l\/lp\/auth\/session\/Expired?isUsernamePasswordLogin=1&isLogout=1\"}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.MasterPages.Dialog.InlineDialog\",\"P\":[null,{\"_type\":\"id\",\"Value\":\"d2l_1_95_526\"},\"Warning\",\"New User Session\",\"The current user session has changed, so the links and content on this page may not behave as expected.\",\"OK\",\"\",\"Close this Dialog\",\"d2l-dialog-inline-body-warning\",true,false,false],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.MasterPages.Dialog.Inline.Abort\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_95_526\"}]}]}",
+"16":"{\"_type\":\"func\",\"N\":\"D2LMathML.DesktopInit\",\"P\":[\"https:\/\/s.brightspace.com\/lib\/mathjax\/2.6.1\/MathJax.js?config=MML_HTMLorMML\",\"https:\/\/s.brightspace.com\/lib\/mathjax\/2.6.1\/MathJax.js?config=TeX-AMS-MML_HTMLorMML%2cSafe\"]}",
+"17":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.Authentication.Xsrf.Init\",\"P\":[\"d2l_referrer\",\"wafdBAL93NP68EcBAT9gNZxqT01LGiIo\",-1164409611]}",
+"18":"{\"_type\":\"func\",\"N\":\"D2L.LP.ActivityBar.Init\",\"P\":[{\"_type\":\"url\",\"Url\":\"\/d2l\/activityFeed\/checkForNewAlerts\"},300,\"alert_bucket_{0}\",\"ab_status_{0}\"]}",
+"19":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Common.Controls.MessageArea.Init\",\"P\":[\"d2l_messagearea\",{\"_type\":\"url\",\"Url\":\"\/d2l\/lp\/validation\/errors\"}]}",
+"20":"{\"_type\":\"func\",\"N\":\"D2L.LP.Globalization.Locale.Init\",\"P\":[0,{\"_type\":\"anon\",\"DecimalSeparator\":\".\",\"GroupSeparator\":\",\",\"NumberNegativePattern\":1,\"PercentPositivePattern\":0,\"PercentNegativePattern\":0,\"PercentSymbol\":\"%\",\"NegativeSign\":\"-\",\"NativeDigits\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"9\"],\"UseNativeDigits\":false,\"GroupSizes\":[0],\"IntegerRegex\":\"^([\\\\(-]*(([01234567890123456789]+))[\\\\)-]*)$|^([\\\\(-]*[01234567890123456789]+[\\\\)-]*)$\",\"DecimalRegex\":\"^([\\\\(-]*(([01234567890123456789]+))(\\\\.[01234567890123456789]+)?[\\\\)-]*)$|^([\\\\(-]*[01234567890123456789]*\\\\.?[01234567890123456789]+[\\\\)-]*)$\"},{\"_type\":\"anon\",\"InputDateFormat\":\"M\/d\/yyyy\",\"Is24HourClock\":false,\"NativeDigits\":[\"0\",\"1\",\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"9\"],\"UseNativeDigits\":false,\"TimeFormat\":\"h:mm tt\",\"AmDesignator\":\"AM\",\"PmDesignator\":\"PM\",\"ShortMonthNames\":[\"Jan\",\"Feb\",\"Mar\",\"Apr\",\"May\",\"Jun\",\"Jul\",\"Aug\",\"Sep\",\"Oct\",\"Nov\",\"Dec\",\"\"],\"LongMonthNames\":[\"January\",\"February\",\"March\",\"April\",\"May\",\"June\",\"July\",\"August\",\"September\",\"October\",\"November\",\"December\",\"\"],\"ShortDayOfWeekNames\":[\"Sun\",\"Mon\",\"Tue\",\"Wed\",\"Thu\",\"Fri\",\"Sat\"]},{\"_type\":\"anon\",\"TextDirection\":1},{\"_type\":\"anon\",\"Culture\":\"en-us\"},{\"_type\":\"anon\",\"JustNow\":\"just now\",\"OneMinuteAgo\":\"1 minute ago\",\"TwoMinutesAgo\":\"2 minutes ago\",\"MinutesAgoMany\":\"[0] minutes ago\",\"OneHourAgo\":\"1 hour ago\",\"TwoHoursAgo\":\"2 hours ago\",\"ManyHoursAgo\":\"[0] hours ago\",\"YesterdayTime\":\"yesterday at [0]\",\"DayOfWeekTime\":\"[0] at [1]\",\"MonthDayTime\":\"[0] at [1]\",\"Now\":1550593015262}]}",
+"21":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.Initialize\",\"P\":[{\"_type\":\"url\",\"Url\":\"\/d2l\/login?target=%2fd2l%2fle%2fcontent%2f4313159%2fviewContent%2f27122297%2fView&sessionExpired=1\"},\"Error: unable to complete your request.\",{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Util.Dictionary\",\"flash\":{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.FlashMessages.RpcReceivePayloadProvider\"},\"session\":{\"_type\":\"func\",\"N\":\"D2L.PT.Auth.SessionTimeout.RpcReceivePayloadProvider\"},\"messageArea\":{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Common.Controls.MessageArea.RpcReceivePayloadProvider\"},\"OR\":{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.ObjectRepository.RpcReceivePayloadProvider\"},\"JS\":{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.JavaScript.RpcReceiveJsPayloadProvider\"},\"CSS\":{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.JavaScript.RpcReceiveCssPayloadProvider\"},\"ariaMessages\":{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.Aria.RpcReceivePayloadProvider\"}}]}",
+"22":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.InlineHelp.Init\",\"P\":[{\"_type\":\"url\",\"Url\":\"\/d2l\/lp\/inlineHelp\/4313159\/help\"}]}",
+"23":"{\"_type\":\"func\",\"N\":\"D2L.LE.ViewContent.ContentViewer.OnLoad\",\"P\":[4313159,27122297,null,{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/content\/4313159\/viewContent\/27122297\/eaa70906-53a8-4585-84a5-c058f4703399\/TrackViewing\"},{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/content\/4313159\/viewContent\/27122297\/eaa70906-53a8-4585-84a5-c058f4703399\/FinalizeView\"},0,true]}",
+"24":"{\"_type\":\"pipe\"}"}
+,
+"AB_DL_PH_Messages":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\"}"}
+,
+"d2l_1_8_634":{"MenuFlyout.OpenFunction":"{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.JavaScript.If\",\"P\":[{\"_type\":\"call\",\"N\":\"D2L.LP.Web.UI.Html.JavaScript.CompareBoolean\",\"P\":[1,{\"_type\":\"call\",\"N\":\"D2L.VG\",\"P\":[\"ab_status_Grades\"]},true]},{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"AB_DL_PH_Grades\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"AB_DL_PH_Grades\"},\"GET\",{\"_type\":\"call\",\"N\":\"D2L.LP.Web.Mvc.RouteLocation.Create\",\"P\":[\"\/d2l\/MiniBar\/{orgUnitId}\/ActivityFeed\/{action}\",{\"_type\":\"D2L.LP.Util.Dictionary\",\"Category\":1},{\"_type\":\"D2L.LP.Util.Dictionary\",\"action\":\"GetAlerts\",\"orgUnitId\":4313159}]},{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Web.UI.Rpc.RpcOptions\",\"keepAlive\":true,\"includeXsrfHeader\":false}],\"D\":true},0,false],\"D\":true}]}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.VS\",\"P\":[\"ab_status_Grades\",false]},{\"_type\":\"func\",\"N\":\"D2L.LP.ActivityBar.OpenBucket\",\"P\":[\"alert_bucket_Grades\"]}]}",
+"MenuFlyout.CloseFunction":"{\"_type\":\"func\",\"N\":\"D2L.LP.ActivityBar.CloseBucket\",\"P\":[\"alert_bucket_Grades\"]}"}
+,
+"alert_bucket_Grades":{"aria-message":"\"You have new Updates\"",
+"title":"\"Update alerts\"",
+"new-alert-title":"\"Update alerts - You have new alerts\"",
+"flyout-id":"{\"_type\":\"id\",\"Value\":\"d2l_1_8_634\"}"}
+,
+"AB_DL_PH_Grades":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\"}"}
+,
+"d2l_1_9_446":{"MenuFlyout.OpenFunction":"{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.JavaScript.If\",\"P\":[{\"_type\":\"call\",\"N\":\"D2L.LP.Web.UI.Html.JavaScript.CompareBoolean\",\"P\":[1,{\"_type\":\"call\",\"N\":\"D2L.VG\",\"P\":[\"ab_status_Alerts\"]},true]},{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"AB_DL_PH_Alerts\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"AB_DL_PH_Alerts\"},\"GET\",{\"_type\":\"call\",\"N\":\"D2L.LP.Web.Mvc.RouteLocation.Create\",\"P\":[\"\/d2l\/MiniBar\/{orgUnitId}\/ActivityFeed\/{action}\",{\"_type\":\"D2L.LP.Util.Dictionary\",\"Category\":0},{\"_type\":\"D2L.LP.Util.Dictionary\",\"action\":\"GetAlerts\",\"orgUnitId\":4313159}]},{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Web.UI.Rpc.RpcOptions\",\"keepAlive\":true,\"includeXsrfHeader\":false}],\"D\":true},0,false],\"D\":true}]}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.VS\",\"P\":[\"ab_status_Alerts\",false]},{\"_type\":\"func\",\"N\":\"D2L.LP.ActivityBar.OpenBucket\",\"P\":[\"alert_bucket_Alerts\"]}]}",
+"MenuFlyout.CloseFunction":"{\"_type\":\"func\",\"N\":\"D2L.LP.ActivityBar.CloseBucket\",\"P\":[\"alert_bucket_Alerts\"]}"}
+,
+"alert_bucket_Alerts":{"aria-message":"\"You have new Subscriptions\"",
+"title":"\"Subscription alerts\"",
+"new-alert-title":"\"Subscription alerts - You have new alerts\"",
+"flyout-id":"{\"_type\":\"id\",\"Value\":\"d2l_1_9_446\"}"}
+,
+"AB_DL_PH_Alerts":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\"}"}
+,
+"ContentNavigator":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\"}"}
+,
+"d2l_pageTitleActions_quiz_summary":{"0":"{\"_type\":\"D2L.LP.Util.Dictionary\",\"enabledIconCss\":\"d2l_1_59_565\",\"disabledIconCss\":\"\",\"onClick\":{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"QuizContentViewPlaceHolder\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"QuizContentViewPlaceHolder\"},\"GET\",{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/quizzing\/4313159\/1748347\/GetSummaryPartialView\"},{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Web.UI.Rpc.RpcOptions\",\"keepAlive\":true,\"includeXsrfHeader\":false}],\"D\":true}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_summary\",false]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_submissions\",true]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_reports\",true]}]}}"}
+,
+"d2l_pageTitleActions_quiz_submissions":{"0":"{\"_type\":\"D2L.LP.Util.Dictionary\",\"enabledIconCss\":\"d2l_1_61_492\",\"disabledIconCss\":\"\",\"onClick\":{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"QuizContentViewPlaceHolder\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"QuizContentViewPlaceHolder\"},\"GET\",{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/quizzing\/4313159\/1748347\/GetSubmissionsPartialView\"},{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Web.UI.Rpc.RpcOptions\",\"keepAlive\":true,\"includeXsrfHeader\":false}],\"D\":true}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_submissions\",false]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_summary\",true]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_reports\",true]}]}}"}
+,
+"d2l_pageTitleActions_quiz_reports":{"0":"{\"_type\":\"D2L.LP.Util.Dictionary\",\"enabledIconCss\":\"d2l_1_63_301\",\"disabledIconCss\":\"\",\"onClick\":{\"_type\":\"pipe\",\"P\":[{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"QuizContentViewPlaceHolder\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Rpc.ConnectPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"QuizContentViewPlaceHolder\"},\"GET\",{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/quizzing\/4313159\/1748347\/GetReportsPartialView\"},{\"_type\":\"D2L.LP.Util.Dictionary\"},{\"_type\":\"D2L.LP.Web.UI.Rpc.RpcOptions\",\"keepAlive\":true,\"includeXsrfHeader\":false}],\"D\":true}],\"D\":true},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_reports\",false]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_summary\",true]},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.SetItemIsVisible\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"},\"quiz_submissions\",true]}]}}"}
+,
+"d2l_1_64_238":{"0":"{\"_type\":\"D2L.LP.Util.Dictionary\",\"enabledIconCss\":\"d2l_1_65_297\",\"disabledIconCss\":\"\",\"onClick\":{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Legacy.MasterPages.Dialog.Open\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_5_930\"},{\"_type\":\"url\",\"Url\":\"\/d2l\/lms\/content\/viewer\/actions\/submit_feedback_popup.d2l?tId=27122297&ou=4313159\"},\"Save\",null,\"\",550,500,\"Close this Dialog\",[{\"_type\":\"D2L.LP.Web.UI.Legacy.MasterPages.DialogLegacy+ButtonData\",\"IsPrimary\":true,\"Key\":\"submitButton\",\"Param\":\"\",\"Text\":\"Submit\",\"ResponseType\":1,\"IsEnabled\":true},{\"_type\":\"D2L.LP.Web.UI.Legacy.MasterPages.DialogLegacy+ButtonData\",\"IsPrimary\":false,\"Key\":\"cancelButton\",\"Param\":\"\",\"Text\":\"Cancel\",\"ResponseType\":0,\"IsEnabled\":true}]],\"D\":true}}"}
+,
+"d2l_1_57_676":{"onClose":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Desktop.Controls.ContextMenu.OnCloseHandler\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_pageTitleActions\"}]}"}
+,
+"d2l_pageTitleActions":{"Context":"{\"_type\":\"D2L.LP.Util.Dictionary\",\"floatingContainerId\":{\"_type\":\"id\",\"Value\":\"d2l_1_57_676\"}}"}
+,
+"ContentView":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\"}"}
+,
+"QuizContentViewPlaceHolder":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\"}"}
+,
+"AdditionalInfoPlaceholder":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\"}"}
+,
+"d2l_1_3_625":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"restrictions\"}"}
+,
+"d2l_1_1_752":{"submit":"{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialRender\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_3_625\"},{\"_type\":\"func\",\"N\":\"D2L.LP.Web.UI.Common.Controls.Form.RpcSubmitPartial\",\"P\":[{\"_type\":\"id\",\"Value\":\"d2l_1_3_625\"},{\"_type\":\"id\",\"Value\":\"d2l_1_1_752\"},{\"_type\":\"url\",\"Url\":\"\/d2l\/le\/content\/4313159\/updateresource\/quiz\/1748347\/UpdateRestrictions?topicId=27122297\"},false,{\"_type\":\"D2L.LP.Util.Dictionary\"}],\"D\":true},0,false],\"D\":true}"}
+,
+"ResultDetails":{"0":"{\"_type\":\"D2L.LP.Web.UI.Html.PartialRendering.PartialHtmlRenderContext\",\"HeadingLevel\":2,\"ValidClassNames\":[],\"Scope\":\"\",\"ChildScopeCounters\":\"restrictions:0\"}"}
+
+};
+
+		//]]>
+		</script>
+	
+</body></html>

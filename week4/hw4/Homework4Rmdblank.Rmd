@@ -121,7 +121,7 @@ Normality plots of mpg look pretty close to normal, which satisfies the normalit
 #####################################
 
 <span style="color:DarkViolet"> Predict the classifications from the LDA fit. Tabulate the variable Domestic with the LDA classification, and report the number of correctly classified domestic vehicles.
-Number of domestic vehicles that are correctly classified = 294</span>
+Number of domestic vehicles that are correctly classified = 204</span>
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:
@@ -129,7 +129,7 @@ Number of domestic vehicles that are correctly classified = 294</span>
 fittedclass = predict(ldafit,data=Auto)$class
 confusion.matrix = table(Auto$domestic,fittedclass)
 confusion.matrix
-sum(diag(confusion.matrix))
+#sum(diag(confusion.matrix))
 ```
 
 
@@ -144,9 +144,11 @@ sum(diag(confusion.matrix))
 #Question 7, sensitivity  = TP / TP + FN = TP/P
 sensitivity = confusion.matrix[2,2]/(confusion.matrix[2,2] + confusion.matrix[1,2])
 sensitivity
+204/(204+41)
 #Question 8, specificity = TN / TN + FP = TN/N
 specificity = confusion.matrix[1,1]/(confusion.matrix[1,1] + confusion.matrix[2,1])
 specificity
+90/(90+57)
 ```
 
 
@@ -180,9 +182,9 @@ boxplot(year~domestic, data=Auto, xlab="Domestic", ylab="year")
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:   one of  
 A) 	cylinders,  
-B) 	displacement,  
+->B) 	displacement,  
 C) 	horsepower,  
-->D) 	weight,  
+D) 	weight,  
 E) 	acceleration,  
 F) 	year
 
@@ -209,9 +211,9 @@ F) 	year
 (post to discussion board on D2L)
 ```{r,echo=FALSE}
 library(pROC)
-myroc = roc(response=Auto$domestic, predictor = Auto$weight)
+myroc = roc(response=Auto$domestic, predictor = Auto$displacement)
 myroc$auc
-plot.roc(myroc, main="ROC of domestic car predicted by weight")
+plot.roc(myroc, main="ROC of domestic car predicted by displacement")
 ```
 
 #####################################
@@ -220,7 +222,7 @@ plot.roc(myroc, main="ROC of domestic car predicted by weight")
 
 <span style="color:DarkViolet"> The ROC curve and R output for using *mpg* to predict *Domestic* is shown in the image. Discuss whether you would use *mpg* or the variable you selected previously (among *cylinders*, *displacement*, *horsepower*, *weight*, *acceleration*, *year*) to predict *Domestic*.</span>
 
-Weight has a larger area under the curve than does mpg (0.8741 vs 0.8407). Based purely on AUC, weight should be selected. However, weight may violate the equal variance condition and the AUC between weight and mpg are not that much different, so I would keep mpg.
+Displacement has a significantly larger area under the ROC curve than does mpg (0.9267 vs 0.8407). Based purely on AUC, displacement should be selected.
 
 [See D2L for image, not able to include in code.]  
 
@@ -419,7 +421,7 @@ predict(qdafit,newdata)$class
 
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
-American,  
+->American,  
 European,  
 Japanese  
 
@@ -444,7 +446,7 @@ Japanese
   3   1  21  57
 
 
-The QDA fit overall is a little better. It is significantly better at predicting Japanese origin.
+Both have a high error rate, but the QDA fit overall is a little better. It is significantly better at predicting Japanese origin.
 
 ```{r,echo=FALSE}
 
@@ -569,7 +571,7 @@ allpredictedCV1 = allpredictedCV2 = allpredictedCV3 = factor(rep(NA,n),levels=c(
 
 for (i in 1:cvk)  {
   ldafit1 = lda(origin~displacement, data=Auto, subset=(cvgroups!=i))
-  newdata1 = data.frame(Auto[cvgroups==i,3])
+  newdata1 = data.frame(Auto[cvgroups==i,c(3)])
   allpredictedCV1[cvgroups==i] = predict(ldafit1,newdata1)$class
   
   ldafit2 = lda(origin~mpg+displacement, data=Auto, subset=(cvgroups!=i))
@@ -683,6 +685,7 @@ Model 3 has fewer parameters to estimate and would be computationally less expen
 
 <span style="color:DarkViolet">Comparing Model 1 to 2 to 3 and Model 4 to 5 to 6, we observe improvement in predictive ability by including more than two predictors. Discuss why, using the scatterplots in the image to compare predictors in your discussion.  </span>
 
+There appears to be strong relationships between between many of the variables.
 
 ```{r, echo=TRUE}
 pairs(Auto[,c(1,2,3,4,5)])
@@ -743,7 +746,7 @@ mvn(xJapanese, mvnTest = "hz")$multivariateNormality
 
 <span style="color:DarkViolet"> Explain what your observations from the previous question tell you about the appropriateness of the QDA model for predicting *origin* for this data.</span>
 
-The Henze-Zirkler test concludes that the assumption of multivariate normality is not true. Since the assumption is not met the QDA model is not appropriate.
+The Henze-Zirkler test concludes that the assumption of multivariate normality is violated. Since the assumption is not met, the QDA model is not appropriate.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -756,3 +759,5 @@ The Henze-Zirkler test concludes that the assumption of multivariate normality i
 <span style="color:DarkViolet"> Provide an alternative method, suited to the qualitative response *origin*, that could be used to fit the above model. You may provide explanation / reasoning to support your choice.</span>
 
 <span style="color:green">**Text Answer**: </span>
+
+knn might be a good choice here, because it does not make any assumptions about the underlying distribution.
