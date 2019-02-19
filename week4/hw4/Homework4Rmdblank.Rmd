@@ -534,6 +534,16 @@ Set R’s seed to 4 (for Homework 4) and define cvgroups (random groups for the 
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+library(ISLR)
+library(MASS)
+data(Auto)
+attach(Auto)
+
+cvk = 10
+n = dim(Auto)[1]
+groups = c(rep(1:10,39),1,2)
+set.seed(4)
+cvgroups = sample(groups,n)
 ```
 
 
@@ -543,14 +553,69 @@ Set R’s seed to 4 (for Homework 4) and define cvgroups (random groups for the 
 
 <span style="color:DarkViolet">For the grouping of the data described in the previous question, use 10-fold cross-validation method to calculate $CV_{(10)}$ for each of Models 1-6. Report the $CV_{(10)}$ for each model.  </span>
 
+Model 1:  LDA using the predictor displacement.  
+Model 2:  LDA using the predictors mpg and displacement.  
+Model 3:  LDA using the predictors mpg, cylinders, displacement, horsepower, and weight.  
+Model 4:  QDA using the predictor displacement.  
+Model 5:  QDA using the predictors mpg and displacement.  
+Model 6:  QDA using the predictors mpg, cylinders, displacement, horsepower, and weight. 
+
+
 
 ```{r,echo=FALSE}
+#colnames(Auto)
+
+allpredictedCV1 = allpredictedCV2 = allpredictedCV3 = factor(rep(NA,n),levels=c("1","2","3"))
+
+for (i in 1:cvk)  {
+  ldafit1 = lda(origin~displacement, data=Auto, subset=(cvgroups!=i))
+  newdata1 = data.frame(Auto[cvgroups==i,3])
+  allpredictedCV1[cvgroups==i] = predict(ldafit1,newdata1)$class
+  
+  ldafit2 = lda(origin~mpg+displacement, data=Auto, subset=(cvgroups!=i))
+  newdata2 = data.frame(Auto[cvgroups==i,c(1,3)])
+  allpredictedCV2[cvgroups==i] = predict(ldafit2,newdata2)$class
+  
+  ldafit3 = lda(origin~mpg+cylinders+displacement+horsepower+weight, data=Auto, subset=(cvgroups!=i))
+  newdata3 = data.frame(Auto[cvgroups==i,c(1,2,3,4,5)])
+  allpredictedCV3[cvgroups==i] = predict(ldafit3,newdata3)$class
+}
+CVmodel1 = sum(allpredictedCV1!= Auto$origin)/n; CVmodel1
+CVmodel2 = sum(allpredictedCV2!= Auto$origin)/n; CVmodel2
+CVmodel3 = sum(allpredictedCV3!= Auto$origin)/n; CVmodel3
+
+
+allpredictedCV4 = allpredictedCV5 = allpredictedCV6 = factor(rep(NA,n),levels=c("1","2","3"))
+for (i in 1:cvk)  {
+  qdafit1 = qda(origin~displacement, data=Auto, subset=(cvgroups!=i))
+  newdata1 = data.frame(Auto[cvgroups==i,3])
+  allpredictedCV4[cvgroups==i] = predict(qdafit1,newdata1)$class
+  
+  qdafit2 = qda(origin~mpg+displacement, data=Auto, subset=(cvgroups!=i))
+  newdata2 = data.frame(Auto[cvgroups==i,c(1,3)])
+  allpredictedCV5[cvgroups==i] = predict(qdafit2,newdata2)$class
+  
+  qdafit3 = qda(origin~mpg+cylinders+displacement+horsepower+weight, data=Auto, subset=(cvgroups!=i))
+  newdata3 = data.frame(Auto[cvgroups==i,c(1,2,3,4,5)])
+  allpredictedCV6[cvgroups==i] = predict(qdafit3,newdata3)$class
+}
+CVmodel4 = sum(allpredictedCV4!= Auto$origin)/n; CVmodel4
+CVmodel5 = sum(allpredictedCV5!= Auto$origin)/n; CVmodel5
+CVmodel6 = sum(allpredictedCV6!= Auto$origin)/n; CVmodel6
+
+
 #Question 33
+0.4617347
 #Question 34
+0.2806122
 #Question 35
+0.2576531
 #Question 36
+0.4795918
 #Question 37
+0.2857143
 #Question 38
+0.2653061
 ```
 
 
@@ -594,7 +659,7 @@ Model 6: $CV_{(10)}$ =
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 Model 1,  
 Model 2,  
-Model 3,  
+->Model 3,  
 Model 4,  
 Model 5,  
 Model 6  
@@ -606,6 +671,7 @@ Model 6
 
 <span style="color:DarkViolet"> Suggest a possible reason behind the preference between models 3 and 6, related to the number of parameters that need to be estimated for each model.</span>
 
+Model 3 has fewer parameters to estimate and would be computationally less expensive.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -617,6 +683,10 @@ Model 6
 
 <span style="color:DarkViolet">Comparing Model 1 to 2 to 3 and Model 4 to 5 to 6, we observe improvement in predictive ability by including more than two predictors. Discuss why, using the scatterplots in the image to compare predictors in your discussion.  </span>
 
+
+```{r, echo=TRUE}
+pairs(Auto[,c(1,2,3,4,5)])
+```
 
 [See D2L for image, not able to include in code.]  
 
@@ -650,6 +720,20 @@ If we fit this model on the full data set and predict the data using that model,
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+#assumptions
+xvar = cbind(mpg, cylinders, displacement, horsepower,weight)
+xDomesitc = xvar[origin == 1,]
+xEuropean = xvar[origin == 2,]
+xJapanese = xvar[origin == 3,]
+
+#install.packages("MVN")
+library(MVN)
+mvn(xDomesitc, mvnTest = "hz")$multivariateNormality
+mvn(xEuropean, mvnTest = "hz")$multivariateNormality
+mvn(xJapanese, mvnTest = "hz")$multivariateNormality
+#multivariate normality of the predictors is reasonable, 
+#  so it is not surprising that cross-validation gives precisely the same 
+#  classification counts as assessing the model on the same data
 ```
 
 
@@ -658,6 +742,8 @@ If we fit this model on the full data set and predict the data using that model,
 #####################################
 
 <span style="color:DarkViolet"> Explain what your observations from the previous question tell you about the appropriateness of the QDA model for predicting *origin* for this data.</span>
+
+The Henze-Zirkler test concludes that the assumption of multivariate normality is not true. Since the assumption is not met the QDA model is not appropriate.
 
 <span style="color:green">**Text Answer**: </span>
 
