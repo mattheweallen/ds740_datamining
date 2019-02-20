@@ -27,6 +27,7 @@ REGfit = lm(y~x)
 summary(REGfit)  
 
 #fit penalized regression using all predictors
+#install.packages("glmnet")
 library(glmnet)  # may need to download package glmnet
 lambdalist = exp((1200:-1200)/100)  # order large to small
   #fit ridge regression - need alpha = 0
