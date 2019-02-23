@@ -47,6 +47,29 @@ using each of the following methods:
 
 ```{r,echo=FALSE}
 trees = read.csv("Trees.csv")
+colnames(trees)
+#multiple linear regression
+origfit = lm(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=trees)
+summary(origfit)
+
+#labels
+x = model.matrix(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=trees)[,-1]
+y = trees[,1]
+n = dim(x)[1]
+p = dim(x)[2]
+
+#ridge regression
+library(glmnet)  # may need to download package glmnet
+lambdalist = (1:100)/100  # order large to small
+#fit ridge regression - need alpha = 0
+RRfit = glmnet(x, y, alpha = 0,lambda=lambdalist)
+coef(RRfit,s=0.1)
+#LASSO
+LASSOfit = glmnet(x, y, alpha = 1,lambda=lambdalist)
+coef(LASSOfit,s=0.1)
+#Elastic net
+ENETfit = glmnet(x, y, alpha = 0.7,lambda=lambdalist)
+coef(ENETfit,s=0.1)
 ```
 
 #####################################
@@ -57,7 +80,7 @@ trees = read.csv("Trees.csv")
 
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
-0,  
+->0,  
 1,  
 2,  
 3,  
@@ -69,6 +92,7 @@ trees = read.csv("Trees.csv")
 
 <span style="color:DarkViolet">Provide an explanation for the answer to the previous question. </span>
 
+There is likely multicolinearity happening. The features are highly correlated with each other.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -81,8 +105,8 @@ $\hat{\beta}_0$ = −5.90695, $\hat{\beta}_1$ = 0, $\hat{\beta}_2$ = 0, $\hat{\b
 
 <span style="color:green">**Multiple SELECT Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
-Multiple linear regression,  
-Ridge Regression,  
+->Multiple linear regression,  
+->Ridge Regression,  
 Elastic net,  
 LASSO  
 
@@ -96,12 +120,12 @@ LASSO
 $\texttt{lambdalist = c((1:100)/100)}$  
 for fitting with the glmnet() function.</span>  
 
-<span style="color:DarkViolet">$\hat{\beta}_0$ =  
-$\hat{\beta}_1$ =   
-$\hat{\beta}_2$ =   
-$\hat{\beta}_3$ =   
-$\hat{\beta}_4$ =   
-$\hat{\beta}_5$ = </span>    
+<span style="color:DarkViolet">$\hat{\beta}_0$ = -2.552886e+01
+$\hat{\beta}_1$ = 3.437740e+00  
+$\hat{\beta}_2$ = 0  
+$\hat{\beta}_3$ = 0  
+$\hat{\beta}_4$ = 0 
+$\hat{\beta}_5$ = -2.799844e-04</span>    
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
@@ -124,7 +148,7 @@ $\hat{\beta}_5$ = </span>
 Elastic net,  
 Ridge Regression,  
 Multiple linear regression,  
-LASSO
+->LASSO
 
 
 
@@ -137,7 +161,7 @@ LASSO
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
-
+lamda = .4
 
 
 ***
@@ -158,6 +182,7 @@ LASSO
 
 <span style="color:DarkViolet">Each of the five variables *Enroll, Apps, Accept, F.Undergrad*, and *P.Undergrad* is related to the size of the college and has strongly right-skewed distribution.  Explain why the skewness makes sense, in terms of the variety of colleges covered in this dataset. </span>
 
+Looking the histogram of Enroll, it is indeed right skewed. From the summary of the Enroll, the minimum enrolled is 35 and the maximum enrolled is 6392. The enrollment range is so large that this would likely make F.Undergrad, and P.Undergrad also skewed. Along with the total enrollment, the prestige of the college could also make Apps, and Accep right skewed.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -171,6 +196,17 @@ LASSO
 <span style="color:green">**Graph Answer**  </span>: 
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
+library(ISLR)
+data("College")
+help("College")
+
+College$log.Enroll = log(College$Enroll)
+College$log.Apps = log(College$Apps)
+College$log.Accept = log(College$Accept)
+College$log.F.Undergrad = log(College$F.Undergrad)
+College$log.P.Undergrad = log(College$P.Undergrad)
+
+hist(College$log.Enroll, xlab = "log of Enrollment", main = "Histogram of Log of Enrollment")
 ```
 
 
