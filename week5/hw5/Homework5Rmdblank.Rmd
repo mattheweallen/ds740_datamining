@@ -47,14 +47,15 @@ using each of the following methods:
 
 ```{r,echo=FALSE}
 trees = read.csv("Trees.csv")
+Trees = trees[,c(2:7)]
 colnames(trees)
 #multiple linear regression
-origfit = lm(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=trees)
+origfit = lm(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=Trees)
 summary(origfit)
 
 #labels
-x = model.matrix(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=trees)[,c(-1)]
-y = trees[,2]
+x = model.matrix(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=Trees)[,c(-1)]
+y = Trees[,1]
 n = dim(x)[1]
 p = dim(x)[2]
 
@@ -210,7 +211,10 @@ hist(College$log.Enroll, xlab = "log of Enrollment", main = "Histogram of Log of
 
 
 #correlation
-x = model.matrix(log.Enroll~Expend+log.Accept+log.P.Undergrad+perc.alumni+Personal,data=College)
+attach(College)
+college = data.frame(log.Enroll,Expend,log.Accept,log.P.Undergrad,perc.alumni,Personal)
+
+x = model.matrix(log.Enroll~Expend+log.Accept+log.P.Undergrad+perc.alumni+Personal,data=college)
 y = College[,"log.Enroll"]
 
 #cor(x)
@@ -272,18 +276,25 @@ Many of the variables are highly correlated with each other.
 ```{r echo=FALSE, eval=FALSE}
 model = log.Enroll ~ Private + Top10perc + Top25perc + Outstate + Room.Board + Books + Personal + PhD + Terminal + S.F.Ratio + perc.alumni + Expend + Grad.Rate + log.Apps + log.Accept + log.F.Undergrad + log.P.Undergrad
 
+
 lambdalist = (1:1000)/1000  # order large to small
 #fit ridge regression - need alpha = 0
 #RRfit = glmnet(x, y, alpha = 0,lambda=lambdalist)
 #coef(RRfit,s=0.1)
 #LASSO
 
-x = model.matrix(model,data=College)
+college = data.frame(log.Enroll,Private,Top10perc,Top25perc,Outstate,Room.Board,Books,Personal,PhD,Terminal,S.F.Ratio,perc.alumni,Expend,Grad.Rate,log.Apps,log.Accept,log.F.Undergrad,log.P.Undergrad)
+
+
+x = model.matrix(model,data=college)
 x
 y = College[,"log.Enroll"]
 
 LASSOfit = glmnet(x, y, alpha = 1,lambda=lambdalist)
-coef(LASSOfit,s=0.02)
+coef(LASSOfit,s=0.02)#.03,.05,.8,
+coef(LASSOfit,s=0.03)
+coef(LASSOfit,s=0.05)
+coef(LASSOfit,s=0.8)
 #Elastic net
 #ENETfit = glmnet(x, y, alpha = 0.7,lambda=lambdalist)
 #coef(ENETfit,s=0.1)
@@ -299,7 +310,7 @@ coef(LASSOfit,s=0.02)
 1,  
 2,  
 3,  
-4,  
+->4,  
 5
 
 18.  For the LASSO model with $\lambda$ = 0.03, how many coefficients are non-zero?  
@@ -307,7 +318,7 @@ coef(LASSOfit,s=0.02)
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 1,  
 2,  
-3,  
+->3,  
 4,  
 5
 
@@ -315,7 +326,7 @@ coef(LASSOfit,s=0.02)
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 1,  
-2,  
+->2,  
 3,  
 4,  
 5
@@ -323,7 +334,7 @@ coef(LASSOfit,s=0.02)
 20.  For the LASSO model with $\lambda$ = 0.8, how many coefficients are non-zero?  
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
-1,  
+->1,  
 2,  
 3,  
 4,  
@@ -352,8 +363,8 @@ perc.alumni,
 Expend,  
 Grad.Rate,  
 log.Apps,  
-log.Accept,  
-log.F.Undergrad,  
+->log.Accept,  
+->log.F.Undergrad,  
 log.P.Undergrad
 
 ***
@@ -379,6 +390,28 @@ with $\alpha$ = 0.75, make a plot of $CV_{(10)}$ vs $\lambda$ and submit your pl
 <span style="color:green">**Graph Answer**</span>: 
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
+
+#cross-validation
+set.seed(5)
+ncv = 10
+n = dim(college)[1]
+groups = c(rep(1:10,77),(1:7)); cvgroups = sample(groups,n)
+
+library(glmnet)
+lambdalist = (1000:1)/1000  # order large to small
+
+#ENET alpha=0.5 cross-validation
+cvENET50glm = cv.glmnet(x, y, lambda=lambdalist, alpha = 0.75, nfolds=ncv, foldid=cvgroups)
+plot(cvENET50glm$lambda,cvENET50glm$cvm,type="l",lwd=2,col="red",xlab="lambda",ylab="CV(10)")
+whichlowestcvENET50 = order(cvENET50glm$cvm)[1]; min(cvENET50glm$cvm)
+bestlambdaENET50 = lambdalist[whichlowestcvENET50]; bestlambdaENET50; abline(v=bestlambdaENET50)
+
+#fit selected model
+Bestfit = glmnet(x, y, alpha = 0.50,lambda=lambdalist)
+coef(Bestfit,s=bestlambdaENET50)
+plot(Bestfit,xvar="lambda"); abline(v=log(bestlambdaENET50))
+plot(Bestfit)
+
 ```
 
 #####################################
@@ -386,6 +419,8 @@ with $\alpha$ = 0.75, make a plot of $CV_{(10)}$ vs $\lambda$ and submit your pl
 #####################################
 
 <span style="color:DarkViolet">For the Elastic net model with $\alpha$ = 0.75, what is the value of $\lambda$ that minimizes $CV_{(10)}$?</span>
+
+.002
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
