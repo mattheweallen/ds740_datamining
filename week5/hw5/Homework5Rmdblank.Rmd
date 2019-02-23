@@ -53,8 +53,8 @@ origfit = lm(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=
 summary(origfit)
 
 #labels
-x = model.matrix(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=trees)[,-1]
-y = trees[,1]
+x = model.matrix(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=trees)[,c(-1)]
+y = trees[,2]
 n = dim(x)[1]
 p = dim(x)[2]
 
@@ -120,12 +120,12 @@ LASSO
 $\texttt{lambdalist = c((1:100)/100)}$  
 for fitting with the glmnet() function.</span>  
 
-<span style="color:DarkViolet">$\hat{\beta}_0$ = -2.552886e+01
-$\hat{\beta}_1$ = 3.437740e+00  
-$\hat{\beta}_2$ = 0  
-$\hat{\beta}_3$ = 0  
+<span style="color:DarkViolet">$\hat{\beta}_0$ = -1.714025816
+$\hat{\beta}_1$ = 0  
+$\hat{\beta}_2$ = 0.010552334 
+$\hat{\beta}_3$ = 0.001864428 
 $\hat{\beta}_4$ = 0 
-$\hat{\beta}_5$ = -2.799844e-04</span>    
+$\hat{\beta}_5$ = 0.002035016</span>    
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
@@ -207,6 +207,24 @@ College$log.F.Undergrad = log(College$F.Undergrad)
 College$log.P.Undergrad = log(College$P.Undergrad)
 
 hist(College$log.Enroll, xlab = "log of Enrollment", main = "Histogram of Log of Enrollment")
+
+
+#correlation
+
+Expend,  
+log.Accept,  
+log.P.Undergrad,  
+perc.alumni,  
+Personal
+
+x = model.matrix(Volume~.,data=College)[,-1]
+x1 = model.matrix(Volume~.,data=trees)  # includes column of ones to fit intercept
+xfull = model.matrix(Volume~.,data=Trees)[,-1]
+x1full = model.matrix(Volume~.,data=Trees) 
+y = Trees[,1]
+
+cor(x)
+cor(x,y)
 ```
 
 
