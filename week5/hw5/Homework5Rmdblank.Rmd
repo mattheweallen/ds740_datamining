@@ -210,20 +210,10 @@ hist(College$log.Enroll, xlab = "log of Enrollment", main = "Histogram of Log of
 
 
 #correlation
+x = model.matrix(log.Enroll~Expend+log.Accept+log.P.Undergrad+perc.alumni+Personal,data=College)
+y = College[,"log.Enroll"]
 
-Expend,  
-log.Accept,  
-log.P.Undergrad,  
-perc.alumni,  
-Personal
-
-x = model.matrix(Volume~.,data=College)[,-1]
-x1 = model.matrix(Volume~.,data=trees)  # includes column of ones to fit intercept
-xfull = model.matrix(Volume~.,data=Trees)[,-1]
-x1full = model.matrix(Volume~.,data=Trees) 
-y = Trees[,1]
-
-cor(x)
+#cor(x)
 cor(x,y)
 ```
 
@@ -237,7 +227,7 @@ cor(x,y)
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 Expend,  
-log.Accept,  
+->log.Accept,  
 log.P.Undergrad,  
 perc.alumni,  
 Personal
@@ -251,6 +241,8 @@ Personal
 
 <span style="color:DarkViolet">Provide a reason that the predictor you chose in the previous question makes sense, based on the description of the data. </span>
 
+Accept is the number of students accepted. It would be expected that this would be highly correlated with enrollment.
+
 <span style="color:green">**Text Answer**: </span>
 
 
@@ -262,7 +254,7 @@ Personal
 <span style="color:DarkViolet">Describe features of this data set that support using a penalized regression model (versus a basic multiple linear regression model). </span>
 
 <span style="color:green">**Text Answer**: </span>
-
+Many of the variables are highly correlated with each other.
 
 ***
 ***
@@ -278,6 +270,23 @@ Personal
 <span style="color:DarkViolet">For the following questions 17-20,  fit the LASSO ($\alpha$ = 1) model and find coefficients for $\lambda$ = 0.001, 0.002, …, 0.999, 1.000.  Determine how many coefficients are non-zero, **excluding the intercept**.</span>
 
 ```{r echo=FALSE, eval=FALSE}
+model = log.Enroll ~ Private + Top10perc + Top25perc + Outstate + Room.Board + Books + Personal + PhD + Terminal + S.F.Ratio + perc.alumni + Expend + Grad.Rate + log.Apps + log.Accept + log.F.Undergrad + log.P.Undergrad
+
+lambdalist = (1:1000)/1000  # order large to small
+#fit ridge regression - need alpha = 0
+#RRfit = glmnet(x, y, alpha = 0,lambda=lambdalist)
+#coef(RRfit,s=0.1)
+#LASSO
+
+x = model.matrix(model,data=College)
+x
+y = College[,"log.Enroll"]
+
+LASSOfit = glmnet(x, y, alpha = 1,lambda=lambdalist)
+coef(LASSOfit,s=0.02)
+#Elastic net
+#ENETfit = glmnet(x, y, alpha = 0.7,lambda=lambdalist)
+#coef(ENETfit,s=0.1)
 ```
 
 #####################################
