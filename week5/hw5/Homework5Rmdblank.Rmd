@@ -55,9 +55,13 @@ summary(origfit)
 
 #labels
 x = model.matrix(Volume ~ Girth + Height + GirthHeight + Girth2 + Girth2Height,data=Trees)[,c(-1)]
+pairs(x)
+cor(x)
 y = Trees[,1]
 n = dim(x)[1]
 p = dim(x)[2]
+
+y
 
 #ridge regression
 library(glmnet)  # may need to download package glmnet
@@ -93,7 +97,7 @@ coef(ENETfit,s=0.1)
 
 <span style="color:DarkViolet">Provide an explanation for the answer to the previous question. </span>
 
-There is likely multicolinearity happening. The features are highly correlated with each other.
+There is likely multicollinearity happening. The features are highly correlated with each other.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -278,6 +282,7 @@ model = log.Enroll ~ Private + Top10perc + Top25perc + Outstate + Room.Board + B
 
 
 lambdalist = (1:1000)/1000  # order large to small
+plot(lambdalist)
 #fit ridge regression - need alpha = 0
 #RRfit = glmnet(x, y, alpha = 0,lambda=lambdalist)
 #coef(RRfit,s=0.1)
@@ -399,15 +404,17 @@ groups = c(rep(1:10,77),(1:7)); cvgroups = sample(groups,n)
 
 library(glmnet)
 lambdalist = (1000:1)/1000  # order large to small
-
+plot(lambdalist)
 #ENET alpha=0.5 cross-validation
 cvENET50glm = cv.glmnet(x, y, lambda=lambdalist, alpha = 0.75, nfolds=ncv, foldid=cvgroups)
-plot(cvENET50glm$lambda,cvENET50glm$cvm,type="l",lwd=2,col="red",xlab="lambda",ylab="CV(10)")
+bestlambdaENET50 = lambdalist[whichlowestcvENET50]; bestlambdaENET50;
 whichlowestcvENET50 = order(cvENET50glm$cvm)[1]; min(cvENET50glm$cvm)
-bestlambdaENET50 = lambdalist[whichlowestcvENET50]; bestlambdaENET50; abline(v=bestlambdaENET50)
-
+{
+  plot(cvENET50glm$lambda,cvENET50glm$cvm,type="l",lwd=2,col="red",xlab="lambda",ylab="CV(10)", xlim=c(0,.02),ylim = c(0,.1))
+  bestlambdaENET50 = lambdalist[whichlowestcvENET50]; bestlambdaENET50; abline(v=bestlambdaENET50)
+}
 #fit selected model
-Bestfit = glmnet(x, y, alpha = 0.50,lambda=lambdalist)
+Bestfit = glmnet(x, y, alpha = 0.75,lambda=lambdalist)
 coef(Bestfit,s=bestlambdaENET50)
 plot(Bestfit,xvar="lambda"); abline(v=log(bestlambdaENET50))
 plot(Bestfit)
@@ -420,7 +427,7 @@ plot(Bestfit)
 
 <span style="color:DarkViolet">For the Elastic net model with $\alpha$ = 0.75, what is the value of $\lambda$ that minimizes $CV_{(10)}$?</span>
 
-.002
+0.002
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
