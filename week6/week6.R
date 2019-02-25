@@ -69,3 +69,5 @@ fit.w$coefficients
 
 
 #robust regression put less weight on outliers or influential points
+#weights decrease as absolute value of residuals increase
+
