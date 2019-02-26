@@ -124,3 +124,4 @@ showLabels(1:dim(hills)[1], fit.bisquare$w, rownames(hills), id.method = smallwe
 }
 
 #https://www.cs.umd.edu/~mount/Papers/lts-manuscript07.pdf
+
