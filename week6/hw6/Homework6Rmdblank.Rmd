@@ -230,14 +230,16 @@ elnino = na.omit(read.csv("elnino.csv"))
 <span style="color:green">**Graph and Commentary Answer**  </span>: 
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
-colnames(elnino)
+#colnames(elnino)
 model = air.temp~zon.winds+mer.winds+humidity+s.s.temp
 fit.lm = lm(model, data=elnino)
 plot(fit.lm)
 fit.lm
 
+library(nlme)
 fit.gls = gls(model, data=elnino)
 fit.gls
+summary(fit.gls)
 ```
 
 
@@ -247,7 +249,7 @@ fit.gls
 
 <span style="color:DarkViolet">(**Model B**) Use $\texttt{gls()}$ to fit a model with uncorrelated errors. Compare the estimated coefficients from this model to those from Model A.  Why does this make sense?</span>  
 
-They are essentially the same. Both models do not take into account uncorrelated errors. The coefficients are computed in two different ways, and they agree with each other. The lm model uses Ordinary Least Squares and the gls model uses Restricted Maximum Likelihood.
+They are essentially the same. Both models do not take into account correlated errors. The coefficients are computed in two different ways, and they agree with each other. The lm model uses Ordinary Least Squares and the gls model uses Restricted Maximum Likelihood.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -292,6 +294,13 @@ Enter your R code below.</span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+fit.auto = gls(model, data=elnino, correlation = corAR1(form = ~1 | buoy))
+summary(fit.auto)
+
+fit.auto$coefficients
+
+AIC(fit.gls)
+AIC(fit.auto)
 ```
 
 #####################################
@@ -301,6 +310,7 @@ Enter your R code below.</span>
 <span style="color:DarkViolet">Write 2-4 sentences comparing the equation and appropriateness of Model C to the equation and appropriateness of Model B.
 </span>  
 
+Since measurements at each buoy are strongly correlated with measurements from the previous day, an autoregressive model of order 1 seems to be more appropriate. The first model assumes uncorrelated error terms. From the plot of the error with the previous day's error for buoy 3, there is evidence that successive days errors are indeed correlated with each other.
 <span style="color:green">**Text Answer**: </span>
 
 
@@ -316,6 +326,7 @@ Enter your R code below.</span>
 
 <span style="color:green">**Text Answer**: </span>
 
+The AIC for model C of 381.2676 is significantly better than for model B of 694.1104. They are not reasonable alternatives. AIC takes into account the fit and the number of parameters, so model C is a better tradeoff between fit and number of parameters.
 
 
 
@@ -329,6 +340,8 @@ Enter your R code below.</span>
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+covMatrix = getVarCov(fit.auto) #grab the first off diagnol number. this is the correlation between noise terms of consecutive days. divide by variance which is on the diagnol
+covMatrix[1,2]/covMatrix[1,1]
 ```
 
 
@@ -343,4 +356,5 @@ Enter your R code below.</span>
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+(covMatrix[1,2]/covMatrix[1,1])^2
 ```
