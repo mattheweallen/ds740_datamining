@@ -50,6 +50,15 @@ Enter your R code below.</span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+#install.packages("smss")
+library(smss)
+#library(nlme)
+data("crime2005")
+m1 = lm(VI2~ME + PO, data = crime2005)
+
+plot(m1)
+
+crime2005$STATE[c(8,40,51)]
 ```
 
 
@@ -59,9 +68,12 @@ Enter your R code below.</span>
 #####################################
 
 <span style="color:DarkViolet">Plot the regression diagnostic plots for the model in the previous question. Which states (or other regions) appear to be outliers? Give the names of the states. (It may help to refer to http://www.50states.com/abbreviations.htm.)</span>  
+DE SC DC
+
+The states Delaware, South Carolina, and District of Columbia appear to be outliers.
 
 <span style="color:green">**Text Answer**: </span>
-
+51,40,8
 ***
 
 #####################################
@@ -73,6 +85,26 @@ Enter your R code below.</span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+#while loop with huber weights
+fit.w = lm(VI2~ME + PO, data = crime2005)
+
+oldcoef = rep(0, length(fit.w$coef))
+newcoef = fit.w$coef
+iter = 0
+
+while(sum(abs(oldcoef-newcoef))>.0001 & iter < 100) {
+  MAR = median(abs(fit.w$residuals))
+  k = 1.345*MAR/0.6745 #tuning parameter k=1.345*sigma for Huber
+  w = pmin(k/abs( fit.w$residuals),1)
+  fit.w = lm(VI2~ME + PO, data = crime2005, weights = w)
+  
+  iter = iter + 1
+  oldcoef = newcoef
+  newcoef = fit.w$coefficients
+}
+newcoef
+fit.w$coefficients
+iter
 ```
 
 
@@ -81,6 +113,8 @@ Enter your R code below.</span>
 #####################################
 
 <span style="color:DarkViolet">Write the equation for the linear model you found in the previous question.</span>  
+
+#VI2 = -40.3926844 + 0.6794144*ME + 3.2950743*PO
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -95,6 +129,9 @@ Enter your R code below.</span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+library(MASS)
+fit.bisquare = rlm(VI2~ME + PO, data = crime2005, psi = psi.bisquare)
+fit.bisquare$coefficients
 ```
 
 
@@ -105,7 +142,7 @@ Enter your R code below.</span>
 <span style="color:DarkViolet">Write the equation for the linear model you found in the previous question.</span>  
 
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**: #VI2 = -31.2925739 + 0.6113925*ME + 2.8080861*PO</span>
 
 
 
@@ -114,8 +151,11 @@ Enter your R code below.</span>
 #####################################
 
 <span style="color:DarkViolet">Write 1-2 sentences comparing the equations of the models with Huber and Tukey’s bisquare weights to the model with equal weights.</span>  
+#VI2 = -40.3926844 + 0.6794144*ME + 3.2950743*PO, HUBER
+#VI2 = -31.2925739 + 0.6113925*ME + 2.8080861*PO, BISQUARE
 
 <span style="color:green">**Text Answer**: </span>
+Tukey's bisqure is less influenced by the outliers as compared to Huber.
 
 
 
@@ -129,6 +169,15 @@ Enter your R code below.</span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+library(car)
+#install.packages("car")
+
+{
+  plot(fit.bisquare$w, las=1, cex.axis=1.2, ylab="Weights")
+  smallweights = which(fit.bisquare$w < .8)
+  showLabels(1:dim(crime2005)[1], fit.bisquare$w, crime2005$STATE, method = smallweights)
+}
+
 ```
 
 
@@ -154,6 +203,7 @@ Enter your R code below.</span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+elnino = na.omit(read.csv("elnino.csv"))
 ```
 
 
@@ -180,6 +230,14 @@ Enter your R code below.</span>
 <span style="color:green">**Graph and Commentary Answer**  </span>: 
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
+colnames(elnino)
+model = air.temp~zon.winds+mer.winds+humidity+s.s.temp
+fit.lm = lm(model, data=elnino)
+plot(fit.lm)
+fit.lm
+
+fit.gls = gls(model, data=elnino)
+fit.gls
 ```
 
 
@@ -189,6 +247,7 @@ Enter your R code below.</span>
 
 <span style="color:DarkViolet">(**Model B**) Use $\texttt{gls()}$ to fit a model with uncorrelated errors. Compare the estimated coefficients from this model to those from Model A.  Why does this make sense?</span>  
 
+They are essentially the same. Both models do not take into account uncorrelated errors. The coefficients are computed in two different ways, and they agree with each other. The lm model uses Ordinary Least Squares and the gls model uses Restricted Maximum Likelihood.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -206,6 +265,8 @@ Enter your R code below.</span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+buoy3.resids = fit.gls$residuals[which(elnino$buoy == 3)]
+plot(buoy3.resids[-1]~buoy3.resids[-14], xlab="Rediduals Previous Day", ylab="Rediduals")
 ```
 
 #####################################
@@ -214,6 +275,7 @@ Enter your R code below.</span>
 
 <span style="color:DarkViolet">A reasonable supposition would be that the air temperature at a particular buoy might be associated with the air temperature on the previous day.  This could induce autocorrelation in the error terms for that buoy.  Does there appear to be autocorrelation within the residuals for buoy 3?  Explain.</span>  
 
+It does appear that there is autocorrelation with the residuals for buoy 3, because there appears to be an increasing trend in the residuals.
 
 <span style="color:green">**Text Answer**: </span>
 

@@ -114,14 +114,13 @@ abline(fit.huber, lwd=2, col="red", lty=3)
 legend("topleft", legend=c("OLS", "Huber", "Bisquare"), lty=c(1,3,2), col=c("black","red","blue"))
 
 
-
-#install.packages("car")
-{
 library(car)
+#install.packages("car")
+
 plot(fit.bisquare$w, las=1, cex.axis=1.2, ylab="Weights")
 smallweights = which(fit.bisquare$w < .8)
-showLabels(1:dim(hills)[1], fit.bisquare$w, rownames(hills), id.method = smallweights)
-}
+showLabels(1:dim(hills)[1], fit.bisquare$w, rownames(hills), method = smallweights)
+
 
 #https://www.cs.umd.edu/~mount/Papers/lts-manuscript07.pdf
 
