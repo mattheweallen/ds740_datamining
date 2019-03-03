@@ -51,6 +51,9 @@ Enter your R code below.
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+library(ISLR)
+data(OJ)
+summary(OJ)
 ```
 
 
