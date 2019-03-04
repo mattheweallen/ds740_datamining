@@ -226,6 +226,11 @@ elnino = na.omit(read.csv("elnino.csv"))
 1. Upload your two plots.
 2. Comment on the appropriateness of the linear model.</span>
 
+The linear model is not appropriate here, because it is clear from the plots that the residuals are not normally distributed which is an underlying assumption.
+
+
+
+
 
 <span style="color:green">**Graph and Commentary Answer**  </span>: 
   (post to discussion board on D2L)
