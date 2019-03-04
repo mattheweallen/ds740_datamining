@@ -54,6 +54,15 @@ Enter your R code below.
 library(ISLR)
 data(OJ)
 summary(OJ)
+set.seed(7)
+
+train = sample(1:dim(OJ)[1],800,replace=F)
+
+
+#install.packages("tree")
+library(tree)
+mytree = tree(Purchase~., data = OJ[train,])
+summary(mytree)
 ```
 
 
@@ -66,16 +75,16 @@ Fit a tree to the training data, using Purchase as the response variable and all
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
 	
-LoyalCH
+->LoyalCH
 
 	
 Store
 
 	
-PriceDiff
+->PriceDiff
 
 	
-SalePriceMM
+->SalePriceMM
 
 	
 PriceCH
@@ -84,7 +93,7 @@ PriceCH
 #####################################
 ### Question 3 (2 points) 
 
-What is the error rate on the training set?
+What is the error rate on the training set? 0.1788
 
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
@@ -104,9 +113,11 @@ Plot the decision tree with category labels.  Submit your plot to the Homework 7
 <span style="color:green">**Graph Answer**  </span>: 
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
+plot(mytree)
+text(mytree, pretty=0)
 ```
 
-
+Customer brand loyalty for Citrus Hill (LoyalCH) is the largest division between the groups. In fact if LoyalCH < 0.482389, then Minute Maid will be chosen. If LoyalCH >= 0.482389, then in all but one case will someone not purchase Citrus Hill. The one case is where the sale price of Minute Maid is more than 16.5 cents lower than the sale price of Citrus Hill. 
 
 #####################################
 ### Question 5 (2 points)
@@ -116,6 +127,15 @@ Compute the confusion matrix for the validation set.  What is the validation set
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+item.pred = predict(mytree, OJ[-train,], type="class")
+#confusion matrix
+table(item.pred, OJ$Purchase[-train])
+(18+21)/(18+21+147+84)
+
+
+#use 10-fold CV to choose the optimal number of leaves
+oj.cv = cv.tree(mytree, FUN = prune.misclass)
+oj.cv
 ```
 
 
@@ -136,13 +156,13 @@ Use 10-fold cross-validation on the training data to choose the number of leaves
 
 4
 
-5
+->5
 
 6
 
 7
 
-8
+->8
 
 
 #####################################
@@ -153,6 +173,17 @@ Create a pruned tree with 5 leaves.  What is the error rate of the pruned tree o
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+prune.oj = prune.misclass(mytree, best = 5)
+prune.oj
+
+item.pred = predict(prune.oj, OJ[-train,], type="class")
+plot(prune.oj)
+text(prune.oj, pretty=0)
+#confusion matrix
+table(item.pred, OJ$Purchase[-train])
+(18+21)/(18+21+147+84)
+
+#it looks like same error rate
 ```
 
 
@@ -175,6 +206,21 @@ Enter your R code below.
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+#https://jangorecki.gitlab.io/data.cube/library/data.table/html/na.omit.data.table.html
+library(ISLR)
+data("Hitters")
+Hitters = na.omit(Hitters, cols="Salary")
+Hitters$Salary = log(Hitters$Salary)
+
+
+hist(Hitters$Salary)
+summary(Hitters)
+
+#perform boosting
+#install.packages("gbm")
+library(gbm)
+boost = gbm(Salary~., data = Hitters, distribution = "gaussian", n.trees = 5000, shrinkage = .001, interaction.depth = 4)
+summary(boost)
 ```
 
 #####################################
@@ -192,7 +238,7 @@ Which of the variables is most important for predicting log(Salary) in this mode
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 
 	
-CAtBat
+->CAtBat
 
 HmRun
 
@@ -210,6 +256,33 @@ Enter your R code below.
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+
+#use 10 fold cross validation to estimate the error rate
+n=263
+k=10 #using 10-fold cross-validation
+groups=c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k)) #produces list of group labels
+#groups
+
+set.seed(7)
+cvgroups = sample(groups,n)
+boost.predict=rep(-1,n)
+lm.predict=rep(-1,n)
+
+for(i in 1:k) {
+  groupi = (cvgroups == i)
+  #perform boosting and predict values of groupi
+  boost = gbm(Salary~., data = Hitters[!groupi,], distribution = "gaussian", n.trees = 5000, shrinkage = .001, interaction.depth = 4)
+  boost.predict[groupi] = predict(boost, newdata = Hitters[groupi,], n.trees = 5000, type="response")
+  #fit linear model
+  lmfitCV = lm(Salary~.,data=Hitters,subset=!groupi)
+  lm.predict[groupi] = predict.lm(lmfitCV,Hitters[groupi,])
+}
+
+CV10.MSE.LM = sum((lm.predict-Hitters$Salary)^2)/n
+CV10.MSE.LM
+
+CV10.MSE.BOOSTING = sum((boost.predict-Hitters$Salary)^2)/n
+CV10.MSE.BOOSTING
 ```
 
 
@@ -220,7 +293,7 @@ What MSE do you find for each method?
 #####################################
 ### Question 11 (1 point) 
 
-Boosting:
+Boosting:0.2203441
 
 
 <span style="color:green">**Numeric Answer**  </span> 
@@ -232,7 +305,7 @@ Boosting:
 #####################################
 ### Question 12 (1 point) 
 
-Linear regression:
+Linear regression:0.4319816
 
 
 <span style="color:green">**Numeric Answer**  </span> 
@@ -249,7 +322,7 @@ Which model has the lower cross-validation MSE for this data set?
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 
-Boosting
+->Boosting
 
 Linear regression
 
@@ -270,13 +343,18 @@ Data Set: Continue to use the Hitters data set.
 
 Use $\texttt{?Hitters}$ to view what each variable in the data set represents.  Examine some preliminary graphs and summaries of the data.  If we want to use decision trees to analyze this data set, why are random forests a good idea? Explain in 2-4 sentences.
 
+There are strong correlations between the predictors. Predictors like Hits and Runs for example are highly correlated. The more hits a batter gets the more runs they will have.
+
+```{r,echo=FALSE}
+pairs(Hitters)
+```
 
 <span style="color:green">**Text Answer**: </span>
 
 
 #####################################
 ### Question 15 (1 point)
-
+#meallen rewatch video
 Perform bagging to predict log(Salary) in terms of the other variables in the data set (excluding Salary).  
 
 Enter your R code below.
