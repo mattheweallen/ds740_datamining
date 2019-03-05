@@ -1,0 +1,72 @@
+function SetRadioButtonAsSelected( radioButtonId ) {
+    var radioButton = UI.GetById(radioButtonId);
+    if ( !radioButton ) {
+        return;
+    }
+    radioButton.checked = true;
+
+    var radioButtonsForQuestion = $( 'input[name="' + radioButton.name + '"]' );
+    if ( !radioButtonsForQuestion ) {
+        return;
+    }
+
+    var radioParentDivs = radioButtonsForQuestion.parent();
+    if ( !radioParentDivs ) {
+        return;
+    }
+
+    var tableRows = radioParentDivs.parent();
+    if ( tableRows ) {
+        tableRows.removeClass( 'd2l-rowshadeonhover-selected' );
+        tableRows.addClass( 'd2l-rowshadeonhover' );
+    }
+
+    var parentDivForClickedRadioButton = radioButton.parentNode;
+    if ( !parentDivForClickedRadioButton)  {
+        return;
+    }
+
+    var rowForClickedRadioButton = parentDivForClickedRadioButton.parentNode;
+    if ( !rowForClickedRadioButton ) {
+        return;
+    }
+
+    D2L.LP.Web.UI.Html.Dom.AddClassName( 'd2l-rowshadeonhover-selected', rowForClickedRadioButton );
+    D2L.LP.Web.UI.Html.Dom.RemoveClassName( 'd2l-rowshadeonhover', rowForClickedRadioButton );
+
+}
+
+function ToggleCheckBox( event, checkBoxId ) {
+    // Prevent the default checkbox event from occuring
+    event.stopPropagation();
+    event.preventDefault();
+
+    // Use settimeout = 0 to only propogate checked setting after all other DOM changes have occurred.
+    setTimeout( function () {
+
+        var checkBox = UI.GetById( checkBoxId );
+        if ( !checkBox ) {
+            return;
+        }
+
+        checkBox.checked = !checkBox.checked;
+
+        var parentDivForClickedCheckBox = checkBox.parentNode;
+        if ( !parentDivForClickedCheckBox ) {
+            return;
+        }
+
+        var rowForClickedCheckBox = parentDivForClickedCheckBox.parentNode;
+        if ( !rowForClickedCheckBox ) {
+            return;
+        }
+
+        if ( checkBox.checked ) {
+            D2L.LP.Web.UI.Html.Dom.AddClassName( 'd2l-rowshadeonhover-selected', rowForClickedCheckBox );
+            D2L.LP.Web.UI.Html.Dom.RemoveClassName( 'd2l-rowshadeonhover', rowForClickedCheckBox );
+        } else {
+            D2L.LP.Web.UI.Html.Dom.RemoveClassName( 'd2l-rowshadeonhover-selected', rowForClickedCheckBox );
+            D2L.LP.Web.UI.Html.Dom.AddClassName( 'd2l-rowshadeonhover', rowForClickedCheckBox );
+        }
+    }, 0 );
+}

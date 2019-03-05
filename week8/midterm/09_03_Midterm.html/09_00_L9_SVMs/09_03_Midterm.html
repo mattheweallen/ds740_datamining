@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Midterm</title>
+  <!-- MAIN STYLE CSS -->
+  <link href="/content/support/css/style.css" rel="stylesheet" />
+  <!-- COMPONENT SCRIPT -->
+  <script src="/content/support/scripts/style.js"></script>
+  <!--[if lt IE 9]>
+      <script src="https://uwli.courses.wisconsin.edu/content/support/scripts/html5shiv.js"></script>
+  <![endif]-->
+</head> <!-- WED, MAR 18, 2015 -->
+<body>
+<div class="page-container" role="main"><!-- BEGIN PAGE CONTAINER --><header role="banner"><!-- REMEMBER TO CHANGE THE PAGE TITLE -->
+<h1><span class="icon-exam"></span> Midterm Project</h1>
+</header><!-- END HEADER -->
+<h2>Purpose</h2>
+<p>This midterm project is designed to guide you to:</p>
+<ol>
+<li>identify appropriate methods for analyzing data.</li>
+<li>correctly fit models and summarize estimates.</li>
+<li>appropriately select between methods and assess the predictive ability of the final chosen method.</li>
+<li>apply the supervised-learning methods you have learned and practiced in the course thus far via a more free-form application.</li>
+<li>practice and receive feedback as preparation for the final project.</li>
+</ol>
+<h2>References</h2>
+<p>Material / Methods covered in:</p>
+<ul>
+<li>Lessons 1 and 3-7 for supervised-learning methods.</li>
+<li>Lessons 2 and 8 for model assessment and selection.</li>
+</ul>
+<h2>Data Sets</h2>
+<p>You will analyze <strong>one</strong> of the four data sets included below.</p>
+<p><a href="/d2l/common/dialogs/quickLink/quickLink.d2l?ou=4313159&amp;type=content&amp;rcode=UWS1-12333439" target="_blank">Data Set Descriptions</a></p>
+<div class="two-column">
+<section aria-flowto="sr-col2">
+<p><span class="icon-download"></span> <a href="/d2l/common/dialogs/quickLink/quickLink.d2l?ou=4313159&amp;type=content&amp;rcode=UWS1-10872762" target="_blank">calciumgood.csv</a></p>
+<p><span class="icon-download"></span> <a href="/d2l/common/dialogs/quickLink/quickLink.d2l?ou=4313159&amp;type=content&amp;rcode=UWS1-12333282" target="_blank">ozone.csv</a></p>
+</section>
+<section id="sr-col2">
+<p><span class="icon-download"></span> <a href="/d2l/common/dialogs/quickLink/quickLink.d2l?ou=4313159&amp;type=content&amp;rcode=UWS1-10872764" target="_blank">ais.csv</a></p>
+<p><span class="icon-download"></span> <a href="/d2l/common/dialogs/quickLink/quickLink.d2l?ou=4313159&amp;type=content&amp;rcode=UWS1-10872765" target="_blank">04cars.csv</a></p>
+</section>
+</div>
+<div class="clearfix"></div>
+<h2>Tasks</h2>
+<p>Your project must analyze one of the datasets listed above and include the following:</p>
+<div class="callout minimal bordered success" role="note">
+<p><span class="label success" role="presentation">Part 1</span></p>
+<p>Select either the factor response or the quantitative response for the analysis in Part 2.</p>
+<ol type="a">
+<li>Discuss why you selected the response variable (factor versus quantitative).</li>
+<li>Describe a possible practical purpose for the data analysis and an audience who might be interested in this purpose.</li>
+</ol>
+</div>
+<div class="callout minimal bordered success" role="note">
+<p><span class="label success" role="presentation">Part 2</span></p>
+<p>Consider all other variables (excluding the two possible response variables) to be predictor variables. Then, for the response variable you selected:</p>
+<ol type="a">
+<li>Identify <strong>two possible</strong> methods (from two different lessons) for predicting the response and provide justification for why these methods are appropriate for the data.</li>
+<li>Use cross-validation techniques to select between the two methods (and among any parameters needed for those methods).</li>
+<li>Add an outer level of cross-validation to further assess the predictive ability of the model selected.</li>
+<li>Fit the final selected model to the data and summarize and discuss the outcome of the fit. Include estimates of any model parameters.</li>
+</ol>
+</div>
+<h2>Format</h2>
+<p>The project will consist of two pieces:</p>
+<ol>
+<li>A 1-2 page executive summary which reports your question, analysis, and results in a non-technical manner. Figures may be embedded with the text or included on an additional page. References, if any, may be included on an additional page. This should be in .doc, .docx, or .pdf format.</li>
+<li>A script containing the code you used to analyze the data. This should be a clean, commented, final version of the code, in either a .R file or a .Rmd file.</li>
+</ol>
+<h2>Assessment Checklist</h2>
+<p><strong>Analysis (reflected in executive summary and code)</strong></p>
+<ul>
+<li>Employs two data mining techniques from this course that are appropriate to the question, each with full and correct application.</li>
+<li>The analysis uses cross-validation appropriately for model selection.</li>
+<li>The analysis uses double cross-validation appropriately for model assessment/validation.</li>
+<li>Analysis is original; if resources other than ones provided for this course were used (including online discussions or posts such as Kaggle), these are cited in a References section at the end of the executive summary.</li>
+<li>Final fitted model is stated (with estimated / selected parameters) and its use is described.</li>
+</ul>
+<p><strong>Executive summary</strong></p>
+<ul>
+<li>States a possible analysis purpose and explains why the target audience should be interested.</li>
+<li>Discusses the types of variables and how they relate; this may involve appropriate figures for describing distributions and relationships.</li>
+<li>Explains why the selected data mining techniques are appropriate. This may involve appropriate figures, such as plots for checking assumptions.</li>
+<li>Writing is clear, professional, and in nontechnical language.</li>
+<li>Includes at least 1 figure, which is easy to read and has a legend if appropriate.</li>
+<li>Utility of the figure(s) to the analysis/results is clearly communicated.</li>
+<li>Discussion of results states a specific recommendation for the target audience.</li>
+</ul>
+<p><strong>Computer code</strong></p>
+<ul>
+<li>Analysis code is well-commented. There is a clear connection between the code and the analyses and results described in the executive summary.</li>
+<li>Analysis code corresponding to all aspects of executive summary (examination of data, application of methods, and model selection and assessment) is included.</li>
+<li>Exploratory analyses unrelated to final results have been removed from the code.</li>
+<li>Analysis code is able to be applied by a fresh user (your instructor in this case).</li>
+</ul>
+<p>If your project satisfies all of the requirements listed above, then it qualifies for at least a C. Grades of A or B will be based on the following:</p>
+<table class="striped" role="presentation">
+<tbody>
+<tr>
+<td>Does the analysis show evidence of proper and full data utilization?</td>
+<td>Meets expectations</td>
+<td>Exceeds expectations</td>
+</tr>
+<tr>
+<td>Is the applicability and choice of the methods carefully described?</td>
+<td>Meets expectations</td>
+<td>Exceeds expectations</td>
+</tr>
+<tr>
+<td>Is the analysis thorough and deep?</td>
+<td>Meets expectations</td>
+<td>Exceeds expectations</td>
+</tr>
+<tr>
+<td>Is the analysis code both efficient and complete?</td>
+<td>Meets expectations</td>
+<td>Exceeds expectations</td>
+</tr>
+<tr>
+<td>Do the writing and figures show evidence of creativity and professionalism?</td>
+<td>Meets expectations</td>
+<td>Exceeds expectations</td>
+</tr>
+</tbody>
+</table>
+<h2>Submitting Your Work</h2>
+<a class="btn info" href="/d2l/common/dialogs/quickLink/quickLink.d2l?ou=4313159&amp;type=content&amp;rcode=UWS1-10872029" role="button" target="_blank">Go to Midterm Dropbox</a></div>
+<!-- END PAGE CONTAINER --><footer role="contentinfo"><!-- ADD class="no-text" TO REMOVE FOOTER TEXT -->
+<p></p>
+<!-- DO NOT REMOVE THIS EMPTY <p> ELEMENT --></footer>
+</body>
+</html>
