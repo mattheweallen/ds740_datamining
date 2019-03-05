@@ -361,6 +361,15 @@ Enter your R code below.
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+#install.packages("randomForest")
+library(randomForest)
+hitters.bag = randomForest(Salary~., data=Hitters,mtry=19,importance=T)
+
+importance(hitters.bag)
+hitters.bag #% Var explained: 76.22
+
+lmfit = lm(Salary~.,data=Hitters)
+summary(lmfit)
 ```
 
 #####################################
@@ -368,6 +377,7 @@ Enter your R code below.
 
 Examining the bagged model you created in the previous question, how does the proportion of variation explained by the bagged model compare with the proportion of variation explained by multiple linear regression?
 
+The proportion of variation explained by multiple linear regression is 55.86%, and the proportion of variation explained by the bagged model is 76.22%. The bagged model does better explaining the variation compared to the linear model.
 
 <span style="color:green">**Text Answer**: </span>
 
@@ -379,7 +389,7 @@ Which variable is more important for predicting log(Salary) in the bagged model?
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 	
-CRBI
+->CRBI
 
 Years
 
@@ -388,6 +398,36 @@ Years
 
 Set the random seed to 7 again and use 10-fold cross-validation to compare bagging with random forests using 6 variables.  Write 1-2 sentences comparing the MSE of each of these methods to the MSE of boosting found in Problem 2.
 
+The MSE for bagging is 0.03195395 and the MSE for random forests using 6 variables is 0.03184546. These are very similar. They are both significantly better than the MSE for boosting which was 0.2203441.
+
+0.2203441
 
 <span style="color:green">**Text Answer**: </span>
+```{r, echo=TRUE}
+n=263
+k=10 #using 10-fold cross-validation
+groups=c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k)) #produces list of group labels
+#groups
 
+set.seed(7)
+cvgroups = sample(groups,n)
+bag.predict=rep(-1,n)
+
+random_forest.predict=rep(-1,n)
+
+for(i in 1:k) {
+  groupi = (cvgroups == i)
+  #perform boosting and predict values of groupi
+  bag = randomForest(Salary~., data=Hitters,mtry=19,importance=T)
+  bag.predict[groupi] = predict(bag, newdata = Hitters[groupi,])
+  
+  random_forest = randomForest(Salary~., data=Hitters,mtry=6,importance=T)
+  random_forest.predict[groupi] = predict(random_forest, newdata = Hitters[groupi,])
+}
+
+CV10.MSE.BAG = sum((bag.predict-Hitters$Salary)^2)/n
+CV10.MSE.BAG #=0.03195395
+
+CV10.MSE.RANDOM_FOREST = sum((random_forest.predict-Hitters$Salary)^2)/n
+CV10.MSE.RANDOM_FOREST #=0.03184546
+```
