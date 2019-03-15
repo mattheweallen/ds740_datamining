@@ -37,7 +37,7 @@ names(bodyfat)
 ############################################################################################
 ##### Double cross-validation with a pre-defined cv function for inner model selection #####				 
 ############################################################################################
-
+#install.packages("glmnet")
 library(glmnet)  # use LASSO model from package glmnet 
 lambdalist = exp((-1200:1200)/100)  # defines models to consider
 
