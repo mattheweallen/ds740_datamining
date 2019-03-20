@@ -25,7 +25,12 @@ summary(ais$Sex)
 #table(ais$Sex) 
 
 #plot histograms of variable to check for normality
-#hist(ais$Bfat) #possible response variable looks skewed
+hist(ais$Bfat, xlab="Body Fat", main = "Distribution of Body Fat") #possible response variable looks skewed
+ais$log_bfat = log(ais$Bfat)
+shapiro.test(ais$log_bfat)
+
+hist(ais$log_bfat, xlab="Body Fat", main = "Distribution of Log Transformed Body Fat")
+
 
 hist(ais$Ht)
 hist(ais$Wt)
@@ -199,14 +204,14 @@ nmodels = 11
 Model1 = (Bfat ~ Sex)
 Model2 = (Bfat ~ Sex+Ht)
 Model3 = (Bfat ~ Sex+Ht+Wt)
-Model4 = (Bfat ~ Sex+Ht+Wt+LBM)
-Model5 = (Bfat ~ Sex+Ht+Wt+LBM+RCC)
-Model6 = (Bfat ~ Sex+Ht+Wt+LBM+RCC+WCC)
-Model7 = (Bfat ~ Sex+Ht+Wt+LBM+RCC+WCC+Hc)
-Model8 = (Bfat ~ Sex+Ht+Wt+LBM+RCC+WCC+Hc+Hg)
-Model9 = (Bfat ~ Sex+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr)
-Model10 = (Bfat ~ Sex+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI)
-Model11 = (Bfat ~ Sex+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI+SSF)
+Model4 = (Bfat ~ Sex+Ht+Wt+SSF)
+Model5 = (Bfat ~ Sex+Ht+Wt+SSF+LBM+RCC)
+Model6 = (Bfat ~ Sex+Ht+Wt+SSF+LBM+RCC+WCC)
+Model7 = (Bfat ~ Sex+Ht+Wt+SSF+LBM+RCC+WCC+Hc)
+Model8 = (Bfat ~ Sex+Ht+Wt+SSF+LBM+RCC+WCC+Hc+Hg)
+Model9 = (Bfat ~ Sex+Ht+Wt+SSF+LBM+RCC+WCC+Hc+Hg+Ferr)
+Model10 = (Bfat ~ Sex+Ht+Wt+SSF+LBM+RCC+WCC+Hc+Hg+Ferr+BMI)
+Model11 = (Bfat ~ Sex+Ht+Wt+SSF+LBM+RCC+WCC+Hc+Hg+Ferr+BMI)
 allModels = list(Model1,Model2,Model3,Model4,Model5,Model6,Model7,
                  Model8,Model9,Model10,Model11)	
 
@@ -335,3 +340,47 @@ y.out = fulldata.out$Bfat
 CV.out = sum((allpredictedCV.out-y.out)^2)/n.out
 R2.out = 1-sum((allpredictedCV.out-y.out)^2)/sum((y.out-mean(y.out))^2)
 CV.out; R2.out
+
+
+#based on the plots use model that has 4 measurements. model does not improve after that. use full data set to estimate coefficients
+#pick 4 easiest quantities to measure Sex, Ht, Wt, SSF (sum of skin folds)
+#Describe sum of skin folds procedure
+
+#https://www.verywellfit.com/calculate-body-fat-by-measuring-skinfolds-3120273
+
+ModelFinal = (log_bfat ~ Sex+Wt+SSF)
+finalModel = lm(formula = ModelFinal,data=ais)
+finalModel
+summary(finalModel)
+hist(ais$Ht)
+
+#in the final model it appears that Wt and Ht are not significant, so can further simplify model to just be SSF and Sex
+
+#show histograms of predictors.
+
+#perform shapiro test to show normality assumption to be true
+shapiro.test(ais$Bfat) #response not normal, maybe transform
+hist(ais$Bfat)
+
+shapiro.test(ais$Ht)
+shapiro.test(ais$Wt)
+shapiro.test(ais$LBM) #not normal
+shapiro.test(ais$RCC) #not normal
+shapiro.test(ais$WCC) #not normal
+shapiro.test(ais$Hc) #not normal
+shapiro.test(ais$Hg)  #not normal
+shapiro.test(ais$Ferr) #not normal
+shapiro.test(ais$BMI) #not normal
+shapiro.test(ais$SSF)  #not normal
+
+
+#take log of all variables that are not normal
+ais$Bfat = log(ais$Bfat)
+ais$LBM = log(ais$LBM)
+ais$RCC = log(ais$RCC)
+ais$WCC = log(ais$WCC)
+ais$Hc = log(ais$Hc)
+ais$Hg = log(ais$Hg)
+ais$Ferr = log(ais$Ferr)
+ais$BMI = log(ais$BMI)
+ais$SSF = log(ais$SSF)
