@@ -13,7 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Part 1
 
-The dataset that was chosen for the Midterm project was the Australian Institute of Sport Data set. The factor response is 
+The dataset that was chosen for the Midterm project was the Australian Institute of Sport Data set. The quantative response was chosen, which in this dataset is Body Fat (Bfat). Body fat was chosen for the current study, but the qualitative factor response could also be an interesting investigation like finding what body measurements correlate to different sports for example. The Body Fat response is important, because it is difficult and expensive to measure body fat directly. Finding easy measurements that predict body fat is critical where body fat cannot be measured directly. The method developed in this analysis could be used by athletic trainers to predict an athletes body fat based on easily measured quantities.
+
+
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 

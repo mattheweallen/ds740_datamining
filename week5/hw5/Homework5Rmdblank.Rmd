@@ -281,7 +281,7 @@ Many of the variables are highly correlated with each other.
 model = log.Enroll ~ Private + Top10perc + Top25perc + Outstate + Room.Board + Books + Personal + PhD + Terminal + S.F.Ratio + perc.alumni + Expend + Grad.Rate + log.Apps + log.Accept + log.F.Undergrad + log.P.Undergrad
 
 
-lambdalist = (1:1000)/1000  # order large to small
+lambdalist = (0:10)/100  # order large to small
 plot(lambdalist)
 #fit ridge regression - need alpha = 0
 #RRfit = glmnet(x, y, alpha = 0,lambda=lambdalist)
