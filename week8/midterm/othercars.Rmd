@@ -1,0 +1,427 @@
+---
+title: "Car Pricing Regression"
+author: "Dana Swanstrom"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+
+```{r include=FALSE}
+# All packages intalled here.
+library(ggplot2)
+library(Hmisc)
+library(FNN)
+```
+
+**Data Examination and Cleaning**
+
+We start by loading the data into R and looking at the structure of the data. The data includes some missing values that are identified by "NA" but also some asterisk values. I am telling R that the asterisk values and "NA" should be converted to NAs.
+```{r}
+cars_2004 = read.csv('04cars.csv',na.strings=c("*","NA"))
+str(cars_2004)
+```
+The overall structure of the data looks good when read in using the na.strings argument. Nothing needs to be converted to a factor or from a factor.
+
+___
+
+Our next step is to take a look at the summary of the data. The summary along with the data summary file is helpful. 
+```{r}
+summary(cars_2004[c(1:6)])
+summary(cars_2004[c(7:12)])
+summary(cars_2004[c(13:16)])
+```
+Quick look through the max and min values confirms that we do not have any extreme outliers. The main concern in the data is the missing data. This data set is not that large, so just deleting rows with missing data is probably something to avoid. In addition, based on the summary document for the data, I am very concerned about the NA values for length and height. This information is missing for all pickup trucks. Removing these rows will mean that an entire class of vehicle would be missing from the data.
+
+***Step 1 for NA Values.***
+With regards to the NA values for cylinders. Both of the missing values are associated with and engine size of 1.3L. In real life, we would be able to go out an probably find the cylinder count.  In this case we are not given the make of the car. As a result, I am going to make the assumption that for most smaller engines, the cylinder count is 4 and impute that date into the data set.
+
+```{r}
+# Make a copy of the data
+cars_2004a = cars_2004[,]
+cars_2004a$Cylinders[cars_2004a$Engine == 1.3 & is.na(cars_2004a$Cylinders)] = 4
+```
+
+___
+
+***Step 2 for NA Values***
+Since we have substantial missing data for Length and Height, we will not use Length and Height as predictor variables. Wheelbase and Length should be correlated based on real-life knowledge, and as you can see below, the correlation is approximately 0.87. Heights correlation with retail price being low, we will start our work by just ignoring height.
+
+Here is the correlation of Wheelbase and Length, giving some reassurance that we can drop Length from our data set, yet still use Wheelbase which is correlated with Length.
+```{r}
+cor(cars_2004a[,c(14,15)],use="pairwise.complete.obs")
+```
+This is the correlation calculation of Height and RetailPrice. We will remove Height also from the data set because removing the rows associated with pickup trucks will probably be more detrimental than removing height as a predictor.
+```{r}
+cor(cars_2004a[,c(2,16)],use="pairwise.complete.obs")
+```
+
+
+Create a new dataframe with Length and Height removed.
+```{r}
+# cars_2004b will be a dataframe without Length and Height
+cars_2004b = cars_2004a[,1:14]
+```
+
+___
+
+***Step 3 for NA Values***
+Examine patters of remaining missing values. The remaining NA values are present for CityMPG, HwyMPG, Weight, and Wheelbase.
+```{r}
+# Look at all rows that have atleast one NA and only look at columns 11-14 as they are the only columns with missing values still
+cars_2004b[!complete.cases(cars_2004b),c(11:14)]
+```
+Observations: Row 45 and 61 have 3 of 4 values missing. This is a lot of data to have missing. We will just remove these rows. In addition, the two missing weight options are ones we will also delete. We will delete rows 45, 61, 190, and 320.
+```{r}
+cars_2004_complete = cars_2004b[-c(45,61,190,320),]
+# Reindex the dataframe
+rownames(cars_2004_complete) = c(1:dim(cars_2004_complete)[1])
+```
+
+All that is left is the CityMPG and HwyMPG. Real life experience and previous work with Auto data indicates that these quantities are related to a vehicle's Horsepower and Weight. Filling values with regression is a quick method to put in some of the missing data. In real life, if we had the models of these cars, we would just find the missing data.
+
+Work to use regression to fill in the missing CityMPG values.
+```{r}
+ctyMPG.model = lm(formula = CityMPG ~ Horsepower + Weight, data=cars_2004_complete[complete.cases(cars_2004_complete),])
+summary(ctyMPG.model)
+cars_2004_complete$CityMPG[!complete.cases(cars_2004_complete)]  = predict(ctyMPG.model,cars_2004_complete[!complete.cases(cars_2004_complete),])
+```
+Work to use regression to fill in the missing HwyMPG values.
+```{r}
+hwyMPG.model = lm(formula = HwyMPG ~ Horsepower + Weight, data=cars_2004_complete[complete.cases(cars_2004_complete),])
+summary(hwyMPG.model)
+cars_2004_complete$HwyMPG[!complete.cases(cars_2004_complete)]  = predict(hwyMPG.model,cars_2004_complete[!complete.cases(cars_2004_complete),])
+```
+
+Let's look at the final set of data that we will use to find our models. 
+```{r}
+summary(cars_2004_complete[c(1:6)])
+summary(cars_2004_complete[c(7:12)])
+summary(cars_2004_complete[c(13:14)])
+```
+We can see that we no longer have any missing values.
+
+___
+
+*Summary to This Point*
+
+Dataframe cars_2004 is the original data set.
+Dataframe cars_2004_complete has the columns Length and Weight removed. All rows with NA values have either been removed (4 rows where removed) or values were imputed (14 rows have imputed data).
+
+___
+
+**Model Use**
+We will be using K nearest Neighbors and LASSO Regression. We need to look at the histograms and the standard deviations of the variables to determine if we need to transform any of the data.
+```{r}
+hist(cars_2004_complete$Retailprice)
+hist(cars_2004_complete$Engine)
+hist(cars_2004_complete$Cylinders)
+hist(cars_2004_complete$Horsepower)
+hist(cars_2004_complete$CityMPG)
+hist(cars_2004_complete$HwyMPG)
+hist(cars_2004_complete$Weight)
+hist(cars_2004_complete$Wheelbase)
+print('Engine');  sd(cars_2004_complete$Engine); print('Cylinders');  sd(cars_2004_complete$Cylinders); print('Horsepower');  sd(cars_2004_complete$Horsepower); print('CityMPG');  sd(cars_2004_complete$CityMPG); print('HwyMPG');  sd(cars_2004_complete$HwyMPG); print('Weight') 
+sd(cars_2004_complete$Weight); print('Wheelbase');  sd(cars_2004_complete$Wheelbase);  
+```
+
+
+The histograms and the standard deviations provide direction on what variables to log transform (retail price), and that we should standardize all the predictor variables as both KNN and LASSO can be affected detrimentally by significant scale differences in the predictor variables.
+
+We can use lapply() to standardize all.
+```{r}
+cars_2004_complete_L = lapply(cars_2004_complete[,3:14],scale)
+cars_2004_complete_std = cbind(cars_2004_complete[,1:2],data.frame(cars_2004_complete_L))
+```
+
+Finally, since retail price is skewed to the right, we will do a log transform of the retail price.
+```{r}
+cars_2004_complete_std$Retailprice.log = log(cars_2004_complete_std$Retailprice)
+```
+
+In R, the KNN function works easiest if the response variable is in one data frame and the predictor variables are in another dataframe. We will give the response variables the same index values as 
+```{r}
+cars.x = cars_2004_complete_std[,3:14]
+cars.y = cars_2004_complete_std[,15]
+# Next line helps to ensure the data is indexed the same way.
+names(cars.y) = rownames(cars.x)
+# Save a list of the predictor variable names
+exp_vars <- names(cars.x)
+```
+
+Using a method explained at https://www3.nd.edu/~steve/computing_with_data/17_Refining_kNN/refining_knn.html, we will find the significance of the predictor variables. The author of the tutorial shows two methods for finding the significance of the predictor variables. I am using the shorter of the two methods that makes use of the laply function found in the plyr library. The article shows the longer, but more interpretable method also.
+
+The process is based on doing what might be considered backwards thinking. We will predict each predictor variable, based on the response variable RetailPrice.log. This first batch of code puts together a data frame that can be used to loop through all the response variables.
+```{r}
+cars.x_L <- lapply(exp_vars, function(x) {
+    df <- data.frame(car = rownames(cars.x), variable = x, value = cars.x[, 
+        x], RetailLog = cars.y)
+    df
+})
+names(cars.x_L) = exp_vars
+```
+
+This batch of code loops through doing simple linear regression with each response variable ("value"in the code) as a function of the RetailPrice.log value. The function then obtains the F statistic from each loop and puts it into a sorted list. The list is sorted so the most significant variable comes first and the least significant is last. 
+```{r}
+library(plyr)
+var_sig_fstats <- laply(cars.x_L, function(df) {
+    fit <- lm(value ~ RetailLog, data = df)
+    f <- summary(fit)$fstatistic[1]
+    f
+})
+names(var_sig_fstats) <- names(cars.x_L)
+most_sig_stats <- sort(var_sig_fstats, decreasing = T)
+most_sig_stats
+```
+
+We now sort the columns of our dataframe to allow us to do some cross validation to determine how many of the variables we should use.
+```{r}
+cars.x_ord <- cars.x[, names(most_sig_stats)]
+```
+
+___
+*The KNN Technique*
+
+
+The parameters that we want to optimize for KNN are the number of nearest neighbors (K) and the specific predictor variables. The work below, will identify both of these parameters. The code works to find the number of predictor variables, but since the predictors are in order of significance, we will know that if our best number of predictors is 5, that we will use the first 5 predictor variables.
+
+We first do some thinking to put some bounds on possible K values and the number of variables. The square root of the length of the data is often a good estimate for the number of nearest neighbors.
+```{r}
+sqrt(length(cars.x[[1]]))
+```
+We obtain 20.59, so lets use 25 as a high mark.
+
+The maximum number of predictors is the same as the number of variables.
+```{r}
+num_nearest_neighbors = seq(1:25)
+num_of_predictors = seq(1:nvariables)
+```
+
+Our first code block will use Cross Validation to find the best combination of variables and nearest neighbors to use. The code finds the CV(10) for models that use the first predictor, then the first two predictors, then the first 3 predictors, etc. Since the predictors are listed in order of possible significance, this process will loop through all the most promising combinations of predictor variables.
+```{r}
+nvariables = dim(fullx.in)[2]
+allmodelKNNCV.in = matrix(data = NA, nrow = length(num_nearest_neighbors), ncol = 2)
+colnames(allmodelKNNCV.in) = c('Num_Variables', 'CV10')
+for (l in num_nearest_neighbors) { # First loop is used to evaluate the number of nearest neighbors for KNN 
+  fullx.in = cars.x_ord
+  fully.in = cars.y
+  k.in = 10 
+  n.in = dim(fullx.in)[1]
+  nvariables = dim(fullx.in)[2]
+  groups.in = c(rep(1:k.in,floor(n.in/k.in)),1:(n.in%%k.in))  #produces list of group labels
+  set.seed(9)
+  cvgroups.in = sample(groups.in,n.in)
+  allpredictedCV.in = matrix(rep(NA,n.in*nvariables),ncol=nvariables)
+  
+  for (i in 1:k.in)  { # Loop to evaluate each of the K splits of Cross Validation
+    groupi.in = (cvgroups.in == i)
+    
+    for (m in 1:nvariables) { # Loop to evaluate how many variables should be used. Since the variables are in a specific order we also know which variables to use.
+      allpredictedCV.in[groupi.in,m] = knn.reg(data.frame(fullx.in[!groupi.in,1:m]), data.frame(fullx.in[groupi.in,1:m]), fully.in[!groupi.in], k=l)$pred
+    }
+    
+  }
+  
+  allmodelCV.in = rep(NA,nvariables)
+  for (m in 1:nvariables) { 
+    allmodelCV.in[m] = sum((allpredictedCV.in[,m]-fully.in)^2)/n.in
+  }
+  
+  bestmodel.in = (1:nvariables)[order(allmodelCV.in)[1]]
+  allmodelKNNCV.in[l,1] = bestmodel.in
+  allmodelKNNCV.in[l,2] = min(allmodelCV.in)
+  
+}
+```
+
+The loop doesn't output anything. The next block outputs the best We then look to find the parameters that we should use in our final model.
+```{r}
+allmodelsK_numVari = as.data.frame(allmodelKNNCV.in)
+plot(allmodelsK_numVari$Num_Variables,allmodelsK_numVari$CV10,lwd=2,col="red",xlab="Number of Variables",ylab="CV(10)",
+    xlim=c(5,11),ylim = c(0.035,0.06), main = "CV(10) for Number of Variables and Number of K Nearest Neighbors")
+text(allmodelsK_numVari$Num_Variables,allmodelsK_numVari$CV10, labels = row.names(allmodelsK_numVari), pos = 4)
+best_nearest_neighbors = which.min(allmodelsK_numVari$CV10)
+best_num_variables = allmodelsK_numVari[best_nearest_neighbors,1]
+best_nearest_neighbors
+best_num_variables
+```
+From the graph and the output, we can see that our KNN model makes use of the first 6 most significant predictor variables and only 2 nearest neighbors.
+
+*Final KNN Fitted Model*
+Our 6 predictor variables are Horsepower, Cylinders, Engine, CityMPG, Weight, and HwyMPG and we will use a number of nearest neighbors of K = 2.
+
+In R,
+knn.reg(train = cars.x_ord[,1:6], newdata, cars.y, k = 2) 
+
+
+*KNN Technique Assessment*
+We end our examination of KNN by assessing the technique. The following is double cross validation code to assess KNN on this data.
+```{r}
+library(FNN)
+fulldata.out = cars.x_ord
+k.out = 10 
+n.out = dim(fulldata.out)[1]
+#define the cross-validation splits 
+groups.out = c(rep(1:k.out,floor(n.out/k.out)),1:(n.out%%k.out))  #produces list of group labels
+set.seed(9)
+cvgroups.out = sample(groups.out,n.out)  #orders randomly, with seed (8)
+allpredictedCV.out = rep(NA,n.out)
+for (j in 1:k.out)  {  #be careful not to re-use loop indices
+  groupj.out = (cvgroups.out == j)
+  traindata.out = cars_2004_complete_std[!groupj.out,]
+  trainx.out = cars.x_ord[!groupj.out,]
+  trainy.out = cars.y[!groupj.out]
+  testx.out = cars.x_ord[groupj.out,]
+  testy.out = cars.y[groupj.out]
+  ### entire model-fitting process ###
+  nvariables = dim(fullx.in)[2]
+  # Holding place for CV(10) and number of variables. Row name will be the number of nearest neighbors.
+  allmodelKNNCV.in = matrix(data = NA, nrow = length(num_nearest_neighbors), ncol = 2)
+  colnames(allmodelKNNCV.in) = c('Num_Variables', 'CV10')
+  
+  for (l in num_nearest_neighbors) {
+    fullx.in = trainx.out
+    fully.in = trainy.out
+    k.in = 10 
+    n.in = dim(fullx.in)[1]
+    nvariables = dim(fullx.in)[2]
+    groups.in = c(rep(1:k.in,floor(n.in/k.in)),1:(n.in%%k.in))  #produces list of group labels
+    # set.seed(9)
+    cvgroups.in = sample(groups.in,n.in)
+    allpredictedCV.in = matrix(rep(NA,n.in*nvariables),ncol=nvariables)
+    
+    for (i in 1:k.in)  {
+      groupi.in = (cvgroups.in == i)
+      
+      for (m in 1:nvariables) {
+        allpredictedCV.in[groupi.in,m] = knn.reg(data.frame(fullx.in[!groupi.in,1:m]), data.frame(fullx.in[groupi.in,1:m]), fully.in[!groupi.in], k=l)$pred
+      }
+      
+    }
+    allmodelCV.in = rep(NA,nvariables)
+    for (m in 1:nvariables) { allmodelCV.in[m] = sum((allpredictedCV.in[,m]-fully.in)^2)/n.in}
+    
+    bestmodel.in = (1:nvariables)[order(allmodelCV.in)[1]]
+    allmodelKNNCV.in[l,1] = bestmodel.in
+    allmodelKNNCV.in[l,2] = min(allmodelCV.in)
+    
+  }
+  allmodelsK_numVari = as.data.frame(allmodelKNNCV.in)
+  best_nearest_neighbors = which.min(allmodelsK_numVari$CV10)
+  best_num_variables = allmodelsK_numVari[best_nearest_neighbors,1]
+  best_nearest_neighbors
+  best_num_variables
+  
+  allpredictedCV.out[groupj.out] = knn.reg(trainx.out[,1:best_num_variables], testx.out[,1:best_num_variables], trainy.out, k=best_nearest_neighbors)$pred
+  
+} 
+```
+
+Next block of code looks at the results. We can look at the CV(10) of the KNN process and then the R Squared.
+```{r}
+#assessment
+y.out = cars.y
+CV.out = sum((allpredictedCV.out-y.out)^2)/n.out
+R2.out = 1-sum((allpredictedCV.out-y.out)^2)/sum((y.out-mean(y.out))^2)
+CV.out; R2.out
+```
+
+The metric for evaluating the KNN technique of finding a model is the R squared value. In this case we obtain approximately 0.82. This indicates that our model explains about 82% of the variation in the response variable. This is a fairly high value indicating that KNN is a strong technique for this data set.
+
+
+*The LASSO Technique for finding a Model*
+
+Using the built in cross-validation method found in the glmnet library, we will determine the coefficients and specific lambda value that provides the best model.
+```{r}
+library(glmnet)  # use LASSO model from package glmnet 
+lambdalist = exp((-1200:1200)/100)  # defines models to consider
+fulldata.in = cars_2004_complete_std  # only input the data used to fit the model
+    
+x.in = model.matrix(Retailprice.log ~ .,data=fulldata.in[,-c(1,2)])
+y.in = fulldata.in[,15]
+k.in = 10 
+n.in = dim(fulldata.in)[1]
+groups.in = c(rep(1:k.in,floor(n.in/k.in)),1:(n.in%%k.in))  #produces list of group labels
+set.seed(9)   
+cvgroups.in = sample(groups.in,n.in)  #orders randomly, with seed (9) 
+#LASSO cross-validation
+cvLASSOglm.in = cv.glmnet(x.in, y.in, lambda=lambdalist, alpha = 1, nfolds=k.in, foldid=cvgroups.in)
+plot(cvLASSOglm.in$lambda,cvLASSOglm.in$cvm,type="l",lwd=2,col="red",xlab="lambda",ylab="CV(10)",
+ xlim=c(0,0.05),ylim = c(0.044,0.06))
+whichlowestcvLASSO.in = order(cvLASSOglm.in$cvm)[1]
+print("Minimum CV Value")
+min(cvLASSOglm.in$cvm)
+bestlambdaLASSO = (cvLASSOglm.in$lambda)[whichlowestcvLASSO.in]
+abline(v=bestlambdaLASSO)
+print("Best lambda value")
+bestlambdaLASSO  # this is the lambda for the best LASSO model
+LASSOfit.in = glmnet(x.in, y.in, alpha = 1,lambda=lambdalist)  # fit the model across possible lambda
+print("Coefficients for the Best Model")
+LASSObestcoef = coef(LASSOfit.in, s = bestlambdaLASSO); LASSObestcoef # coefficients for the best mode
+   
+```
+
+*Final LASSO Fitted Model*
+As you can see from the output of R, our best lambda will be 0.0003562065 and all 12 of the remaining predictor variables have coefficients other than zero.
+
+
+
+
+*LASSO Regression Technique Assessment*
+We end our examination of LASSO Regression by assessing the technique. The following is double cross validation code to assess LASSO Regression on this data.
+```{r}
+##### model assessment OUTER CV (with model selection INNER CV as part of model-fitting) #####
+fulldata.out  = cars_2004_complete_std
+k.out = 10 
+n.out = dim(fulldata.out)[1]
+#define the cross-validation splits 
+groups.out = c(rep(1:k.out,floor(n.out/k.out)),1:(n.out%%k.out))  #produces list of group labels
+set.seed(8)
+cvgroups.out = sample(groups.out,n.out)  #orders randomly, with seed (8) 
+allpredictedCV.out = rep(NA,n.out)
+for (j in 1:k.out)  {  #be careful not to re-use loop indices
+  groupj.out = (cvgroups.out == j)
+  traindata.out = cars_2004_complete_std[!groupj.out,]
+  trainx.out = model.matrix(Retailprice.log~.,data=traindata.out[,-c(1,2)])
+  trainy.out = traindata.out[,15]
+  
+  testdata.out = cars_2004_complete_std[groupj.out,]
+  testx.out = model.matrix(Retailprice.log~.,data=testdata.out[,-c(1,2)])
+  testy.out = testdata.out[,15]
+  
+  ### entire model-fitting process ###
+    fulldata.in = traindata.out  # only input the data used to fit the model
+    
+    x.in = model.matrix(Retailprice.log~.,data=fulldata.in[,-c(1,2)])
+    y.in = fulldata.in[,15]
+    k.in = 10 
+    n.in = dim(fulldata.in)[1]
+    groups.in = c(rep(1:k.in,floor(n.in/k.in)),1:(n.in%%k.in))  #produces list of group labels
+#    set.seed(8)   # do not reset seed for each internal loop
+    cvgroups.in = sample(groups.in,n.in)  #orders randomly, with seed (8) 
+    #LASSO cross-validation
+    cvLASSOglm.in = cv.glmnet(x.in, y.in, lambda=lambdalist, alpha = 1, nfolds=k.in, foldid=cvgroups.in)
+    plot(cvLASSOglm.in$lambda,cvLASSOglm.in$cvm,type="l",lwd=2,col="red",xlab="lambda",ylab="CV(10)",
+    xlim=c(0,0.1),ylim = c(0.04,0.06))
+    whichlowestcvLASSO.in = order(cvLASSOglm.in$cvm)[1]; min(cvLASSOglm.in$cvm)
+    bestlambdaLASSO = (cvLASSOglm.in$lambda)[whichlowestcvLASSO.in]; bestlambdaLASSO
+    abline(v=bestlambdaLASSO)
+    ### resulting in bestlambdaLASSO ###
+  
+    LASSOtrainfit.out = glmnet(trainx.out, trainy.out, alpha = 1,lambda=lambdalist)
+    allpredictedCV.out[groupj.out] = predict(LASSOtrainfit.out,newx=testx.out,s=bestlambdaLASSO)
+}
+```
+
+___
+
+Next block of code looks at the results. We can look at the CV(10) of the LASSO regression technique and then the R Squared.
+```{r}
+#assessment
+y.out = cars.y
+CV.out = sum((allpredictedCV.out-y.out)^2)/n.out
+R2.out = 1-sum((allpredictedCV.out-y.out)^2)/sum((y.out-mean(y.out))^2)
+CV.out; R2.out
+```
+
+The metric for evaluating the LASSO regression technique of finding a model is also the R squared value. In this case we obtain approximately 0.799. This indicates that our model explains about 79.9% of the variation in the response variable. This is slightly less than the KNN technique for model fitting. In our situation of predicting car retail prices, this would probably use KNN for our retail pricing calculations.

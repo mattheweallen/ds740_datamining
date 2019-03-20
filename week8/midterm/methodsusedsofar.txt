@@ -1,0 +1,5 @@
+linear regression
+logistic regression
+linear discriminant analysis
+quadratic discriminant analysis
+decision trees
