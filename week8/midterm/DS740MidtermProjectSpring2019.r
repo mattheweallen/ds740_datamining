@@ -1,3 +1,7 @@
+#R code for ds 740 midterm project
+#Matt Allen
+
+#read in the data
 ais = read.csv("ais.csv")
 pairs(ais)
 #make sex into factor variable
@@ -6,9 +10,9 @@ summary(ais$Sex)
 
 #plot histograms of variable to check for normality
 hist(ais$Bfat, xlab="Body Fat", main = "Distribution of Body Fat") #possible response variable looks skewed
-ais$Bfat = log(ais$Bfat) #use log of bfat to fix right skewness
 shapiro.test(ais$Bfat)
 
+ais$Bfat = log(ais$Bfat) #use log of bfat to fix right skewness
 hist(ais$Bfat, xlab="Body Fat", main = "Distribution of Log Transformed Body Fat")
 
 ais = ais[,c(2:13)]
@@ -61,30 +65,6 @@ y.out = fulldata.out$Bfat
 CV.out = sum((allpredictedCV.out-y.out)^2)/n.out
 R2.out = 1-sum((allpredictedCV.out-y.out)^2)/sum((y.out-mean(y.out))^2)
 CV.out; R2.out
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -162,3 +142,22 @@ CV.out; R2.out
 ModelFinal = (Bfat ~ Sex+Wt+SSF) # remove ht because it is not significant. SSF is a better predictor
 finalModel = lm(formula = ModelFinal,data=ais)
 summary(finalModel)
+par(mfrow = c(2, 2))
+plot(finalModel) #create diagnostic plots
+
+#use bisquare method to put less weight on outliers
+library(MASS)
+fit.bisquare = rlm(ModelFinal, data = ais, psi = psi.bisquare)
+summary(fit.bisquare)
+fit.bisquare
+
+#install.packages("car")
+#show the weights used in the bisquare
+library(car)
+
+plot(fit.bisquare$w, las=1, cex.axis=1.2, ylab="Weights")
+smallweights = which(fit.bisquare$w < .1)
+smallweights
+fit.bisquare$w[200]
+fit.bisquare$w[201]
+fit.bisquare$w[202]
