@@ -1,0 +1,3829 @@
+---
+title: "Homework8_DS740SU18SEC02_BrianPankau - Predictve_Modeling"
+author: "Brian Pankau"
+date: '`r Sys.Date()`'
+output:
+  word_document:
+    fig_height: 4
+    fig_width: 4.5
+  pdf_document:
+    fig_height: 4
+    fig_width: 4.5
+  html_document:
+    fig_height: 4
+    fig_width: 4.5
+editor_options: 
+  chunk_output_type: console
+---
+
+# Initialization ----
+```{r setup, include=FALSE, echo=FALSE, eval=TRUE, include=FALSE}
+# Set knitting options ----
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load packages ----
+require(mosaic)
+# library("ggpubr")
+# library("reshape2")
+# library(pROC)
+# library(smss)
+
+# Customize ----
+trellis.par.set(theme = theme.mosaic()) # change default color scheme for lattice
+knitr::opts_chunk$set(
+  tidy = TRUE,    # display code as typed
+  size = "small"  # slightly smaller font for code
+) 
+```
+
+```{r Documentation, echo=FALSE, eval=FALSE, include=TRUE}
+# Documentation ----
+
+# > Problem Definition ----
+# 
+
+# > Data Set ----
+# Name: 202 Australian elite athletes (R package alr3)
+# Source: https://www.rdocumentation.org/packages/alr4/versions/1.0.5/topics/ais
+# Description: Data on 102 male and 100 female athletes collected at the Australian Institute of Sport.
+# Factor response: Sport, with several levels
+# Quantitative response: Bfat
+# Predictors: (11)
+# - Sport Sport
+# - Bfat Percent body fat
+# - Sex (0 = male or 1 = female)
+# - Ht height (cm)
+# - Wt weight (kg)
+# - LBM lean body mass
+# - RCC red cell count
+# - WCC white cell count
+# - Hc Hematocrit
+# - Hg Hemoglobin
+# - Ferr plasma ferritin concentration
+# - BMI body mass index, weight/(height)**2
+# - SSF sum of skin folds
+
+# > Referenced Links: ----
+```
+
+```{r, Investigative Questions, echo=TRUE, eval=FALSE, include=TRUE}
+# Experimental Design Research Questions ----
+# 
+# > Investigation Intent ----
+# - Why is this investigation being performed?
+# - What is the goal for this investigation?
+# - What are the objectives for this investigation?
+# - What is hoped to be gained from this investigation?
+# - By performing this investigation, what is the expected impact to the organization?
+# - Quantitative benefits?
+# - Qualitative benefits?
+# - Should this investigation be performed now or at a later time?
+# - If this investigation is NOT performed, what is lost?
+# 
+# > Dataset Acquisition ----
+# - Is there data for this investigation?
+# - Where is the data being obtained from?
+# - Who owns this data?
+# - What is the release criteria for this data?
+# - Are there enough observations in the dataset?
+# - Can more data observations be obtained?
+# - Were all observations made using the same measurement criteria?
+# 
+# > Data Characterization ----
+# - What is the distribution of the data for each response and predictor variable?
+# - Is the density within each variable a normal distribution?
+# - What degree is the data skewed (right [positive] or left [negative])?
+# - What is the kurtosis of the distribution?
+# - Is the distribution of the data multi-modal?
+# - What is the mean for each variable?
+# - What is the standard deviation (sd) for each variable?
+# - How many observations are there per categorical predictor (binning)?
+# - What are the inner quartile ranges (IQR) for each variable?
+# - Does the boxplots indicate that there are outliers in the data?
+# - For time series data, what is the trend within each variable over time?
+# 
+# > Data Cleaning ----
+# - Are there observations that contain missing data?
+# - Are there observations that contain malformed data?
+# - Are there unexpected characters in the data fields of the observations?
+# - Are the observations in a normalize format?
+# - How does the investigation resolve these issues (data exclusion)?
+# 
+# > Outlier Analysis ----
+# - Do the outliers differ significantly in character from the rest of the data?
+# - What is the methodology being used to identify what is a significant outlier?
+# - Why are some outlier observations chosen for exclusion rather than others?
+# - Does the exclusion of outliers improve the distribution of the data (normality)?
+# - Does the exclusion of outliers improve the model's prediction?
+# 
+# > Data Transformation ----
+# - If the distribution of the data is non-normal, is a transformation appropriate?
+# - What types of transformations were attempted?
+# - How successful were the transformations?
+# - Did the transformations make a difference in the model's prediction?
+# 
+# > Predictor Reduction ----
+# - What predictors are significant?
+# - What techniques were used to reduce the number of predictors (P-value, Stepwise, Ridge Regression, LASSO, Elastic Net, PCA)?
+# - What criteria was used to evaluate predictor reduction (AIC, BIC)
+# - What was the effect in variance vs bias by reducing the number of predictors?
+# - What was the effect in the model's predictions when using a reduced predictor set?
+# 
+# > Model Selection ----
+# - What is the objective of the investigation (prediction vs categorization)?
+# - Is the response variable continuous (quantitative) or discrete (categorical)?
+# - How many factors does the categorical response variable contain (2, 2+)?
+# - How are any categorical predictors in the model managed (hyper-plane sub-setting)?
+# - Which regression models were considered {lm(), glm(), gls(), multinom(), TukeyBiSquare(), lda(), qda()}?
+# - Which regression model is preferred? Why?
+# - What other models were considered (KNN, decision trees, neural networks)?
+# 
+# > Predictor Weighting ----
+# - Were the predictor values weighed?
+# - What weighing methodology was used (Huber, ...)?
+# 
+# > Data Partitioning ----
+# - How was sampling performed?
+# - How was the dataset partitioned into training, test, validation sets?
+# - Is boosting applicable?
+# - Is bagging applicable?
+# - Are Random Forests applicable?
+# - Is boot-strapping applicable?
+# - What cross-validation methodology was used (leave-one-out, CV-10,...)?
+# - Was the model overfitted?
+# - Was the model underfitted?
+# 
+# > Statistical Assessment ----
+# - How are the residuals distributed?
+# - What statistical tests are applicable?
+# 
+# > Model Response Assessment ----
+# - Is the model's response class-based or probability-based?
+# - What metrics were used to assess the model's predictions or categorizations?
+#   - Confusion Matrix
+#   - Gain and Lift Chart
+#   - Kolmogorov Smirnov Chart
+#   - AUC
+#   - ROC
+#   - Gini Coefficient
+#   - Concordant vs. Discordant Ratio
+#   - Root Mean Squared Error
+#   - K-fold Cross Validation
+# 
+# > Results ----
+# - What are the results of this investigation?
+# - What are the findings of this investigation?
+# 
+# > Conclusion ----
+# - What can be concluded from this investigation?
+# 
+# > Next Steps ----
+# - What questions, topics, issues ware not addressed in this investigation?
+# - What is the follow-on investigation?
+# 
+# > Publication ----
+# - In which publications should this investigation be published?
+# - Who should receive notice about the findings from this investigation?
+# 
+```
+
+```{r, Restart_R, echo=FALSE, eval=TRUE, include=TRUE}
+# Restart R ----
+
+
+# to manually restart R-Studio  (Ctrl-Shift-F10)
+
+# issue command to restart R in R-Studio
+#.rs.restartR()  # also works
+if (!require(rstudioapi)) {
+  install.packages("rstudioapi", quiet = TRUE)
+}
+library(rstudioapi, quietly = TRUE)
+restartSession(command = "")
+```
+
+```{r A_00_Clear_Environment, echo=FALSE, eval=TRUE, include=FALSE}
+# > Clear the R-Studio Console & workspace ----
+if (!require(mise)) {
+  install.packages("mise")
+}
+library(mise, quietly = TRUE)
+mise()
+rm(list = ls())
+if (!is.null(dev.list())) {
+  dev.off()
+}
+
+A_00_Clear_Environment <- 1
+```
+
+```{r, A_01_Detach_All_Packages(), echo=FALSE, eval=TRUE, include=TRUE}
+# fn:Detach All Packages ----
+# source: https://stackoverflow.com/questions/7505547/detach-all-packages-while-working-in-r
+
+
+# define fn
+detachAllPackages <- function() {
+  basic.packages <-
+    c(
+      "package:stats",
+      "package:graphics",
+      "package:grDevices",
+      "package:utils",
+      "package:datasets",
+      "package:methods",
+      "package:base"
+    )
+
+  package.list <-
+    search()[ifelse(unlist(gregexpr("package:", search())) == 1, TRUE, FALSE)]
+
+  package.list <- setdiff(package.list, basic.packages)
+
+  if (length(package.list) > 0) {
+    for (package in package.list)
+      detach(package, character.only = TRUE)
+  }
+
+  sessionInfo()
+}
+
+A_01_Detach_All_Packages <- 1
+```
+
+```{r, A_02_normality_test_pvalue(df), echo=FALSE, eval=TRUE, include=FALSE}
+# normality_test_pvalue(df) ----
+# Test the normality for a predictor set & output the p-values
+
+
+# define fn
+normality_test_pvalue <- function(df) {
+  shapiro.test.vector <- rep(NA, 11)
+  for (i in 1:11) {
+    shapiro.test.vector[i] <- format(shapiro.test(df[, i])$p.value,
+      digits = 3,
+      scientific = FALSE
+    )
+  }
+  cbind(names(df)[1:11], shapiro.test.vector)
+}
+A_02_normality_test_pvalue <- 1
+```
+
+```{r, A_03_Extract_Boxcox_Lambda(v), echo=FALSE, eval=TRUE, include=TRUE}
+# fn:Extract Boxcox Lambda Vector ----
+# source: http://rcompanion.org/handbook/I_12.html
+# input: a vector of data such as df$col
+# output: a vector of lambdas
+
+extract_boxcox_lambda <- function(v) {
+  if (!require(MASS)) {
+    install.packages("MASS", quiet = TRUE)
+  }
+  library(MASS, quietly = TRUE)
+
+  # Transform male Bfat as a single vector
+  Box <- boxcox(v ~ 1, lambda = seq(-6, 6, 0.1), plotit = FALSE)
+
+  # Create a data frame with the results
+  Cox <- data.frame(Box$x, Box$y)
+
+  # Order the new data frame by decreasing y
+  Cox2 <- Cox[with(Cox, order(-Cox$Box.y)), ]
+
+  # Extract that lambda
+  lambda <- Cox2[1, "Box.x"]
+  T_box <- (v^lambda - 1) / lambda
+
+  # if(!require(rcompanion)){install.packages("rcompanion")}
+  # library(rcompanion, quietly=TRUE)
+  # plotNormalHistogram(T_box)
+  # shapiro.test(T_box)$p.value
+  # detach(package:rcompanion, unload=TRUE)
+
+
+  detach(package:MASS, unload = TRUE)
+
+  return(T_box)
+}
+
+A_03_Extract_Boxcox_Lambda <- 1
+```
+
+```{r, A_04_Load_Dataset, echo=TRUE, eval=TRUE, include=TRUE}
+# Load Dataset ----
+
+
+# > Read .csv file into a dataframe ----
+ais <- read.csv("ais.csv")
+
+# > Make a copy of the original dataset that is not transformed ----
+# (the ".nt" indicates that the dataset is "non-transformed")
+ais.nt <- ais
+
+# > Factorize the *Sex* predictor ----
+ais.nt$Sex <- as.factor(ais.nt$Sex)
+
+# > Re-label *Sex* factors ----
+levels(ais.nt$Sex) <- c("M", "F")
+
+# > Add a row ID to the dataframe ----
+ais.nt$RowID <- seq.int(nrow(ais.nt))
+
+# > Create *Sport.label*: a new response variable as a joint label between categorical variables Sex and Sport
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "b_ball"] <- "m_b_ball"
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "b_ball"] <- "f_b_ball"
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "field"] <- "m_field"
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "field"] <- "f_field"
+# ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport=="gym"] <- "m_gym"   # zero records
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "gym"] <- "f_gym"
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "netball"] <- "m_netball" # zero records
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "netball"] <- "f_netball"
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "row"] <- "m_row"
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "row"] <- "f_row"
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "swim"] <- "m_swim"
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "swim"] <- "f_swim"
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "t_400m"] <- "m_t_400m"
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "t_400m"] <- "f_t_400m"
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "t_sprnt"] <- "m_t_sprnt"
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "t_sprnt"] <- "f_t_sprnt"
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "tennis"] <- "m_tennis"
+ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "tennis"] <- "f_tennis"
+ais.nt$Sport.label[ais.nt$Sex == "M" & ais.nt$Sport == "w_polo"] <- "m_w_polo"
+# ais.nt$Sport.label[ais.nt$Sex == "F" & ais.nt$Sport == "w_polo"] <- "f_w_polo" # zero records
+
+# > Reorganize the columns in the dataframe ----
+ais.nt <- subset(ais.nt, select = c(Bfat, Ht:SSF, Sport.label, Sport, Sex, RowID))
+
+# > Label dataframe variables ----
+if (!require(labelled)) {
+  install.packages("labelled", quiet = TRUE)
+}
+library(labelled, quietly = TRUE)
+var_label(ais.nt$Sport) <- "Type of Sport"
+var_label(ais.nt$Bfat) <- "Percent body fat"
+var_label(ais.nt$Sex) <- "Sex (M=0, F=1)"
+var_label(ais.nt$Ht) <- "Height (cm)"
+var_label(ais.nt$Wt) <- "Wight (kg)"
+var_label(ais.nt$LBM) <- "Lean Body Mass"
+var_label(ais.nt$RCC) <- "Red Cell Count"
+var_label(ais.nt$WCC) <- "White Cell Cnt"
+var_label(ais.nt$Hc) <- "Hematocrit"
+var_label(ais.nt$Hg) <- "Hemoglobin"
+var_label(ais.nt$Ferr) <- "Plasma Ferritin Concentration"
+var_label(ais.nt$BMI) <- "Body Mass Index"
+var_label(ais.nt$SSF) <- "Sum of Skin Folds"
+var_label(ais.nt$Sport.label) <- "Type of Sport by Sex"
+var_label(ais.nt$RowID) <- "Row ID"
+
+
+detachAllPackages()
+
+A_04_Load_Dataset <- 1
+```
+
+
+```{r, A_05_Explore_Full_Dataset, echo=TRUE, eval=TRUE, include=TRUE}
+# Characterize Dataset ----
+
+
+# source: https://cran.r-project.org/web/packages/DataExplorer/vignettes/dataexplorer-intro.html
+
+# > List the counts per bin category
+with(ais.nt, table(Sport.label))
+with(ais.nt, table(Sport))
+with(ais.nt, table(Sex))
+
+# Source: https://stats.idre.ucla.edu/r/dae/multinomial-logistic-regression/
+with(ais.nt, do.call(rbind, tapply(Bfat, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(Ht, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(Wt, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(LBM, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(RCC, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(WCC, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(Hc, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(Hg, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(Ferr, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(BMI, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+with(ais.nt, do.call(rbind, tapply(SSF, Sport.label, function(x) c(Mean = mean(x), SD = sd(x)))))
+
+
+# > Issue basic statistics ----
+summary(ais.nt)
+
+# > Summarize the statistics ----
+if (!require(psych)) {
+  install.packages("psych", quiet = TRUE)
+}
+library(psych, quietly = TRUE)
+describe(ais.nt, IQR = TRUE, skew = TRUE, omit = TRUE)
+
+# > Summarize the statistics by factor category ----
+describeBy(ais.nt[1:11], ais.nt$Sport.label)
+describeBy(ais.nt[1:11], ais.nt$Sport)
+describeBy(ais.nt[1:11], ais.nt$Sex)
+detach(package:psych, unload = TRUE)
+
+# > List the data structure internals ----
+str(ais.nt)
+
+# > Visualize the data structure internals ----
+if (!require(DataExplorer)) {
+  install.packages("DataExplorer", quiet = TRUE)
+}
+library(DataExplorer, quietly = TRUE)
+plot_str(ais.nt)                  # diagonal network
+plot_str(ais.nt, type = "r")      # radial network
+
+# > Plot categorical frequency distributionsof the  predictors ----
+if (!require(dplyr)) {
+  install.packages("dplyr", quiet = TRUE)
+}
+library(dplyr, quietly = TRUE)
+plot_bar(ais.nt, title = "ais")
+
+# > Plot non-categorical frequency distribution of the predictors ----
+plot_histogram(ais.nt[-15], title = "ais Histogram")
+
+# > Plot principle component analysis ----
+plot_prcomp(na.omit(ais), title = "ais PCA")
+
+# plot the distribution of the quantative predictors by sport type
+plot_boxplot(ais.nt, by = "Sport", title = "ais Sport")
+
+# plot the distribution of the quantative predictors by sex
+plot_boxplot(ais.nt, by = "Sex", title = "ais Sex")
+
+# > Plot type-of-sport distribution of the quantative predictors ----
+plot_scatterplot(subset(ais.nt, ais.nt$Sex == "F")[-14], by = "Bfat", title = "ais")
+
+# > Plot correlations ----
+plot_correlation(ais.nt,
+  maxcat = 30L,
+  use = "pairwise.complete.obs",
+  title = "ais"
+)
+
+if (!require(dplyr)) {
+  install.packages("dplyr", quiet = TRUE)
+}
+library(dplyr, quietly = TRUE)
+
+# create some temporary dataframes from the R-Studio environment
+plot_scatterplot(dplyr::select(filter(ais.nt, ais.nt$Sex == "F"), c(Bfat, Sport)), 
+                 by = "Bfat", title = "ais Bfat by Sport Type for Females")
+plot_scatterplot(dplyr::select(filter(ais.nt, ais.nt$Sex == "M"), c(Bfat, Sport)), 
+                 by = "Bfat", title = "ais Bfat by Sport Type for Males")
+#detach(package:dplyr, unload = TRUE)
+
+# > Plot Sex distribution of the quantative predictors ----
+plot_scatterplot(ais.nt, by = "Sex", title = "ais")
+detach(package:DataExplorer, unload = TRUE)
+
+detachAllPackages()
+
+A_05_Explore_Full_Dataset <- 1
+```
+
+
+```{r, A_06_Outlier_Discovery, echo=TRUE, eval=TRUE, include=TRUE}
+# Discover outliers in the full dataset as partitioned by sex ----
+
+
+# > Define predictor_outliers_by_sport_type fn ----
+predictor_outliers_by_sport_type <- function(df, sport_sex) {
+  if (!require(outliers)) {
+    install.packages("outliers", quiet = TRUE)
+  }
+  library("outliers", quietly = TRUE)
+    
+  type_of_sport_set <- unique(df[df$Sex == sport_sex, "Sport.label"])
+  number_of_predictors <- dim(df)[2] - 4
+  predictor_outliers_by_sport_type_mat <-
+    matrix(rep(0, length(type_of_sport_set) * number_of_predictors),
+      nrow = length(type_of_sport_set),
+      ncol = number_of_predictors
+    )
+  rownames(predictor_outliers_by_sport_type_mat) <- type_of_sport_set
+  colnames(predictor_outliers_by_sport_type_mat) <- names(df)[1:number_of_predictors]
+  for (i in 1:number_of_predictors) {
+    for (j in 1:length(type_of_sport_set)) {
+      predictor_outliers_by_sport_type_mat[j, i] <-
+        outliers::outlier(outliers::outlier(df[df$Sport.label == type_of_sport_set[j], ][i]))
+    }
+  }
+  return(predictor_outliers_by_sport_type_mat)
+}
+
+# > Get Female outliers via outliers package ----
+predictor_outliers_by_sport_type(ais.nt, "F")
+
+# > Get Male outliers via outliers package ----
+predictor_outliers_by_sport_type(ais.nt, "M")
+
+
+
+
+# > Test for Normality ----
+for (i in 1:11) {
+  shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",][i])
+}
+
+
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+shapiro.test(ais.nt[ais.nt$Sport.label == "f_b_ball",]$Bfat)
+
+#normality_test_pvalue(ais.nt[ais.nt$Sport.label=="f_b_ball",]$Bfat)
+
+
+
+
+
+# graphically review the full data set by sex
+# > Boxplot Sex by sport-type the predictors for graphical identification of outliers ----
+if (!require(rcompanion)) {
+  install.packages("rcompanion", quiet = TRUE)
+}
+library("DataExplorer", quietly = TRUE)
+plot_boxplot(ais.nt[ais.nt$Sex == "F", ],
+  by = "Sport", title = "ais Female Sport Players"
+)
+
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_b_ball", ],
+  by = "Sport", title = "ais Female g_b_ball Players"
+)
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_field", ],
+  by = "Sport", title = "ais Female f_field Players"
+)
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_gym", ],
+  by = "Sport", title = "ais Female f_gym Player"
+)
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_netball", ],
+  by = "Sport", title = "ais Female f_netball Players"
+)
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_row", ],
+  by = "Sport", title = "ais Female f_row Players"
+)
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_swim", ],
+  by = "Sport", title = "ais Female f_swim Players"
+)
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_t_400m", ],
+  by = "Sport", title = "ais Female f_t_400m Players"
+)
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_t_sprnt", ],
+  by = "Sport", title = "ais Female f_t_sprnt Players"
+)
+plot_boxplot(ais.nt[ais.nt$Sex == "F" & ais.nt$Sport.label == "f_tennis", ],
+  by = "Sport", title = "ais Female f_tennis Players"
+)
+
+plot_boxplot(ais.nt[ais.nt$Sex == "M" & ais.nt$Sport.label == "m_b_ball", ], by = "Sport", title = "ais Male m_b_ball Players")
+plot_boxplot(ais.nt[ais.nt$Sex == "M" & ais.nt$Sport.label == "m_field", ], by = "Sport", title = "ais Male m_field Players")
+plot_boxplot(ais.nt[ais.nt$Sex == "M" & ais.nt$Sport.label == "m_row", ], by = "Sport", title = "ais Male m_row Players")
+plot_boxplot(ais.nt[ais.nt$Sex == "M" & ais.nt$Sport.label == "m_swim", ], by = "Sport", title = "ais Male m_swim Players")
+plot_boxplot(ais.nt[ais.nt$Sex == "M" & ais.nt$Sport.label == "m_t_400m", ], by = "Sport", title = "ais Male m_t_400m Players")
+plot_boxplot(ais.nt[ais.nt$Sex == "M" & ais.nt$Sport.label == "m_t_sprnt", ], by = "Sport", title = "ais Male m_t_sprnt Players")
+plot_boxplot(ais.nt[ais.nt$Sex == "M" & ais.nt$Sport.label == "m_tennis", ], by = "Sport", title = "ais Male m_tennis Players")
+plot_boxplot(ais.nt[ais.nt$Sex == "M" & ais.nt$Sport.label == "m_w_polo", ], by = "Sport", title = "ais Male m_w_polo Players")
+# detach(package:rcompanion, unload = TRUE)
+
+
+# > Check the counts per sport type by sex before recommending outlier removal ----
+# goal: keep count number per sport type bin by sex >= 4
+with(ais.nt[ais.nt$Sex == "F", ], table(Sport.label)) # f_gym = 4, f_t_sprnt = 4
+# f_b_ball   f_field     f_gym f_netball     f_row    f_swim  f_t_400m f_t_sprnt  f_tennis
+#  13-1         7-1         4     23-1        22-1     9        11         4         7
+
+with(ais.nt[ais.nt$Sex == "M", ], table(Sport.label)) # m_tennis = 4
+# m_b_ball   m_field     m_row    m_swim  m_t_400m m_t_sprnt  m_tennis  m_w_polo
+#   12-3       12        15-3      13-1        18        11         4        17
+
+# write.csv(ais.nt, "C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais.nt.csv")
+
+# > Manually compare boxplots with dataset and <mark> outliers ----
+# outlier review findings:
+# Sport	    Bfat	Sex	Ht	    Wt	    LBM	    RCC	    WCC	    Hc	    Hg	    Ferr	BMI	    SSF	 OCnt rm
+# t_400m    11.07	F	174.10	64.70	57.54  <5.31>  <9.50>	47.10	15.90	29.00	21.35	57.90	2
+# t_sprnt	11.64	F	163.90	60.10	53.11	4.82	7.60	43.20	14.40	58.00  <22.37> <50.00>	2
+# field    <11.77>	F	169.80 <58.00> <51.17>	4.48	9.50	36.50  <13.30>	54.00	20.12  <49.90>	6  *
+# row	    16.58	F  <156.00><49.80> <41.54>	4.21	7.50	38.40	13.20	73.00	20.46	74.70	3  *
+# netball	17.22	F	168.60 <51.90> <42.96>	4.52	5.10	38.80	13.10	58.00	18.26	80.10	2  *
+# b_ball	28.83	F	193.40	96.30	68.53	4.71	5.30	41.40	14.00	38.00  <25.75><171.10>	2  *
+
+# Sport	     Bfat	Sex	Ht	    Wt	    LBM	    RCC	    WCC	    Hc	    Hg	    Ferr	BMI	    SSF	 OCnt rm
+# swim	     6.46	M	190.40 <96.90> <91.00>	4.32	4.30   <41.60> <14.00>	177.00 <26.73>	35.20	5 *
+# row	    <6.96>  M	198.00	93.50	87.00	4.95	5.90	45.40	15.50	125.00	23.85	34.80	1 *
+# field	     8.51	M	185.00 111.30 <102.00>	5.48	4.60	49.40  <18.00>  132.00	32.52	55.70	2
+# t_400m    <8.84>	M	178.50	71.00	65.00	5.49	5.90	47.70	15.90	66.00	22.28  <48.00>	2
+# t_sprnt    9.40	M	189.10 <94.80> <86.00>	5.50	6.40	48.10	16.50	40.00	26.51	52.80	2 *
+# t_400m    <9.50>	M	187.30	76.80	70.00	5.21	7.50	47.50	16.50	20.00	21.89  <46.70>	2
+# t_sprnt    9.56	M	174.90	75.90	69.00  <6.72>	7.10   <59.70>	19.20	76.00	24.81	44.80	2
+# row	    10.81	M  <165.30><53.80> <48.00>	5.18	6.50	45.40	14.90	93.00  <19.69>	54.00	4 *
+# row	    11.95	M	188.10	88.20	78.00	4.71	8.00	45.50	15.60	91.00	24.93	78.00	1
+# row	   <12.61>	M	181.80	85.40	75.00	5.04	7.10	44.00	14.80	64.00	25.84	61.80	1 *
+# b_ball   <14.53>	M	209.40 113.70	97.00	5.17	8.00	47.90	16.40	36.00	25.93  <88.90>	2 *
+
+
+# > ID recommended outlier removals ----
+# female = 4 rows
+# Sport	    Bfat	Sex	Ht	    Wt	    LBM	    RCC	    WCC	    Hc	    Hg	    Ferr	BMI	    SSF	 OCnt rm
+# field    <11.77>	1	169.80 <58.00> <51.17>	4.48	9.50	36.50  <13.30>	54.00	20.12  <49.90>	6  *
+# row	    16.58	1  <156.00><49.80> <41.54>	4.21	7.50	38.40	13.20	73.00	20.46	74.70	3  *
+# netball	17.22	1	168.60 <51.90> <42.96>	4.52	5.10	38.80	13.10	58.00	18.26	80.10	2  *
+# b_ball	28.83	1	193.40	96.30	68.53	4.71	5.30	41.40	14.00	38.00  <25.75><171.10>	2  *
+
+# male = 6 rows
+# Sport	     Bfat	Sex	Ht	    Wt	    LBM	    RCC	    WCC	    Hc	    Hg	    Ferr	BMI	    SSF	 OCnt rm
+# swim	     6.46	0	190.40 <96.90> <91.00>	4.32	4.30   <41.60> <14.00>	177.00 <26.73>	35.20	5 *
+# row	    <6.96>  0	198.00	93.50	87.00	4.95	5.90	45.40	15.50	125.00	23.85	34.80	1 *
+# t_sprnt    9.40	0	189.10 <94.80> <86.00>	5.50	6.40	48.10	16.50	40.00	26.51	52.80	2 *
+# row	    10.81	0  <165.30><53.80> <48.00>	5.18	6.50	45.40	14.90	93.00  <19.69>	54.00	4 *
+# row	   <12.61>	0	181.80	85.40	75.00	5.04	7.10	44.00	14.80	64.00	25.84	61.80	1 *
+# b_ball   <14.53>	0	209.40 113.70	97.00	5.17	8.00	47.90	16.40	36.00	25.93  <88.90>	2 *
+
+
+detachAllPackages()
+
+A_06_Outlier_Discovery <- 1
+```
+
+
+```{r, A_07_Outlier_Removal, echo=TRUE, eval=TRUE, include=TRUE}
+# > Remove the outliers from the full dataset ----
+# remove the outliers from the non-tranformed full dataset
+# create a new dataframe (ais.no) than contains non-transformed data w/o outliers
+
+
+# Records to omit ----
+# Bfat	Ht	    Wt	    LBM	    RCC	    WCC	    Hc	    Hg	    Ferr	BMI	    SSF	    Sex	Sport	Sport.label	RowID	rm
+# 11.77	169.80	58.00	51.17	4.48	9.50	36.50	13.30	54.00	20.12	49.90	1	field	f_field	    104	    Y
+# 16.58	156.00	49.80	41.54	4.21	7.50	38.40	13.20	73.00	20.46	74.70	1	row	    f_row	    137	    Y
+# 17.22	168.60	51.90	42.96	4.52	5.10	38.80	13.10	58.00	18.26	80.10	1	netball	f_netball	140	    Y
+# 28.83	193.40	96.30	68.53	4.71	5.30	41.40	14.00	38.00	25.75	171.10	1	b_ball	f_b_ball	200	    Y
+
+# male = 6 rows
+# Bfat	Ht	Wt	LBM	    RCC	    WCC	    Hc	    Hg	    Ferr	BMI	S   SF	    Sex	    Sport	        Sport.label	RowID	rm
+# 6.46	190.40	96.90	91.00	4.32	4.30	41.60	14.00	177.00	26.73	35.20	0	swim	    m_swim	    17	    Y
+# 6.96	198.00	93.50	87.00	4.95	5.90	45.40	15.50	125.00	23.85	34.80	0	row	        m_row	    26	    Y
+# 9.40	189.10	94.80	86.00	5.50	6.40	48.10	16.50	40.00	26.51	52.80	0	t_sprnt	    m_t_sprnt	72	    Y
+# 10.81	165.30	53.80	48.00	5.18	6.50	45.40	14.90	93.00	19.69	54.00	0	row	        m_row	    92	    Y
+# 12.61	181.80	85.40	75.00	5.04	7.10	44.00	14.80	64.00	25.84	61.80	0	row	        m_row	    112	    Y
+# 14.53	209.40	113.70	97.00	5.17	8.00	47.90	16.40	36.00	25.93	88.90	0	b_ball	    m_b_ball	125	    Y
+
+
+# > Remove rows via *RowID* the outliers via original dataframe ----
+# the ".o" indicates that "non-tranformed dataset with records omitted"
+ais.no <- ais.nt[ !(ais.nt$RowID %in% c(17, 26, 72, 92, 104, 112, 125, 137, 140, 200)), ]
+
+
+detachAllPackages()
+
+A_07_Outlier_Removal <- 1
+```
+
+
+```{r, A_08_Assess_Full_Dataset, echo=TRUE, eval=TRUE, include=TRUE}
+# Assess Full Dataset: test for normality, transform as necessary ----
+# assess all records except the outliers
+
+# > Make a working copy of the non-transformed full dataset (Bfat:SSF)
+# the ".to" indicates that the dataframe has "transformed" predictors with outliers "omitted"
+ais.to <- ais.nt
+
+
+# assess non-transformed outliers omitted dataset for skewness & normality
+
+# > Test for Skewness ----
+if (!require(e1071)) {
+  install.packages("e1071", quiet = TRUE)
+}
+library("e1071", quietly = TRUE)
+skewness.ais.to <- rep(0, 11)
+for (i in 1:11) {
+  skewness.ais.to[i] <- round(skewness(ais.to[, i]), 4)
+}
+cbind(names(ais.to)[1:11], skewness.ais.to)
+# detach(package:e1071, unload = TRUE)
+
+#              skewness.ais.to
+#  [1,] "Bfat" "0.7539"
+#  [2,] "Ht"   "-0.1978"
+#  [3,] "Wt"   "0.2388"
+#  [4,] "LBM"  "0.3558"
+#  [5,] "RCC"  "0.4129"
+#  [6,] "WCC"  "0.8289"
+#  [7,] "Hc"   "0.2732"
+#  [8,] "Hg"   "0.1746"
+#  [9,] "Ferr" "1.2711"
+# [10,] "BMI"  "0.9395"
+# [11,] "SSF"  "1.166"
+
+
+# > Test for Normality ----
+normality_test_pvalue(ais.to)
+#              shapiro.test.ais.to
+#  [1,] "Bfat" "N"
+#  [2,] "Ht"   "Y"
+#  [3,] "Wt"   "Y"
+#  [4,] "LBM"  "N"
+#  [5,] "RCC"  "N"
+#  [6,] "WCC"  "N"
+#  [7,] "Hc"   "N"
+#  [8,] "Hg"   "N"
+#  [9,] "Ferr" "N"
+# [10,] "BMI"  "N"
+# [11,] "SSF"  "N"
+
+
+# NOTE: *ais.to$Ht* and *ais.to$Wt* have normal distributions, no transform necessary
+
+# > Find the lambda transformation power ----
+# use the transformTukey() when boxcox returns NaN
+if (!require(rcompanion)) {
+  install.packages("rcompanion", quiet = TRUE)
+}
+library("rcompanion", quietly = TRUE)
+transformTukey(ais.to$WCC, plotit = FALSE) # = -0.0250
+detach(package:rcompanion, unload = TRUE)
+
+# > Transform Predictors ----
+# *ais.to$Ht* and *ais.to$Wt* have normal distributions, no transform necessary
+ais.to$Bfat.t <- extract_boxcox_lambda(ais.to$Bfat)
+ais.to$LBM.t <- extract_boxcox_lambda(ais.to$LBM)
+ais.to$RCC.t <- extract_boxcox_lambda(ais.to$RCC)
+ais.to$WCC.t <- (sign(ais.to$WCC) * abs(ais.to$WCC)^-0.0250)
+ais.to$Hc.t <- extract_boxcox_lambda(ais.to$Hc)
+ais.to$Hg.t <- extract_boxcox_lambda(ais.to$Hg)
+ais.to$Ferr.t <- extract_boxcox_lambda(ais.to$Ferr)
+ais.to$BMI.t <- extract_boxcox_lambda(ais.to$BMI)
+ais.to$SSF.t <- extract_boxcox_lambda(ais.to$SSF)
+
+# > Remove the non-transformed variables from dataframe ----
+# *ais.to$Ht* and *ais.to$Wt* have normal distributions, no transform necessary
+ais.to <- subset(ais.to, select = -c(Bfat, LBM, RCC, WCC, Hc, Hg, Ferr, BMI, SSF))
+
+# > Reorder Predictors ----
+# *ais.to$Ht* and *ais.to$Wt* have normal distributions, no transform necessary
+ais.to <- subset(
+  ais.to,
+  select = c(
+    Bfat.t,
+    Ht,
+    Wt,
+    LBM.t,
+    RCC.t,
+    WCC.t,
+    Hc.t,
+    Hg.t,
+    Ferr.t,
+    BMI.t,
+    SSF.t,
+    Sport.label,
+    Sport,
+    Sex,
+    RowID
+  )
+)
+
+# > Verify Normality for the Transformed Predictors ----
+normality_test_pvalue(ais.to)
+#                shapiro.test.ais.to
+#  [1,] "Bfat.t" "0.000016"
+#  [2,] "Ht"     "0.212"
+#  [3,] "Wt"     "0.451"
+#  [4,] "LBM.t"  "0.251"
+#  [5,] "RCC.t"  "0.00622"
+#  [6,] "WCC.t"  "0.767"
+#  [7,] "Hc.t"   "0.00105"
+#  [8,] "Hg.t"   "0.0282"
+#  [9,] "Ferr.t" "0.576"
+# [10,] "BMI.t"  "0.208"
+# [11,] "SSF.t"  "0.00253"
+
+
+# > Graphically Review Transformed Predictors ----
+if (!require(rcompanion)) {
+  install.packages("rcompanion", quiet = TRUE)
+}
+library("DataExplorer", quietly = TRUE)
+plot_histogram(ais, title = "Non-transformed, Full dataset")
+plot_histogram(ais.to, title = "Transformed, Full dataset")
+detach(package:rcompanion, unload = TRUE)
+
+
+detachAllPackages()
+
+A_08_Assess_Full_Dataset <- 1
+```
+
+
+```{r, A_09_Explore_Alternate_Transformations, echo=TRUE, eval=TRUE, include=TRUE}
+# Explore Alternate Transformations ----
+
+
+# make a working copy of the full dataset (Bfat:SSF)
+# ".tow" dataframe contains transformed predictors w/o outliers that is a temporary working version
+asi.tow <- ais.no
+
+# > log() Transform ----
+asi.tow$Bfat.t <- log(asi.tow$Bfat)
+asi.tow$LBM.t <- log(asi.tow$LBM)
+asi.tow$RCC.t <- log(asi.tow$RCC)
+asi.tow$WCC.t <- log(asi.tow$WCC)
+asi.tow$Hc.t <- log(asi.tow$Hc)
+asi.tow$Hg.t <- log(asi.tow$Hg)
+asi.tow$Ferr.t <- log(asi.tow$Ferr)
+asi.tow$BMI.t <- log(asi.tow$BMI)
+asi.tow$SSF.t <- log(asi.tow$SSF)
+normality_test_pvalue(asi.tow)  # verify normality for transformed predictors
+
+
+# > log(x/mean(x)+k) ----
+# source: http://seismo.berkeley.edu/~kirchner/eps_120/Toolkits/Toolkit_03.pdf
+# log1p(x) computes log(1+x) accurately also for |x|«1.
+# *asi.tow$Ht* and *asi.tow$Wt* have normal distributions, no transform necessary
+asi.tow <- ais.no
+k = 0.01
+asi.tow$Bfat.t <- log(asi.tow$Bfat / mean(asi.tow$Bfat) + k)
+asi.tow$LBM.t <- log(asi.tow$LBM / mean(asi.tow$LBM) + k)
+asi.tow$RCC.t <- log(asi.tow$RCC / mean(asi.tow$RCC) + k)
+asi.tow$WCC.t <- log(asi.tow$WCC / mean(asi.tow$WCC) + k)
+asi.tow$Hc.t <- log(asi.tow$Hc / mean(asi.tow$Hc) + k)
+asi.tow$Hg.t <- log(asi.tow$Hg / mean(asi.tow$Hg) + k)
+asi.tow$Ferr.t <- log(asi.tow$Ferr / mean(asi.tow$Ferr) + k)
+asi.tow$BMI.t <- log(asi.tow$BMI / mean(asi.tow$BMI) + k)
+asi.tow$SSF.t <- log(asi.tow$SSF / mean(asi.tow$SSF) + k)
+normality_test_pvalue(asi.tow)  # verify normality for transformed predictors
+
+
+# > sqrt(x) ----
+asi.tow <- ais.no
+asi.tow$Bfat.t <- sqrt(asi.tow$Bfat)
+asi.tow$LBM.t <- sqrt(asi.tow$LBM)
+asi.tow$RCC.t <- sqrt(asi.tow$RCC)
+asi.tow$WCC.t <- sqrt(asi.tow$WCC)
+asi.tow$Hc.t <- sqrt(asi.tow$Hc)
+asi.tow$Hg.t <- sqrt(asi.tow$Hg)
+asi.tow$Ferr.t <- sqrt(asi.tow$Ferr)
+asi.tow$BMI.t <- sqrt(asi.tow$BMI)
+asi.tow$SSF.t <- sqrt(asi.tow$SSF)
+normality_test_pvalue(asi.tow)  # verify normality for transformed predictors
+
+
+# t> log10(x) Transform
+asi.tow <- ais.no
+asi.tow$Bfat.t <- log10(asi.tow$Bfat)
+asi.tow$LBM.t <- log10(asi.tow$LBM)
+asi.tow$RCC.t <- log10(asi.tow$RCC)
+asi.tow$WCC.t <- log10(asi.tow$WCC)
+asi.tow$Hc.t <- log10(asi.tow$Hc)
+asi.tow$Hg.t <- log10(asi.tow$Hg)
+asi.tow$Ferr.t <- log10(asi.tow$Ferr)
+asi.tow$BMI.t <- log10(asi.tow$BMI)
+asi.tow$SSF.t <- log10(asi.tow$SSF)
+normality_test_pvalue(asi.tow)  # verify normality for transformed predictors
+
+
+# > min-max() ----
+# source: https://medium.com/@TheDataGyan/day-8-data-transformation-skewness-normalization-and-much-more-4c144d370e55
+# (value-min(column))/(max(column)-min(column))
+asi.tow <- ais.no
+asi.tow$Bfat.t <- (asi.tow$Bfat - min(asi.tow$Bfat)) / (max(asi.tow$Bfat) - min(asi.tow$Bfat))
+asi.tow$LBM.t <- (asi.tow$LBM - min(asi.tow$LBM)) / (max(asi.tow$LBM) - min(asi.tow$LBM))
+asi.tow$RCC.t <- (asi.tow$RCC - min(asi.tow$RCC)) / (max(asi.tow$RCC) - min(asi.tow$RCC))
+asi.tow$WCC.t <- (asi.tow$WCC - min(asi.tow$WCC)) / (max(asi.tow$WCC) - min(asi.tow$WCC))
+asi.tow$Hc.t <- (asi.tow$Hc - min(asi.tow$Hc)) / (max(asi.tow$Hc) - min(asi.tow$Hc))
+asi.tow$Hg.t <- (asi.tow$Hg - min(asi.tow$Hg)) / (max(asi.tow$Hg) - min(asi.tow$Hg))
+asi.tow$Ferr.t <- (asi.tow$Ferr - min(asi.tow$Ferr)) / (max(asi.tow$Ferr) - min(asi.tow$Ferr))
+asi.tow$BMI.t <- (asi.tow$BMI - min(asi.tow$BMI)) / (max(asi.tow$BMI) - min(asi.tow$BMI))
+asi.tow$SSF.t <- (asi.tow$SSF - min(asi.tow$SSF)) / (max(asi.tow$SSF) - min(asi.tow$SSF))
+normality_test_pvalue(asi.tow)  # verify normality for transformed predictors
+
+
+# > scale() (Z-normal) ----
+# source: https://medium.com/@TheDataGyan/day-8-data-transformation-skewness-normalization-and-much-more-4c144d370e55
+# scale(asi.tow$Bfat, center= TRUE, scale=TRUE)
+asi.tow <- ais.no
+asi.tow$Bfat.t <- scale(asi.tow$Bfat, center = TRUE, scale = TRUE)
+asi.tow$LBM.t <- scale(asi.tow$LBM, center = TRUE, scale = TRUE)
+asi.tow$RCC.t <- scale(asi.tow$RCC, center = TRUE, scale = TRUE)
+asi.tow$WCC.t <- scale(asi.tow$WCC, center = TRUE, scale = TRUE)
+asi.tow$Hc.t <- scale(asi.tow$Hc, center = TRUE, scale = TRUE)
+asi.tow$Hg.t <- scale(asi.tow$Hg, center = TRUE, scale = TRUE)
+asi.tow$Ferr.t <- scale(asi.tow$Ferr, center = TRUE, scale = TRUE)
+asi.tow$BMI.t <- scale(asi.tow$BMI, center = TRUE, scale = TRUE)
+asi.tow$SSF.t <- scale(asi.tow$SSF, center = TRUE, scale = TRUE)
+normality_test_pvalue(asi.tow)  # verify normality for transformed predictors
+
+
+# log(x, base=3) ----
+asi.tow <- ais.no
+asi.tow$Bfat.t <- log(asi.tow$Bfat, base = 3)
+asi.tow$LBM.t <- log(asi.tow$LBM, base = 3)
+asi.tow$RCC.t <- log(asi.tow$RCC, base = 3)
+asi.tow$WCC.t <- log(asi.tow$WCC, base = 3)
+asi.tow$Hc.t <- log(asi.tow$Hc, base = 3)
+asi.tow$Hg.t <- log(asi.tow$Hg, base = 3)
+asi.tow$Ferr.t <- log(asi.tow$Ferr, base = 3)
+asi.tow$BMI.t <- log(asi.tow$BMI, base = 3)
+asi.tow$SSF.t <- log(asi.tow$SSF, base = 3)
+normality_test_pvalue(asi.tow)  # verify normality for transformed predictors
+
+
+detachAllPackages()
+
+A_09_Explore_Alternate_Transformations <- 1
+```
+
+
+```{r}
+# subset the dataset by sex
+if (!require(dplyr)) {
+  install.packages("dplyr")
+}
+library(dplyr, quietly = TRUE)
+ais.nf <- dplyr::select(filter(ais, ais$Sex == 1), c(Sport,Ht:SSF))
+ais.nm <- dplyr::select(filter(ais, ais$Sex == 0), c(Sport,Ht:SSF))
+
+# > Factorize *Sport* predictor ----
+ais.nf$Sport <- factor(ais.nf$Sport)
+ais.nm$Sport <- factor(ais.nm$Sport)
+
+# choose the level of our outcome that we wish to use as our baseline
+ais.nf$Sport <- relevel(ais.nf$Sport, ref = "field")
+ais.nm$Sport <- relevel(ais.nm$Sport, ref = "field")
+
+# use the multinom function from the nnet package to estimate a multinomial logistic regression model
+if (!require(nnet)) {
+  install.packages("nnet", quiet = TRUE)
+}
+library(nnet)
+fit.mn.f <- multinom(Sport ~ ., data = ais.nf)
+fit.mn.m <- multinom(Sport ~ ., data = ais.nm)
+
+summary(fit.mn.f)
+summary(fit.mn.m)
+
+# The multinom package does not include p-value calculation for the regression coefficients, so calculate p-values using z-tests
+z.f <- round(summary(fit.mn.f)$coefficients / summary(fit.mn.f)$standard.errors, 4); z.f
+z.m <- round(summary(fit.mn.m)$coefficients / summary(fit.mn.m)$standard.errors, 4); z.m
+
+# 2-tailed z test
+p.f <- round(((1 - pnorm(abs(z.f), 0, 1)) * 2), 4); p.f
+p.m <- round(((1 - pnorm(abs(z.m), 0, 1)) * 2), 4); p.m
+
+# extract the coefficients from the model and exponentiate
+round(exp(coef(fit.mn.f)), 4)
+round(exp(coef(fit.mn.m)), 4)
+
+# calculate predicted probabilities for each of our outcome levels using the fitted function
+head(pp.f <- round(fitted(fit.mn.f), 4))
+head(pp.m <- round(fitted(fit.mn.m), 4))
+
+# calculate fitted prediction accuracy
+alpha = 0.05
+n_obs = dim(pp.f)[1]
+n_factors = dim(pp.f)[2]
+percentage_correct_factors_per_obs = rep(0, n_obs)
+for (i in 1:n_obs) {
+  percentage_correct_factors_per_obs[i] = sum(pp.f[i,] < alpha)/n_factors
+}
+sum(percentage_correct_factors_per_obs)/n_obs
+
+```
+
+
+```{r, A_10_Subset_Dataset_By_Sex, echo=TRUE, eval=TRUE, include=TRUE}
+# >Subset the dataset by *Sex* ----
+# - ais$Sex ("0" = male or "0" = female) -> ("M" = male or "F" = female)
+
+
+# subset dataframe by sex
+# ".nof" non-transformed, outliers omitted, female dataset
+# ".nom" non-transformed, outliers omitted, male dataset
+if (!require(dplyr)) {
+  install.packages("dplyr")
+}
+library(dplyr, quietly = TRUE)
+ais.nof <- dplyr::select(filter(ais.no, ais.no$Sex == "F"), c(Bfat:Sex))
+ais.nom <- dplyr::select(filter(ais.no, ais.no$Sex == "M"), c(Bfat:Sex))
+
+# > Factorize *Sport* predictor ----
+ais.nof$Sport <- factor(ais.nof$Sport)
+ais.nom$Sport <- factor(ais.nom$Sport)
+
+# > Factorize *Sport.label* predictor ----
+ais.nof$Sport.label <- as.factor(ais.nof$Sport.label)
+ais.nom$Sport.label <- as.factor(ais.nom$Sport.label)
+
+# > Factorize *Sex* predictor ----
+ais.nof$Sex <- as.factor(ais.nof$Sex)
+ais.nom$Sex <- as.factor(ais.nom$Sex)
+
+# >Re-label *Sex* factors ----
+levels(ais.nof$Sex) <- c("F")
+levels(ais.nom$Sex) <- c("M")
+
+
+detachAllPackages()
+
+A_10_Subset_Dataset_By_Sex <- 1
+```
+
+```{r, A_11_Transform_Sex_Datasets, echo=TRUE, eval=TRUE, include=TRUE}
+# Explore female & male dataframes ----
+# test for normality, transform as necessary
+
+
+# > Test for normality, Female dataset ----
+normality_test_pvalue(ais.nof)  # verify normality for transformed predictors
+
+
+# > Test for normality, Male dataset ----
+normality_test_pvalue(ais.nom)  # verify normality for transformed predictors
+
+
+# create copies of the dataframes for transforming
+# ".tof" transformed, outliers omitted, female dataset
+# ".tom" transformed, outliers omitted, male dataset
+ais.tof <- ais.nof
+ais.tom <- ais.nom
+
+
+# > Find lambda transformation power for females ----
+# use the transformTukey() when boxcox returns NaN
+if (!require(rcompanion)) {
+  install.packages("rcompanion", quiet = TRUE)
+}
+library("rcompanion", quietly = TRUE)
+transformTukey(ais.tof$WCC, plotit = FALSE) # =  0.9500
+detach(package:rcompanion, unload = TRUE)
+
+# > Transform Female Predictors ----
+ais.tof$Ht.t <- extract_boxcox_lambda(ais.tof$Ht)
+ais.tof$RCC.t <- extract_boxcox_lambda(ais.tof$RCC)
+ais.tof$WCC.t <- extract_boxcox_lambda(ais.tof$WCC)
+ais.tof$Ferr.t <- extract_boxcox_lambda(ais.tof$Ferr)
+ais.tof$BMI.t <- extract_boxcox_lambda(ais.tof$BMI)
+ais.tof$SSF.t <- extract_boxcox_lambda(ais.tof$SSF)
+
+
+# > Find lambda transformation power for males ----
+# use the transformTukey() when boxcox returns NaN
+if (!require(rcompanion)) {
+  install.packages("rcompanion", quiet = TRUE)
+}
+library("rcompanion", quietly = TRUE)
+transformTukey(ais.tof$WCC, plotit = FALSE) # =  0.9500
+detach(package:rcompanion, unload = TRUE)
+
+# > Transform Male Predictors ----
+ais.tom$Bfat.t <- extract_boxcox_lambda(ais.tom$Bfat)
+ais.tom$RCC.t <- extract_boxcox_lambda(ais.tom$RCC)
+ais.tom$WCC.t <- (sign(ais.m$WCC) * abs(ais.tom$WCC)^0.9500)
+ais.tom$Hc.t <- extract_boxcox_lambda(ais.tom$Hc)
+ais.tom$Hg.t <- extract_boxcox_lambda(ais.tom$Hg)
+ais.tom$Ferr.t <- extract_boxcox_lambda(ais.tom$Ferr)
+ais.tom$BMI.t <- extract_boxcox_lambda(ais.tom$BMI)
+ais.tom$SSF.t <- extract_boxcox_lambda(ais.tom$SSF)
+
+# > Remove the non-transformed predictors from the tranformed dataframes ----
+ais.tof <- subset(ais.tof, select = -c(Ht, RCC, WCC, Ferr, BMI, SSF))
+ais.tom <- subset(ais.tom, select = -c(Bfat, RCC, WCC, Hc, Hg, Ferr, BMI, SSF))
+
+# > Reorder predictors in the transformed dataframes ----
+ais.tof <- subset(ais.tof, select = c(Bfat, Ht.t, Wt, LBM, RCC.t, WCC.t, Hc, Hg, Ferr.t, BMI.t, SSF.t, Sport, Sport.label, Sex))
+ais.tom <- subset(ais.tom, select = c(Bfat.t, Ht, Wt, LBM, RCC.t, WCC.t, Hc.t, Hg.t, Ferr.t, BMI.t, SSF.t, Sport, Sport.label, Sex))
+
+
+detachAllPackages()
+
+A_11_Transform_Sex_Datasets <- 1
+```
+
+```{r, A_12_Assess_Sex_Transformed_Predictors, echo=TRUE, eval=TRUE, include=TRUE}
+# Assess Transformed Predictors ----
+
+
+# > Verify for normality, transformed, no outliers, Female predictors ----
+normality_test_pvalue(ais.tof)  # verify normality for transformed predictors
+
+
+# > Verify for normality, transformed, no outliers, Male predictors ----
+normality_test_pvalue(ais.tom)  # verify normality for transformed predictors
+
+
+# > Graphicaly review transformed predictors ----
+if (!require(rcompanion)) {
+  install.packages("rcompanion", quiet = TRUE)
+}
+library("DataExplorer", quietly = TRUE)
+plot_histogram(ais.nof, title = "Non-transformed, no outliers, Female")
+plot_histogram(ais.tof, title = "Transformed, no outliers, Female")
+plot_histogram(ais.nom, title = "Non-transformed, no outliers, Male")
+plot_histogram(ais.tom, title = "Transformed, no outliers, Male")
+detach(package:rcompanion, unload = TRUE)
+
+# review correlations
+if (!require(rcompanion)) {
+  install.packages("rcompanion", quiet = TRUE)
+}
+library("DataExplorer", quietly = TRUE)
+plot_correlation(ais.nof, type = c("all"), title = "Non-transformed, no outliers, Female")
+plot_correlation(ais.tof, type = c("all"), title = "Transformed, no outliers, Female")
+plot_correlation(ais.nom, type = c("all"), title = "Non-transformed, no outliers, Male")
+plot_correlation(ais.tom, type = c("all"), title = "Transformed, no ooutliers, Male")
+detach(package:rcompanion, unload = TRUE)
+
+
+detachAllPackages()
+
+A_12_Assess_Sex_Transformed_Predictors <- 1
+```
+
+```{r, A_13_Explore_Transformed_Sex_Datasets, echo=TRUE, eval=TRUE, include=TRUE}
+# Characterize transformed F/M Datasets ----
+# source: https://stackoverflow.com/questions/20481772/r-error-some-group-is-too-small-for-qda
+
+
+str(ais.tof)
+summary(ais.tof)
+with(ais.tof, table(Sport.label))
+with(ais.tof, table(Sport))
+with(ais.tof, table(Sex))
+
+str(ais.tom)
+summary(ais.tom)
+with(ais.tom, table(type))
+with(ais.tom, table(Sport.label))
+with(ais.tom, table(Sport))
+with(ais.tom, table(Sex))
+
+
+detachAllPackages()
+
+A_13_Explore_Transformed_Sex_Datasets <- 1
+```
+
+```{r, A_14_Reduced_M_F_stepwise_Bfat_model, echo=TRUE, eval=TRUE, include=TRUE}
+# Create a reduced M_F stepwise Bfat model
+# using transformed, outlier omitted, male + female dataset, create a reduced predictor model
+# Use the response factor body fat, identify the most significant predictors using stepwise regression
+
+
+# full transformed dataset w/o outliers
+# subset the dataframes by removing the factored predictors
+ais.to_ <- subset(ais.to, select = -c(Sport, Sport.label, Sex))
+
+# fit the full model using glm() fn with all predictors
+fit.glm.ais.to_ <- glm(Bfat ~ ., data = ais.to_)
+summary(fit.glm.ais.to_)
+
+
+# assess the VIF for using all predictors
+if (!require(car)) {
+  install.packages("car", quiet = TRUE)
+}
+library("car", quietly = TRUE)
+vif(fit.glm.ais.to_)
+
+
+# display the call to the all model
+fit.glm.ais.to_$cal
+
+
+# attempt to reduce the number of predictors via the stepwise algorithm
+fit.step.glm.ais.to_ <- stepAIC(fit.glm.ais.to_, direction = "both", trace = FALSE)
+summary(fit.step.glm.ais.to_)
+
+
+# assess the VIF for using step predictors
+if (!require(car)) {
+  install.packages("car", quiet = TRUE)
+}
+library("car", quietly = TRUE)
+vif(fit.step.glm.ais.to_)
+
+
+# display the call to the revised model
+fit.step.glm.ais.to_$cal
+
+
+# detach(package:car, unload = TRUE)
+
+
+# FEMALE *Bfat* glm Model Predictors
+# ALL   MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t + RCC.t+WCC.t+Hc+Hg+Ferr.t, data = ais.f_) AIC: 172.67
+# STEP  MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t,                            data = ais.f_) AIC: 164.59
+# FINAL MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t,                            data = ais.f_) AIC: 164.59
+
+
+detachAllPackages()
+
+A_14_Reduced_M_F_stepwise_Bfat_model <- 1
+```
+
+```{r, A_15_Reduced_F_stepwise_Bfat_model, echo=TRUE, eval=TRUE, include=TRUE}
+# Create a reduced Female only stepwise Bfat model
+# using transformed, outlier omitted, female only dataset, create a reduced predictor model
+# Use the response factor body fat, identify the most significant predictors using stepwise regression
+
+
+# using transformed, outliers omittted, female dataset
+# subset the dataframes by removing the factored predictors
+ais.tof_ <- subset(ais.f, select = -c(Sport, Sport.label, Sex))
+
+# fit the full model using glm() fn with all predictors
+fit.glm.ais.tof_ <- glm(Bfat ~ ., data = ais.tof_)
+summary(fit.glm.ais.tof_)
+
+
+# assess the VIF for using all predictors
+if (!require(car)) {
+  install.packages("car", quiet = TRUE)
+}
+library("car", quietly = TRUE)
+vif(fit.glm.ais.tof_)
+
+
+# display the call to the all model
+fit.glm.ais.tof_$cal
+
+
+# attempt to reduce the number of predictors via the stepwise algorithm
+fit.step.glm.ais.tof_ <- stepAIC(fit.glm.ais.tof_, direction = "both", trace = FALSE)
+summary(fit.step.glm.ais.tof_)
+
+
+# assess the VIF for using step predictors
+if (!require(car)) {
+  install.packages("car", quiet = TRUE)
+}
+library("car", quietly = TRUE)
+vif(fit.step.glm.ais.tof_)
+
+
+# display the call to the revised model
+fit.step.glm.ais.tof_$cal
+
+
+# detach(package:car, unload = TRUE)
+
+
+# FEMALE *Bfat* glm Model Predictors
+# ALL   MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t + RCC.t+WCC.t+Hc+Hg+Ferr.t, data = ais.f_) AIC: 172.67
+# STEP  MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t,                            data = ais.f_) AIC: 164.59
+# FINAL MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t,                            data = ais.f_) AIC: 164.59
+
+
+detachAllPackages()
+
+A_15_Reduced_F_stepwise_Bfat_model <- 1
+```
+
+
+```{r, Stepwise_M_Bfat, echo=TRUE}
+
+# Stepwise() glm() MALE predictors
+# for the MALE dataset, using the response factor body fat, sub-select the predictors revised predictors using stepwise regression
+
+
+# male dataset
+# subset the dataframes by removing the factored predictors
+ais.m_ = subset(ais.m, select = -c(Sport, Sport.label, Sex))
+
+# fit the full model using glm() fn with all predictors
+fit.glm.ais.m_ <- glm(Bfat.t ~ ., data = ais.m_)
+summary(fit.glm.ais.m_)
+# Call:
+# glm(formula = Bfat.t ~ ., data = ais.m_)
+#
+# Deviance Residuals:
+#        Min          1Q      Median          3Q         Max
+# -0.0142292  -0.0028696  -0.0004811   0.0029570   0.0138719
+#
+# Coefficients:
+#               Estimate Std. Error t value Pr(>|t|)
+# (Intercept) -8.209e+02  8.211e+02  -1.000 0.320082
+# Ht           2.598e-04  1.854e-04   1.401 0.164532
+# Wt           1.151e-03  3.360e-04   3.426 0.000922 ***
+# LBM         -1.701e-03  3.857e-04  -4.410 2.83e-05 ***
+# RCC.t        6.987e-02  6.108e-02   1.144 0.255696
+# WCC.t        1.799e-02  4.284e-02   0.420 0.675461
+# Hc.t         2.423e+03  2.511e+03   0.965 0.337219
+# Hg.t        -7.635e+01  6.204e+01  -1.231 0.221608
+# Ferr.t       4.369e-04  2.649e-04   1.649 0.102557
+# BMI.t        9.767e+01  5.123e+01   1.906 0.059759 .
+# SSF.t        1.079e+00  8.152e-02  13.233  < 2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#
+# (Dispersion parameter for gaussian family taken to be 2.835498e-05)
+#
+#     Null deviance: 0.0432967  on 101  degrees of freedom
+# Residual deviance: 0.0025803  on  91  degrees of freedom
+# AIC: -766.19
+#
+# Number of Fisher Scoring iterations: 2
+
+# assess the VIF for using all predictors
+if (!require(car)) {
+    install.packages("car", quiet = TRUE)
+}
+library("car", quietly = TRUE)
+vif(fit.glm.ais.m_)
+#       Ht        Wt       LBM     RCC.t     WCC.t      Hc.t      Hg.t    Ferr.t     BMI.t     SSF.t
+# 7.646419 61.883360 51.811022  3.382369  1.329294  6.930333  5.522067  1.168837 13.026952  4.793159
+
+# display the call to the all model
+fit.glm.ais.m_$cal
+# glm(formula = Bfat.t ~ ., data = ais.m_)
+
+
+# attempt to reduce the number of predictors via the stepwise algorithm
+fit.step.glm.ais.m_ <-
+    stepAIC(fit.glm.ais.m_, direction = "both", trace = TRUE)
+summary(fit.step.glm.ais.m_)
+# Call:
+# glm(formula = Bfat.t ~ Ht + Wt + LBM + RCC.t + Ferr.t + BMI.t +
+#     SSF.t, data = ais.m_)
+#
+# Deviance Residuals:
+#        Min          1Q      Median          3Q         Max
+# -0.0164172  -0.0026307  -0.0002823   0.0030437   0.0130956
+#
+# Coefficients:
+#               Estimate Std. Error t value Pr(>|t|)
+# (Intercept) -4.219e+01  1.994e+01  -2.116  0.03698 *
+# Ht           3.142e-04  1.775e-04   1.770  0.07997 .
+# Wt           1.151e-03  3.338e-04   3.447  0.00085 ***
+# LBM         -1.751e-03  3.792e-04  -4.616 1.24e-05 ***
+# RCC.t        6.837e-02  3.473e-02   1.969  0.05192 .
+# Ferr.t       4.418e-04  2.622e-04   1.685  0.09530 .
+# BMI.t        1.040e+02  4.991e+01   2.084  0.03988 *
+# SSF.t        1.083e+00  7.996e-02  13.540  < 2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#
+# (Dispersion parameter for gaussian family taken to be 2.800155e-05)
+#
+#     Null deviance: 0.0432967  on 101  degrees of freedom
+# Residual deviance: 0.0026321  on  94  degrees of freedom
+# AIC: -770.16
+#
+# Number of Fisher Scoring iterations: 2
+
+
+# assess the VIF for using step predictors
+if (!require(car)) {
+    install.packages("car", quiet = TRUE)
+}
+library("car", quietly = TRUE)
+vif(fit.step.glm.ais.m_)
+#       Ht        Wt       LBM     RCC.t    Ferr.t     BMI.t     SSF.t
+# 7.097574 61.857113 50.710775  1.106928  1.159223 12.517537  4.669927
+
+# display the call to the all model
+fit.glm.ais.m_$cal
+# glm(Bfat.t ~ Ht + Wt + LBM + RCC.t + Ferr.t + BMI.t + SSF.t, data = ais.m_)
+
+# detach(package:car, unload = TRUE)
+
+
+# MALE *Bfat* glm Model Predictors
+# ALL   MODEL --> glm(Bfat  ~Ht+Wt+LBM+RCC.t+Ferr.t+BMI.t+SSF.t  +WCC.t+Hc.t+Hg.t, data = ais.m_) AIC: -766.19
+# STEP  MODEL --> glm(Bfat.t~Ht+Wt+LBM+RCC.t+Ferr.t+BMI.t+SSF.t,                   data = ais.m_) AIC: -770.16
+# FINAL MODEL --> glm(Bfat.t~Ht+Wt+LBM+RCC.t+Ferr.t+BMI.t+SSF.t,                   data = ais.m_) AIC: -770.16
+
+
+detachAllPackages()
+
+Stepwise_M_Bfat=1
+
+```
+
+
+```{r, Penalize_F_Bfat, echo=TRUE, eval=TRUE, include=TRUE}
+
+# for the response factor body fat, it penalized regression using all predictors library (glmnet)
+
+
+# female dataset
+# Source: HW Question 5-1.0
+# subset the dataframes by removing the factored predictors
+ais.f_ = subset(ais.f, select = -c(Sport, Sport.label, Sex))
+
+# fit multiple regression using all FEMALE predictors using the lm() model
+fit.lm = lm(Bfat ~ ., data = ais.f_)
+summary(fit.lm)
+# Coefficients:
+# Estimate Std. Error t value Pr(>|t|)
+# (Intercept) -2.053e+02  4.952e+01  -4.146 7.69e-05 ***
+# Ht.t         4.248e-08  6.328e-09   6.712 1.73e-09 ***
+# Wt           5.658e-01  4.832e-02  11.708  < 2e-16 ***
+# LBM         -1.049e+00  4.956e-02 -21.170  < 2e-16 ***
+# RCC.t       -2.377e+01  8.346e+01  -0.285    0.776
+# WCC.t       -4.564e-03  2.045e-01  -0.022    0.982
+# Hc           9.331e-03  6.277e-02   0.149    0.882
+# Hg           7.527e-02  1.515e-01   0.497    0.621
+# Ferr.t      -4.462e-02  7.378e-02  -0.605    0.547
+# BMI.t        1.794e+02  2.812e+01   6.380 7.76e-09 ***
+# SSF.t        2.462e+00  3.389e-01   7.263 1.37e-10 ***
+# Multiple R-squared:  0.9912,	Adjusted R-squared:  0.9902
+
+
+# examine the corellations between the predictors
+pairs(ais.f_[, -1]) # exclude the response variable
+# corellations
+# - Ht.t  ~ Wt    : medium broad positive linear
+# - Wt    ~ LBM   : strong tight positive linear
+# - Hc    ~ Hg    : strong tight positive linear
+# - BMI.t ~ SSF.t : medium broad positive linear
+
+
+# check for collinearity
+if (!require(car)) {
+    install.packages("car", quiet = TRUE)
+}
+library(car, quietly = TRUE)
+vif(fit.lm)
+#      Ht.t        Wt       LBM     RCC.t     WCC.t        Hc        Hg    Ferr.t     BMI.t     SSF.t
+# 25.009117 94.678384 40.047288  3.908485  1.195992  9.236906  6.660269  1.170113 49.122012 14.521754
+
+
+
+# *** RIDGE REGRESSION (RR), LASSO. ELASTIC NET MODELS
+# Source: HW Question 5-3.17-20 Code
+if (!require(glmnet)) {
+    install.packages("glmnet", quiet = TRUE)
+}
+library(glmnet, quietly = TRUE)
+x = model.matrix(Bfat ~ ., data = ais.f_)[, -1]
+y = ais.f_[, 10]
+lambdalist = 1:1000 / 1000
+
+#fit ridge regression model - need alpha = 0
+fit.RR = glmnet(x, y, alpha = 0, lambda = lambdalist)
+coef(fit.RR, s = 0.1)
+plot(fit.RR, xvar = "lambda", xlim = c(-12, 12))
+abline(v = log(0.1))
+
+# plot predicted response to response
+int.RR = coef(fit.RR, s = 0.1)[1, 1]
+int.RR
+coef.RR = coef(fit.RR, s = 0.1)[-1, 1]
+coef.RR
+plot(x %*% coef.RR + int.RR, y, xlab = "yhat", title("RR"))
+
+
+# fit the LASSO (alpha = 1) model and find coefficients for (lambda = 0.001, 0.002, ..., 0.999, 1.000).
+# Determine how many coefficients are non-zero, **excluding the intercept**
+#fit LASSO - need alpha =1
+fit.LASSO = glmnet(x, y, alpha = 1, lambda = lambdalist)       # glmnet requires (x,y)
+summary(fit.LASSO)
+# plot predicted response to response
+int.LASSO = coef(fit.LASSO, s = 0.1)[1, 1]
+int.LASSO
+coef.LASSO = coef(fit.LASSO, s = 0.1)[-1, 1]
+coef.LASSO
+plot(x %*% coef.LASSO + int.RR, y, xlab = "yhat", title("LASSO"))
+
+# summary(coef(fit.LASSO, s = 0.02) != 0) - 1
+# coef(LASSOfit, s = 0.02)
+# summary(coef(fit.LASSO, s = 0.03) != 0) - 1
+# coef(LASSOfit, s = 0.03)
+# summary(coef(fit.LASSO, s = 0.05) != 0) - 1
+# coef(LASSOfit, s = 0.05)
+# summary(coef(fit.LASSO, s = 0.8)  != 0) - 1
+# coef(LASSOfit, s = 0.80)
+
+
+#fit the Elastic Net model
+fit.ENET = glmnet(x, y, alpha = 0.75, lambda = lambdalist)
+coef(fit.ENET, s = 0.4)
+plot(fit.ENET, xvar = "lambda", title("F:ENET a=0.75, l=0.001 glmnet(Bfat~.)"))
+abline(v = log(0.4))
+
+
+# compare Ridge Regression, LASSO, and Elastic Net models
+compare_mat <-
+    round(cbind(coef(fit.RR, s = .1)[, 1],
+          coef(fit.LASSO, s = .5)[, 1],
+          coef(fit.ENET, s = .4)[, 1]
+          ), 6)
+colnames(compare_mat) <- c("RR", "LASSO", "ENET")
+compare_mat
+
+# generate predictions using Ridge Regression, LASSO, and Elastic Net models
+yhat.RR    = predict(fit.RR,    newx = x, s = .1)
+yhat.LASSO = predict(fit.LASSO, newx = x, s = .5)
+yhat.ENET  = predict(fit.ENET,  newx = x, s = .4)
+
+# assess RR predictions
+predict.RR_LASSO_ENET.mat <- cbind(y, yhat.RR, yhat.LASSO, yhat.ENET)
+colnames(predict.RR_LASSO_ENET.mat) <- c("OBS", "RR", "LASSO", "ENET")
+head(predict.RR_LASSO_ENET.mat)
+
+MSE_RR    = sum(predict.RR_LASSO_ENET.mat[,1] - predict.RR_LASSO_ENET.mat[,2])^2/dim(predict.RR_LASSO_ENET.mat)[1]
+MSE_LASSO = sum(predict.RR_LASSO_ENET.mat[,1] - predict.RR_LASSO_ENET.mat[,3])^2/dim(predict.RR_LASSO_ENET.mat)[1]
+MSE_ENET  = sum(predict.RR_LASSO_ENET.mat[,1] - predict.RR_LASSO_ENET.mat[,4])^2/dim(predict.RR_LASSO_ENET.mat)[1]
+MSE_RR; MSE_LASSO; MSE_ENET
+
+
+detachAllPackages()
+
+Penalize_F_Bfat=1
+
+```
+
+
+```{r, FEMALE cv.glmnet(Bfat~.) ELASTIC NET MODEL, echo=TRUE, eval=TRUE, include=TRUE}
+
+# *** CV(10) ELASTIC NET MODEL
+# Question 5-3.22 Code
+# Use the cv.glmnet command along with these cross-validation groups to perform cross-validation, with CV(10) contained in the value cvm of the output.
+# For the Elastic net model with alpha = 0.75, make a plot of CV(10) vs alpha
+
+
+# female dataset
+# subset the dataframes by removing the factored predictors
+ais.f_ = subset(ais.f, select = -c(Sport, Sport.label, Sex))
+
+x1 = model.matrix(Bfat ~ ., data = ais.f_)[, -1]
+y1 = ais.f_[, 10]
+
+
+#cross-validation
+set.seed(5)
+ncv = 10
+n_predictors = dim(ais.f_)[2] - 1
+n_observations = dim(ais.f_)[1]
+groups = c(rep(1:10, n_observations), (1:7))
+cvgroups = sample(groups, n_observations)
+n_lambda = 1000
+lambdalist1 = c((1:n_lambda) / n_lambda) # define lambda
+
+#ENET alpha=0.75 cross-validation
+if (!require(glmnet)) {
+    install.packages("glmnet", quiet = TRUE)
+}
+library(glmnet, quietly = TRUE)
+cvENET750glm = cv.glmnet(
+    x1,
+    y1,
+    lambda = lambdalist1,
+    alpha = 0.750,
+    nfolds = ncv,
+    foldid = cvgroups
+)
+
+# Make a plot of CV(10) vs ??
+plot(
+    cvENET750glm$lambda,
+    cvENET750glm$cvm,
+    xlab = "lambda",
+    ylab = "CV(10)",
+    main = "ENET Alpha=0.75 Cross-Validation(10)"
+)
+
+
+# Question 5-3.23 Code
+min_cvm = min(cvENET750glm$cvm)
+min_cvm # get the lowest cvm
+
+# get the index in the cvm for the lowest cvm
+min_cvm_index = which.min(cvENET750glm$cvm)
+min_cvm_index
+
+# get the lambda that is associated with the lowest cvm
+bestlambdaENET750 = cvENET750glm$lambda[min_cvm_index]
+bestlambdaENET750
+
+# check
+cvENET750glm$lambda[1000]
+cvENET750glm$cvm[1000]
+
+cvENET750glm_ = cv.glmnet(
+    x1,
+    y1,
+    lambda = bestlambdaENET750,
+    alpha = 0.750,
+    nfolds = ncv,
+    foldid = cvgroups
+)
+
+detachAllPackages()
+
+```
+
+
+```{r, Question 5-3.22 CV(10) ELASTIC NET MODEL, echo=TRUE, eval=TRUE, include=TRUE}
+
+# *** CV(10) ELASTIC NET MODEL
+# Question 5-3.22 Code
+# Use the cv.glmnet command along with these cross-validation groups to perform cross-validation, with CV(10) contained in the value cvm of the output.
+# For the Elastic net model with alpha = 0.75, make a plot of CV(10) vs alpha
+
+#cross-validation
+set.seed(5)
+ncv = 10
+n_predictors = dim(ais.all.id)[2] - 1
+n_observations = dim(ais.all.id)[1]
+n_lambda = 1000
+groups = c(rep(1:10, n_observations), (1:7))
+cvgroups = sample(groups, n_observations)
+lambdalist1 = c((1:n_lambda) / n_lambda) # define lambda
+
+#ENET alpha=0.75 cross-validation
+if (!require(glmnet)) {
+    install.packages("glmnet", quiet = TRUE)
+}
+library(glmnet, quietly = TRUE)
+cvENET750glm = cv.glmnet(
+    x1,
+    y1,
+    lambda = lambdalist1,
+    alpha = 0.750,
+    nfolds = ncv,
+    foldid = cvgroups
+)
+
+# Make a plot of CV(10) vs ??
+plot(
+    cvENET750glm$lambda,
+    cvENET750glm$cvm,
+    xlab = "lambda",
+    ylab = "CV(10)",
+    main = "ENET Alpha=0.75 Cross-Validation(10)"
+)
+
+
+# Question 5-3.23 Code
+min_cvm = min(cvENET750glm$cvm)
+min_cvm # get the lowest cvm
+
+# get the index in the cvm for the lowest cvm
+min_cvm_index = which.min(cvENET750glm$cvm)
+min_cvm_index
+
+# get the lambda that is associated with the lowest cvm
+bestlambdaENET750 = cvENET750glm$lambda[min_cvm_index]
+bestlambdaENET750
+
+# check
+cvENET750glm$lambda[1000]
+cvENET750glm$cvm[1000]
+
+cvENET750glm_ = cv.glmnet(
+    x1,
+    y1,
+    lambda = bestlambdaENET750,
+    alpha = 0.750,
+    nfolds = ncv,
+    foldid = cvgroups
+)
+
+detachAllPackages()
+
+```
+
+
+```{r, stepwise glm(Bfat~.), echo=TRUE, eval=TRUE, include=TRUE}
+
+# sub-select the predictors transformed predictors
+
+
+# subset the dataframe by removing the transformed predictors
+
+
+# reiew the correlations
+plot_correlation(ais.0, type = c("all"))
+
+# Stepwise regression model
+# fit the full model using lm() fn
+fit.lm.0 <- lm(Bfat ~ . - Sport.label.id - Sport - Sport.label, data = ais.0)
+step.lm.0 <- stepAIC(fit.lm.0, direction = "both", trace = FALSE)
+step.lm.0$call          # lm(formula = Bfat ~ Ht + Wt + LBM + SSF + Sex, data = ais.0)
+summary(step.lm.0)
+vif(fit.lm.0)
+step.lm.0$call
+
+# include only the predictors from step.0
+ais.1 = subset(ais.0, select = c(Bfat ~ Ht, LBM, SSF, Sex, Sport.label))
+plot_correlation(ais.1, type = c("all"))
+fit.1 <- lm(Bfat ~ Ht + LBM + SSF + Sex - Sport.label.id, data = ais.1)
+vif(fit.1)
+
+
+# fit the full model using glm() fn
+fit.glm.0.t <-
+glm(Bfat ~ . - Sport.label.id - Sport - Sport.label, data = ais.0.t)
+step.glm.0.t <- stepAIC(fit.glm.0.t, direction = "both", trace = FALSE)
+step.glm.0.t$call # lm(formula = Bfat ~ Ht + Wt + LBM + SSF + Sex, data = ais0)
+summary(step.glm.0.t)
+vif(fit.glm.0.t)
+step.glm.0.t$call  # glm(formula = Bfat ~ Ht + Wt + LBM + SSF + Sex, data = ais.0)
+
+# include only the predictors from step.0
+ais.1 = subset(ais.0, select = c(Bfat ~ Ht, LBM, SSF, Sex, Sport.label))
+plot_correlation(ais.1, type = c("all"))
+fit.1 <- lm(Bfat ~ Ht + LBM + SSF + Sex - Sport.label.id, data = ais.1)
+vif(fit.1) 
+
+detachAllPackages()
+
+
+```
+
+
+```{r, NOPE Pairs(), echo=TRUE, eval=TRUE, include=TRUE}
+
+# review the data relationships
+
+# examine scatter plot w/o sex predictor
+pairs(ais.t[, -2])
+pairs(ais.t.m[, -(1:2)])
+pairs(ais.t.f[, -2])
+
+# examine correlations
+plot_correlation(ais,   type = c("all"), title = "ais non-transformed + transformed, male + female")
+#plot_correlation(ais.m, type=c("all"), title = "ais non-transformed, male")
+#plot_correlation(ais.f, type=c("all"), title = "ais non-transformed, female")
+
+plot_correlation(ais.t,   type = c("all"), title = "ais.t transformed, male + female")
+#plot_correlation(ais.t.m, type=c("all"), title = "ais.t transformed, male")
+#plot_correlation(ais.t.f, type=c("all"), title = "ais.t transformed, female")
+
+```
+
+
+```{r, NOPE Question 5-2.14 lm(Bfat.t~.), echo=TRUE, eval=TRUE, include=TRUE}
+
+# Question 5-2.14 Code
+# - Which of the health attribute predictors are most highly correlated with the factor response quantative variable body fat?
+# - Speculation: Can a set of quanatative health attributes of a sport player predict the level of body fat that a person has?
+# - quantative response variable: Bfat.t
+# - quantative predictors: Ht.t,Wt.t,LBM.t,RCC.t,WCC.t,Hc.t,Hg.t,Ferr.t,BMI.t,SSF.t
+
+
+# remove the non-transformed predictors from dataframe
+ais.all.id = subset(ais.all.id, select = -c(Sport.label.id))
+
+# Question 5-2.?
+# - Which of the following predictors is most highly correlated with the response *Bfat.t*?
+allcor = rep(0, 11)
+for (i in 2:11) {
+allcor[i] = cor(ais.all.id[, i], ais.all.id$Bfat.t)
+}
+cbind(names(ais.all.id)[-12], allcor)
+
+#                allcor
+#   [1,] "Bfat.t" "0"
+#>  [2,] "Ht.t"   "-0.78635180861808"
+#   [3,] "Wt.t"   "-0.308438625366116"
+#   [4,] "LBM.t"  "-0.580239196849134"
+#   [5,] "RCC.t"  "-0.326055412138721"
+#>  [6,] "WCC.t"  "0.73657644042274"
+#>  [7,] "Hc.t"   "0.747920791270592"
+#   [8,] "Hg.t"   "-0.740423706881271"
+#   [9,] "Ferr.t" "-0.211012557893798"
+#> [10,] "BMI.t"  "0.837868370202254"
+#> [11,] "SSF.t"  "0.897175827324076"
+
+# identify the predictors that are highly correlated
+x = model.matrix(Bfat.t ~ ., data = ais.all.id)[, -1]
+y = ais.all.id[, 11]
+cor(x)
+plot_correlation(ais.all.id, type = c("all"))
+
+# generate a multiple regression (lm) fit using all predictors
+REGfit = lm(Bfat.t ~ ., data = ais.all.id)
+summary(REGfit)  # significant predictors: *Ht.t, Wt.t, LBM.t, Hc.t, Hg.t, BMI.t, SSF.t*
+
+#  Coefficients: (1 not defined because of singularities)
+#                 Estimate Std. Error t value Pr(>|t|)
+#   (Intercept)  -37.696679   5.780835  -6.521 6.09e-10 ***
+#   x(Intercept)         NA         NA      NA       NA
+#>  xHt.t          0.100122   0.024492   4.088 6.40e-05 ***
+#>  xWt.t         -0.295734   0.045289  -6.530 5.80e-10 ***
+#>  xLBM.t         0.221714   0.058570   3.785 0.000205 ***
+#   xRCC.t         1.625232   1.100694   1.477 0.141443
+#>  xWCC.t         0.130115   0.065308   1.992 0.047757 *
+#>  xHc.t         -1.140468   0.181393  -6.287 2.15e-09 ***
+#>  xHg.t          0.778204   0.149139   5.218 4.69e-07 ***
+#   xFerr.t       -0.009514   0.030587  -0.311 0.756101
+#>  xBMI.t         0.585487   0.219941   2.662 0.008429 **
+#>  xSSF.t         1.548790   0.084412  18.348  < 2e-16 ***
+
+
+#>  xHt.t          0.100122   0.024492   4.088 6.40e-05 ***
+#>  xWt.t         -0.295734   0.045289  -6.530 5.80e-10 ***
+#>  xLBM.t         0.221714   0.058570   3.785 0.000205 ***
+#>  xHc.t         -1.140468   0.181393  -6.287 2.15e-09 ***
+#>  xHg.t          0.778204   0.149139   5.218 4.69e-07 ***
+#>  xSSF.t         1.548790   0.084412  18.348  < 2e-16 ***
+
+REGfit$coefficients
+#   (Intercept) x(Intercept)        xHt.t        xWt.t      xLBM.t      xRCC.t      xWCC.t        xHc.t       xHg.t      xFerr.t      xBMI.t      xSSF.t
+# -37.696679286           NA  0.100122232 -0.295734336 0.221714254 1.625231787 0.130115487 -1.140467600 0.778203783 -0.009513975 0.585486833 1.548790401
+
+# check for collinearity
+vif(REGfit)
+
+#       Ht.t       Wt.t      LBM.t      RCC.t      WCC.t       Hc.t       Hg.t     Ferr.t      BMI.t      SSF.t
+# 265.890964  34.323043  50.569497   1.268018   4.574665 113.808775  94.441880   1.351680 161.641954 112.668165
+
+
+
+REGfit   = lm(Bfat.t ~ ., data = ais.all.id)
+summary(REGfit)
+vif(REGfit) # 0.8039
+REGfit   = lm(Bfat.t ~ . - Ht.t, data = ais.all.id)
+summary(REGfit)
+vif(REGfit) # 0.8039
+REGfit   = lm(Bfat.t ~ . - Ht.t - BMI.t, data = ais.all.id)
+summary(REGfit)
+vif(REGfit) # 0.8039
+
+
+
+ais.all.id_1 = subset(ais.all.id, select = -c(Ht.t, BMI.t, RCC.t, WCC.t, Ferr.t))
+REGfit   = lm(Bfat.t ~ ., data = ais.all.id_1)
+summary(REGfit)
+vif(REGfit) # 0.8039
+# (Intercept)        Wt.t       LBM.t        Hc.t        Hg.t       SSF.t
+# -17.2597712  -0.2987089   0.2738254  -1.4324321   1.2953116   1.7222396
+qqplot(REGfit)
+plot_correlation(ais.all.id_1, type = c("all"))
+
+
+
+
+
+REGfit   = lm(Bfat.t ~ . - Ht.t - BMI.t, data = ais.all.id)
+summary(REGfit); vif(REGfit) # 0.8039 
+plot(REGfit)
+
+
+REGfit00 = lm(Bfat.t ~ Ht.t + Wt.t + LBM.t + Hc.t + Hg.t + BMI.t + SSF.t,
+              data = ais.all.id)
+summary(REGfit1_a); vif(REGfit01) # 0.8039 
+
+REGfit01 = lm(Bfat.t~Ht.t+Wt.t,  data=ais.all.id); summary(REGfit1_a); # 0.8039
+REGfit02 = lm(Bfat.t~Wt.t,  data=ais.all.id); summary(REGfit1_a); # 0.8039
+REGfit03 = lm(Bfat.t~LBM.t, data=ais.all.id); summary(REGfit1_a); # 0.8039
+REGfit04 = lm(Bfat.t~Hc.t,  data=ais.all.id); summary(REGfit1_a); # 
+REGfit05 = lm(Bfat.t~Hg.t,  data=ais.all.id); summary(REGfit1_a); # 
+REGfit06 = lm(Bfat.t~BMI.t, data=ais.all.id); summary(REGfit1_a); # 
+REGfit07 = lm(Bfat.t~SSF.t, data=ais.all.id); summary(REGfit1_a); # 0.8039
+
+
+
+
+# *** RIDGE REGRESSION MODEL
+# Question 5-3.14 Code
+# - generate a multiple regression (lm) fit using significant predictors
+# significant predictors: *Ht.t, Wt.t, LBM.t, Hc.t, Hg.t, BMI.t, SSF.t*
+REGfit1 = lm(Bfat.t ~ Ht.t + Wt.t + LBM.t + Hc.t + Hg.t + BMI.t + SSF.t,
+             data = ais.all.id)
+summary(REGfit1)
+
+# check for collinearity
+if(!require(car)) {
+    install.packages("car")
+}
+library(car)
+vif(REGfit1)
+
+REGfit1$coefficients
+#  (Intercept)         Ht.t         Wt.t        LBM.t         Hc.t         Hg.t        BMI.t        SSF.t 
+# -33.65148763   0.09697277  -0.29575003   0.22560702  -1.10524155   0.76903640   0.54722096   1.55803952 
+
+
+
+# *** LASSO MODEL
+# Question 5-3.17-20 Code
+# fit the LASSO (alpha = 1) model and find coefficients for (lambda = 0.001, 0.002, ..., 0.999, 1.000).
+# Determine how many coefficients are non-zero, **excluding the intercept**
+#fit LASSO - need alpha =1
+if(!require(glmnet)) {
+    install.packages("glmnet")
+}
+library(glmnet)
+x = model.matrix(Bfat.t ~ ., data = ais.all.id)[, -1]
+y = ais.all.id[, 10]
+lambdalist = 1:1000 / 1000
+# glmnet requires (x,y)
+LASSOfit = glmnet(x, y, alpha = 1, lambda = lambdalist)       
+sum(coef(LASSOfit, s = 0.02) != 0) - 1
+coef(LASSOfit, s = 0.02)
+#sum(coef(LASSOfit, s=0.03) != 0)-1; coef(LASSOfit,s=0.03)
+#sum(coef(LASSOfit, s=0.05) != 0)-1; coef(LASSOfit,s=0.05)
+#sum(coef(LASSOfit, s=0.8)  != 0)-1; coef(LASSOfit,s=0.8)
+
+
+# *** ELASTIC NET MODEL
+# Question 5-3.22 Code
+# Use the cv.glmnet command along with these cross-validation groups to perform cross-validation, with CV(10) contained in the value cvm of the output.  
+# For the Elastic net model with alpha = 0.75, make a plot of CV(10) vs alpha
+
+#cross-validation
+set.seed(5)
+ncv = 10
+n_predictors = dim(ais.all.id)[2] - 1
+n_observations = dim(ais.all.id)[1]
+n_lambda = 1000
+groups = c(rep(1:10, n_observations), (1:7))
+cvgroups = sample(groups, n_observations)
+lambdalist1 = c((1:n_lambda) / n_lambda) # define lambda
+
+#ENET alpha=0.75 cross-validation
+cvENET750glm = cv.glmnet(
+    x1,
+    y1,
+    lambda = lambdalist1,
+    alpha = 0.750,
+    nfolds = ncv,
+    foldid = cvgroups
+)
+
+# Make a plot of CV(10) vs ??
+plot(
+    cvENET750glm$lambda,
+    cvENET750glm$cvm,
+    xlab = "lambda",
+    ylab = "CV(10)",
+    main = "ENET Alpha=0.75 Cross-Validation(10)"
+)
+
+
+# Question 5-3.23 Code
+min_cvm = min(cvENET750glm$cvm)
+min_cvm # get the lowest cvm
+
+# get the index in the cvm for the lowest cvm
+min_cvm_index = which.min(cvENET750glm$cvm)
+min_cvm_index
+
+# get the lambda that is associated with the lowest cvm
+bestlambdaENET750 = cvENET750glm$lambda[min_cvm_index]
+bestlambdaENET750
+
+# check
+cvENET750glm$lambda[1000]
+cvENET750glm$cvm[1000]
+
+cvENET750glm_ = cv.glmnet(
+    x1,
+    y1,
+    lambda = bestlambdaENET750,
+    alpha = 0.750,
+    nfolds = ncv,
+    foldid = cvgroups
+)
+
+
+```
+
+
+```{r, Lesson 1a KNN() Quantative Response, echo=TRUE, eval=TRUE, include=TRUE}
+
+# DONE
+# Lesson 1a
+# - use K-nearest neighbors to predict how well the quantative health predictors *Wt.t* and *Ht.t* are associated with the quanative response variable *Bfat.t*
+# - Speculation: Can the quanatative health attributes wieght and height of a sport player predict the level of body fat that a person has?
+# - quantative response variable: Bfat.t
+# - quantative predictors:  Ht.t + Wt.t
+
+
+# remove the non-transformed predictors from dataframe
+ais.all.id = subset(ais.all.id, select = -c(Sport.label.id))
+
+# scale the predictors
+Wt.t.std = scale(ais.all.id$Wt.t)
+Ht.t.std = scale(ais.all.id$Ht.t)
+
+# set the random seed
+set.seed(1)
+
+# determine the number of observations
+n_observations = length(Wt.t.std)
+#n_observations
+
+# calculate the number of samples at 60%
+n_samples = floor(n_observations * 0.60)
+#n_samples
+
+# setup the standardized traning and validations matrixs
+train = sample(1:n_observations, n_samples, replace = F) # ~75% sample rate
+train.X = cbind(ais.all.id$Wt.t[train], ais.all.id$Ht.t[train])
+valid.X = cbind(ais.all.id$Wt.t[-train], ais.all.id$Ht.t[-train])
+train.X.std = scale(train.X)
+valid.X.std = scale(
+    valid.X,
+    center = attr(train.X.std, "scaled:center"),
+    scale = attr(train.X.std, "scaled:scale")
+)
+
+# load the library for the kkn() function
+if (!require(FNN)) {
+    install.packages("FNN")
+}
+library(FNN)
+
+# generate a prediction
+predicted.1 = knn.reg(train.X.std, valid.X.std, ais.all.id$Bfat.t[train], k = 1)
+MSE.1 = mean((predicted.1$pred - ais.all.id$Bfat.t[-train]) ^ 2)
+MSE.1
+
+# find the best value for k
+allMSE = rep(NA, 50)
+allk = 1:50
+for (i in 1:length(allk)) {
+    predicted = knn.reg(train.X.std, valid.X.std, ais.all.id$Bfat.t[train], k = allk[i])
+    allMSE[i] = mean((predicted$pred - ais.all.id$Bfat.t[-train]) ^ 2)
+}
+
+# plot the MSE by values of k
+plot(allk, allMSE, title("Factor = Bfat.t"))
+
+# find the lowest MSE
+best_k_value = match(min(allMSE), allMSE) #
+#best_k_value
+
+# generate a new prediction based on the best value for k
+predicted.2 = knn.reg(train.X.std, valid.X.std, ais.all.id$Bfat.t[train], k = best_k_value)
+MSE.2 = mean((predicted.2$pred - ais.all.id$Bfat.t[-train]) ^ 2)
+#MSE.2
+
+# compare model MSEs
+MSE.1
+MSE.2
+
+```
+
+
+```{r, Lesson 1b KNN() Categorical Response, echo=TRUE, eval=TRUE, include=TRUE}
+
+# DONE
+# Lesson 1b
+# - use K-nearest neighbors to predict how well the quantative health predictors *Wt.t* and *Ht.t* are associated with the quanative response variable *sport.label.id*
+# - Speculation: Can the quantative health attributes wieght and height of a sport player predict the type-of-sport that a person plays?
+# - factor response variable: Sport.label.id
+# - quantative predictors: Ht.t + Wt.t
+
+
+# remove the non-transformed predictors from dataframe
+ais.all.id = subset(ais.all.id, select = -c(Bfat.t))
+
+# scale the predictors
+Wt.t.std = scale(ais.all.id$Wt.t)
+Ht.t.std = scale(ais.all.id$Ht.t)
+
+# set the random seed
+set.seed(1)
+
+# determine the number of observations
+n_observations = length(Wt.t.std)
+#n_observations
+
+# calculate the number of samples at 60%
+n_samples = floor(n_observations * 0.60)
+#n_samples
+
+# setup the standardized traning and validations matrixs
+train = sample(1:n_observations, n_samples, replace = F) # ~75% sample rate
+train.X = cbind(ais.all.id$Wt.t[train], ais.all.id$Ht.t[train])
+valid.X = cbind(ais.all.id$Wt.t[-train], ais.all.id$Ht.t[-train])
+train.X.std = scale(train.X)
+valid.X.std = scale(
+    valid.X,
+    center = attr(train.X.std, "scaled:center"),
+    scale = attr(train.X.std, "scaled:scale")
+)
+
+# load the library for the kkn() function
+if (!require(FNN)) {
+    install.packages("FNN")
+}
+library(FNN)
+
+# generate a prediction
+predicted.1 = knn.reg(train.X.std, valid.X.std, ais.all.id$Sport.label.id[train], k = 1)
+MSE.1 = mean((predicted.1$pred - ais.all.id$Sport.label.id[-train]) ^ 2)
+MSE.1
+
+# find the best value for k
+allMSE = rep(NA, 50)
+allk = 1:50
+for (i in 1:length(allk)) {
+    predicted = knn.reg(train.X.std, valid.X.std, ais.all.id$Sport.label.id[train], k =
+                            allk[i])
+    allMSE[i] = mean((predicted$pred - ais.all.id$Sport.label.id[-train]) ^
+                         2)
+}
+
+# plot the MSE by values of k
+plot(allk, allMSE, title("Factor=Sport.label.id"))
+
+# find the lowest MSE
+best_k_value = match(min(allMSE), allMSE) #
+#best_k_value
+
+# generate a new prediction based on the best value for k
+predicted.2 = knn.reg(train.X.std, valid.X.std, ais.all.id$Sport.label.id[train], k = best_k_value)
+MSE.2 = mean((predicted.2$pred - ais.all.id$Sport.label.id[-train]) ^ 2)
+#MSE.2
+
+# compare model MSEs
+MSE.1
+MSE.2
+
+```
+
+
+```{r, Lesson 6 ols(), echo=TRUE, eval=TRUE, include=TRUE}
+
+# lesson 6
+# predict male Bfat using lda() & qda()
+# (non-robust) linear regression
+
+# subset the dataframes by removing the factored predictors
+ais.f_ = subset(ais.f, select = -c(Sport, Sport.label, Sex))
+ais.m_ = subset(ais.m, select = -c(Sport, Sport.label, Sex))
+
+# ols female
+fit.ols.ais.f_ = lm(Bfat ~ ., data = ais.f_)
+fit.ols.ais.f_
+plot(fit.ols.ais.f_, main = "Female lm(Bfat.t~.)")
+
+# ols male
+fit.ols.ais.m_ = lm(Bfat.t ~ ., data = ais.m_)
+fit.ols.ais.m_
+plot(fit.ols.ais.m_, main = "Male lm(Bfat.t~.)")
+
+```
+
+
+```{r, predict FEMALE Bfat using CV10 with lda() and qda(), echo=TRUE, eval=TRUE, include=TRUE}
+
+# Using a linear discriminant analysis lda() fit model, predict the response *sport.label.id* when using the predictors *Ht.t* + *Wt* + *LBM* + *BMI.t* + *SSF.t* for all female sport players. 
+# Response: *Sport.label.id* is a descrete variable in the set of {1:9}, not a factor
+# *Sport.label.id* mapping: 
+# 1 = f_b_ball
+# 2 = f_field
+# 3 = f_gym
+# 4 = f_netball
+# 5 = f_row
+# 6 = f_swim
+# 7 = f_t_400m
+# 8 = f_t_sprnt
+# 9 = f_tennis
+# Predictors: non-categorical
+
+
+# reset female dataframe
+ais.f_ = ais.f
+
+# populate dataframe with the *Sport.lable.id* pseudo predictor
+ais.f_$Sport.label.id = rep(NA, dim(ais.f_)[1])
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_b_ball"]  = 1
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_field"]   = 2
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_gym"]     = 3
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_netball"] = 4
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_row"]     = 5
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_swim"]    = 6
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_t_400m"]  = 7
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_t_sprnt"] = 8
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_tennis"]  = 9
+
+# subset the dataframes by removing the factored predictors and the Bfat response variable
+ais.f_ = subset(ais.f_, select = -c(Bfat, Sport, Sport.label, Sex))
+
+# characterize the data
+str(ais.f_)
+summary(ais.f_)
+with(ais.f_, table(Sport.label.id))
+
+# load MASS library
+if (!require(MASS)) {
+    install.packages("MASS", quiet = TRUE)
+}
+library(MASS, quietly = TRUE)
+
+# Fit an lda() model using the reduced stepwise predictor set
+fit.lda.ais.f_ = lda(Sport.label.id ~ Ht.t + Wt + LBM, data = ais.f_)
+fit.lda.ais.f_
+
+# Predict the classifications from the LDA fit, and cross-tabulate the variable origin with the LDA classification.
+fittedclasslda.f = predict(fit.lda.ais.f_, data = ais.f_)$class
+table(ais.f_$Sport.label.id, fittedclasslda.f)
+
+  #  fittedclasslda.f
+  #    1  2  3  4  5  6  7  8  9
+  # 1  8  0  0  3  2  0  0  0  0
+  # 2  0  6  0  0  0  0  1  0  0
+  # 3  0  0  3  0  0  0  1  0  0
+  # 4  1  0  0 13  7  0  1  0  1
+  # 5  2  2  1  4 12  1  0  0  0
+  # 6  0  1  0  0  2  3  3  0  0
+  # 7  0  0  0  0  0  3  8  0  0
+  # 8  0  0  0  0  0  1  3  0  0
+  # 9  0  1  1  0  1  0  3  0  1
+
+# number of correctly lda predicted female players by sport type using the lda() model:
+# 1 = f_b_ball  =  8
+# 2 = f_field   =  6
+# 3 = f_gym     =  3
+# 4 = f_netball = 13
+# 5 = f_row     = 12
+# 6 = f_swim    =  3
+# 7 = f_t_400m  =  8
+# 8 = f_t_sprnt =  0
+# 9 = f_tennis  =  1
+
+
+# Fit an qda() model using the reduced stepwise predictor set
+# MASS:::qda.default is: if (any(counts < p + 1)) then stop("some group is too small for 'qda'")
+# --> min(count(Sport.label[1:n]) > max number of predictors = predictors + 1
+# --> since min(count(Sport.label[1:n]) = 4, then max predictors = 3
+# --> dropped BMI.t, SSF.t
+qdafit.f = qda(Sport.label.id ~ Ht.t + Wt + LBM, data = ais.f_)
+qdafit.f
+
+# Predict the classifications from the QDA fit, and cross-tabulate the variable origin with the QDA classification.
+fittedclassqda.f = predict(qdafit.f,data=ais.f_)$class
+table(ais.f_$Sport.label.id, fittedclassqda.f)
+
+  #  fittedclassqda.f
+  #    1  2  3  4  5  6  7  8  9
+  # 1  7  0  0  5  1  0  0  0  0
+  # 2  0  6  0  0  0  0  1  0  0
+  # 3  0  0  4  0  0  0  0  0  0
+  # 4  1  0  0 16  5  0  1  0  0
+  # 5  3  0  0  5 12  2  0  0  0
+  # 6  0  1  0  0  1  4  3  0  0
+  # 7  0  1  0  0  0  1  8  0  1
+  # 8  0  0  0  0  0  0  0  4  0
+  # 9  0  0  1  1  1  0  0  0  4
+
+# number of correctly lda predicted female players by sport type using the lda() model:
+# 1 = f_b_ball  =  7
+# 2 = f_field   =  6
+# 3 = f_gym     =  4
+# 4 = f_netball = 16
+# 5 = f_row     = 12
+# 6 = f_swim    =  4
+# 7 = f_t_400m  =  8
+# 8 = f_t_sprnt =  4
+# 9 = f_tennis  =  4
+
+
+# Comparison: using the full dataset for both fitting and selection (train & test)
+#                LDA    QDA
+# 1 = f_b_ball  =  8     7
+# 2 = f_field   =  6     6
+# 3 = f_gym     =  3     4
+# 4 = f_netball = 13    16
+# 5 = f_row     = 12    12
+# 6 = f_swim    =  3     4
+# 7 = f_t_400m  =  8     8
+# 8 = f_t_sprnt =  0     4
+# 9 = f_tennis  =  1     4
+
+detachAllPackages()
+
+```
+
+
+```{r, use cross-validation (CV10) to compare lda() & qda() models, echo=TRUE, eval=TRUE, include=TRUE}
+
+# use cross-validation (CV10) to compare lda() & qda() models
+
+
+# reset female dataframe
+ais.f_ = ais.f
+
+# populate dataframe with the *Sport.lable.id* pseudo predictor
+ais.f_$Sport.label.id = rep(NA, dim(ais.f_)[1])
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_b_ball"]  = 1
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_field"]   = 2
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_gym"]     = 3
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_netball"] = 4
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_row"]     = 5
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_swim"]    = 6
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_t_400m"]  = 7
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_t_sprnt"] = 8
+ais.f_$Sport.label.id[ais.f_$Sport.label == "f_tennis"]  = 9
+
+# subset the dataframes by removing the factored predictors and the Bfat response variable
+ais.f_ = subset(ais.f_, select = -c(Bfat, Sport, Sport.label, Sex))
+
+# load MASS library
+if (!require(MASS)) {
+install.packages("MASS", quiet = TRUE)
+}
+library(MASS, quietly = TRUE)
+
+# setup CV environment
+n_observations = dim(ais.f_)[1]
+m_folds = 10
+groups = c(rep(1:m_folds, floor(n_observations / m_folds)), c(1:(n_observations %% m_folds)))
+#groups
+set.seed(4)
+cvgroups = sample(groups, n_observations)
+#cvgroups
+all.predict.lda.cv.f = rep(0, n_observations)
+all.predict.qda.cv.f = rep(0, n_observations)
+
+
+# calculate CV10
+for (i in 1:m_folds) {
+    fit.lda.cv.f = lda(Sport.label.id ~ Ht.t + Wt + LBM, data = ais.f_)
+    newdata.lda.f = data.frame(cbind(Ht.t, Wt, LBM)[cvgroups == i, ])
+    all.predict.lda.cv.f[cvgroups == i] = predict(fit.lda.cv.f, newdata.lda.f)$class
+
+    fit.qda.cv.f = qda(Sport.label.id ~ Ht.t + Wt + LBM, data = ais.f_)
+    newdata.qda.f = data.frame(cbind(Ht.t, Wt, LBM)[cvgroups == i, ])
+    all.predict.qda.cv.f[cvgroups == i] = predict(fit.qda.cv.f, newdata.qda.f)$class
+}
+
+# display the predicted lda() number of players that are predicted in each cv trial by sport type
+# row x cols = sport-type x cv fold
+predicted.lda.cv_cm = as.matrix(table(ais.f_$Sport.label.id, all.predict.lda.cv.f))
+predicted.lda.cv_cm
+
+# calculate lda.cv10
+CV10.lda = sum(all.predict.lda.cv.f != ais.f_$Sport.label.id) / n_observations
+
+# display the predicted qda() number of players that are predicted in each cv trial by sport type
+# row x cols = sport-type x cv fold
+predicted.qda.cv_cm = as.matrix(table(ais.f_$Sport.label.id, all.predict.qda.cv.f))
+predicted.qda.cv_cm
+
+# calculate lda.cv10
+CV10.qda = sum(all.predict.qda.cv.f != ais.f_$Sport.label.id) / n_observations
+
+# determine the expected number of players per sport type 
+expected.Sport.label.id.mat.f = as.matrix(with(ais.f_, table(Sport.label.id)))
+expected.Sport.label.id.mat.f
+
+# assess lda() predictions, 9=number of factors in Sport.label.id
+assess.lda = rep(0.0, 9)
+for (i in 1:9) {
+    assess.lda[i] = round(predicted.lda.cv_cm[i,i]/sum(predicted.lda.cv_cm[i,]), 4)
+}
+#assess.lda
+
+# assess qda() predictions, 9=number of factors in Sport.label.id
+assess.qda = rep(0.0, 9)
+for (i in 1:9) {
+    assess.qda[i] = round(predicted.qda.cv_cm[i,i]/sum(predicted.qda.cv_cm[i,]), 4)
+}
+#assess.qda
+
+# compare lda() CV10 vs qda() CV10
+CV10.lda
+CV10.qda
+
+# compare models
+assess.lda
+assess.qda
+
+detachAllPackages()
+
+```
+
+
+```{r, NOPE Linear and Quadratic Discriminant Analysis QDA, echo=TRUE, eval=TRUE, include=TRUE}
+
+# *** QDA() TOO FEW OBS **
+
+# lesson 2.21
+# predict Bfat using lda()
+# Linear and Quadratic Discriminant Analysis
+
+
+# subset the dataframes by removing the factored predictors
+ais.f_ = subset(ais.f, select = -c(Sport, Sport.label, Sex))
+ais.m_ = subset(ais.m, select = -c(Sport, Sport.label, Sex))
+
+
+length(ais.f_$Bfat)
+
+#  female
+fit.lda.ais.f_ = lda(Bfat ~ BMI.t, data = ais.f_)
+fit.lda.ais.f_$means
+fittedclass_fit.lda.ais.f_ = predict(fit.lda.ais.f_, data = ais.f_)$class
+table(ais.f_$Bfat ~ ., data = ais.f_, fittedclass_fit.qda.ais.f_)
+
+
+#  female
+fit.qda.ais.f_ = qda(Bfat ~ ., data = ais.f_)
+fit.qda.ais.f_$means
+fittedclass_fit.qda.ais.f_ = predict(fit.qda.ais.f_, data = ais.f_)$class
+table(ais.f_$Bfat ~ ., data = ais.f_, fittedclass_fit.qda.ais.f_)
+
+#  Male
+fit.qda.ais.m_ = qda(Bfat.t ~ ., data = ais.m_)
+fit.qda.ais.m_$means
+fittedclass_fit.qda.ais.m_ = predict(fit.qda.ais.m_, data = ais.m_)$class
+table(ais.m_$Bfat.t ~ ., data = ais.m_, fittedclass_fit.qda.ais.m_)
+
+
+```
+
+
+```{r, Predict & compare multiple models, echo=TRUE, eval=TRUE, include=TRUE}
+
+# OK
+# lesson 4-3.33
+
+n = dim(ais.all.id)[1]
+m = 10
+groups = c(rep(1:m, floor(n / m)), c(1:(n %% m)))
+#groups
+
+set.seed(4)
+cvgroups = sample(groups, n)
+#cvgroups
+
+allpredictedCV01 = rep(0, n)
+allpredictedCV02 = rep(0, n)
+allpredictedCV03 = rep(0, n)
+allpredictedCV04 = rep(0, n)
+allpredictedCV05 = rep(0, n)
+allpredictedCV06 = rep(0, n)
+allpredictedCV07 = rep(0, n)
+allpredictedCV08 = rep(0, n)
+allpredictedCV09 = rep(0, n)
+allpredictedCV10 = rep(0, n)
+allpredictedCV11 = rep(0, n)
+
+# define the models
+# model01 = c(lda(Sport.label.id~Bfat.t))
+# model02 = c(lda(Sport.label.id~Bfat.t+Ht.t))
+# model03 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t))
+# model04 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t))
+# model05 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t))
+# model06 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t))
+# model07 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t))
+# model08 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t))
+# model09 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t))
+# model10 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t))
+# model11 = c(lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t))
+
+# fit the models
+attach(ais.all.id)
+for (i in 1:m) {
+ldafit01 = lda(Sport.label.id ~ Bfat.t, subset = (cvgroups != i))
+newdata01 = data.frame(cbind(Sport.label.id, Bfat.t)[cvgroups == i, ])
+allpredictedCV01[cvgroups == i] = predict(ldafit01, newdata01)$class
+
+ldafit02 = lda(Sport.label.id ~ Bfat.t + Ht.t, subset = (cvgroups !=
+i))
+newdata02 = data.frame(cbind(Sport.label.id, Bfat.t, Ht.t)[cvgroups ==
+i, ])
+allpredictedCV02[cvgroups == i] = predict(ldafit02, newdata02)$class
+
+ldafit03 = lda(Sport.label.id ~ Bfat.t + Ht.t + Wt.t, subset = (cvgroups !=
+i))
+newdata03 = data.frame(cbind(Sport.label.id, Bfat.t, Ht.t, Wt.t)[cvgroups ==
+i, ])
+allpredictedCV03[cvgroups == i] = predict(ldafit03, newdata03)$class
+
+ldafit04 = lda(Sport.label.id ~ Bfat.t + Ht.t + Wt.t + LBM.t,
+subset = (cvgroups != i))
+newdata04 = data.frame(cbind(Sport.label.id, Bfat.t, Ht.t, Wt.t, LBM.t)[cvgroups ==
+i, ])
+allpredictedCV04[cvgroups == i] = predict(ldafit04, newdata04)$class
+
+ldafit05 = lda(Sport.label.id ~ Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t,
+subset = (cvgroups != i))
+newdata05 = data.frame(cbind(Sport.label.id, Bfat.t, Ht.t, Wt.t, LBM.t, RCC.t)[cvgroups ==
+i, ])
+allpredictedCV05[cvgroups == i] = predict(ldafit05, newdata05)$class
+
+ldafit06 = lda(Sport.label.id ~ Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t +
+WCC.t,
+subset = (cvgroups != i))
+newdata06 = data.frame(cbind(Sport.label.id, Bfat.t, Ht.t, Wt.t, LBM.t, RCC.t, WCC.t)[cvgroups ==
+i, ])
+allpredictedCV06[cvgroups == i] = predict(ldafit06, newdata06)$class
+
+
+ldafit07 = lda(Sport.label.id ~ Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t +
+                   WCC.t + Hc.t,
+               subset = (cvgroups != i)
+               )
+newdata07 = data.frame(
+    cbind(Sport.label.id, Bfat.t, Ht.t, Wt.t, LBM.t, RCC.t, WCC.t, Hc.t)
+    [cvgroups == i, ]
+    )
+
+allpredictedCV07[cvgroups == i] = predict(ldafit07, newdata07)$class
+
+ldafit08 = lda(
+    Sport.label.id ~ Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t + WCC.t + Hc.t + Hg.t,
+    subset = (cvgroups != i)
+)
+newdata08 = data.frame(
+    cbind(Sport.label.id,
+          Bfat.t,
+          Ht.t,
+          Wt.t,
+          LBM.t,
+          RCC.t,
+          WCC.t,
+          Hc.t,
+          Hg.t)
+    [cvgroups == i, ]
+)
+allpredictedCV08[cvgroups == i] = predict(ldafit08, newdata08)$class
+
+ldafit09 = lda(
+    Sport.label.id ~ Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t + WCC.t + Hc.t + Hg.t +
+        Ferr.t,
+    subset = (cvgroups != i)
+)
+newdata09 = data.frame(
+    cbind(Sport.label.id,
+          Bfat.t,
+          Ht.t,
+          Wt.t,
+          LBM.t,
+          RCC.t,
+          WCC.t,
+          Hc.t,
+          Hg.t,
+          Ferr.t)
+    [cvgroups == i, ]
+)
+allpredictedCV09[cvgroups == i] = predict(ldafit09, newdata09)$class
+
+ldafit10 = lda(
+Sport.label.id ~ Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t + WCC.t + Hc.t + Hg.t +
+Ferr.t + BMI.t,
+
+subset = (cvgroups != i)
+)
+newdata10 = data.frame(
+    cbind(Sport.label.id,
+          Bfat.t,
+          Ht.t,
+          Wt.t,
+          LBM.t,
+          RCC.t,
+          WCC.t,
+          Hc.t,
+          Hg.t,
+          Ferr.t,
+          BMI.t)
+    [cvgroups == i,]
+    )
+allpredictedCV10[cvgroups == i] = predict(ldafit10, newdata10)$class
+
+ldafit11 = lda(Sport.label.id ~ Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t + WCC.t + Hc.t + Hg.t +
+    Ferr.t + BMI.t + SSF.t,
+    subset = (cvgroups != i)
+)
+newdata11 = data.frame(
+    cbind(Sport.label.id,
+          Bfat.t,
+          Ht.t,
+          Wt.t,
+          LBM.t,
+          RCC.t,
+          WCC.t,
+          Hc.t,
+          Hg.t,
+          Ferr.t,
+          BMI.t,
+          SSF.t)
+    [cvgroups == i, ]
+)
+allpredictedCV11[cvgroups == i] = predict(ldafit11, newdata11)$class
+}
+T01 = table(ais.all.id$Sport.label.id, allpredictedCV01)
+CVmodel01 = sum(allpredictedCV01 != ais.all.id$Sport.label.id) / n
+
+T02 = table(ais.all.id$Sport.label.id, allpredictedCV02)
+CVmodel02 = sum(allpredictedCV02 != ais.all.id$Sport.label.id) / n
+
+T03 = table(ais.all.id$Sport.label.id, allpredictedCV03)
+CVmodel03 = sum(allpredictedCV03 != ais.all.id$Sport.label.id) / n
+
+T04 = table(ais.all.id$Sport.label.id, allpredictedCV04)
+CVmodel04 = sum(allpredictedCV04 != ais.all.id$Sport.label.id) / n
+
+T05 = table(ais.all.id$Sport.label.id, allpredictedCV05)
+CVmodel05 = sum(allpredictedCV05 != ais.all.id$Sport.label.id) / n
+
+T06 = table(ais.all.id$Sport.label.id, allpredictedCV06)
+CVmodel06 = sum(allpredictedCV06 != ais.all.id$Sport.label.id) / n
+
+T07 = table(ais.all.id$Sport.label.id, allpredictedCV07)
+CVmodel07 = sum(allpredictedCV07 != ais.all.id$Sport.label.id) / n
+
+T08 = table(ais.all.id$Sport.label.id, allpredictedCV08)
+CVmodel08 = sum(allpredictedCV08 != ais.all.id$Sport.label.id) / n
+
+T09 = table(ais.all.id$Sport.label.id, allpredictedCV09)
+CVmodel09 = sum(allpredictedCV09 != ais.all.id$Sport.label.id) / n
+
+T10 = table(ais.all.id$Sport.label.id, allpredictedCV10)
+CVmodel10 = sum(allpredictedCV10 != ais.all.id$Sport.label.id) / n
+
+T11 = table(ais.all.id$Sport.label.id, allpredictedCV11)
+CVmodel11 = sum(allpredictedCV11 != ais.all.id$Sport.label.id) / n01
+
+detach(ais.all.id)
+
+# create a table of CVs
+model_names = c(
+"lda(Sport.label.id~Bfat.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t)",
+"lda(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t)"
+)
+model_values = rbind(
+CVmodel01,
+CVmodel02,
+CVmodel03,
+CVmodel04,
+CVmodel05,
+CVmodel06,
+CVmodel07,
+CVmodel08,
+CVmodel09,
+CVmodel10,
+CVmodel11
+)
+model_cvs = cbind(model_names, model_values)
+colnames(model_cvs) <- c("Model", "CV")
+model_cvs
+
+```
+
+
+```{r, Lesson 5 fit the quantative response , echo=TRUE, eval=TRUE, include=TRUE}
+# OK
+# lesson 5
+
+
+# fit the quantative response variable *Sport.label.id* against the non-transformed predictors, male + female
+fit.ais.all.id = lm(Sport.label.id~Bfat+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI+SSF,data=ais.all.id)  # Bfat, Ferr, SSF
+summary(fit.ais.all.id)
+
+# fit the quantative response variable *Sport.label.id* against the non-transformed predictors, female only
+fit.ais.all.id.f = lm(Sport.label.id~Bfat+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI+SSF,data=ais.all.id.f)  # Hc, BMI
+summary(fit.ais.all.id.f)
+
+# fit the quantative response variable *Sport.label.id* against the non-transformed predictors male only
+fit.ais.all.id.m = lm(Sport.label.id~Bfat+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI+SSF,data=ais.all.id.m)  # none
+summary(fit.ais.all.id.m)
+
+
+# fit the quantative response variable *Sport.label.id* against the transformed predictors
+fit.ais.all.id.t = lm(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t,data=ais.all.id)  # LBM.t
+summary(fit.ais.all.id.t)
+
+# fit the quantative response variable *Sport.label.id* against the transformed predictors
+fit.ais.all.id.t.f = lm(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t,data=ais.all.id.f)  # Hc.t, Hg.t
+summary(fit.ais.all.id.t.f)
+
+# fit the quantative response variable *Sport.label.id* against the transformed predictors
+fit.ais.all.id.t.m = lm(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t,data=ais.all.id.m)  # none
+summary(fit.ais.all.id.t.m)
+
+```
+
+
+```{r, Lesson 6 fit an unweighted model using lm(), echo=TRUE, eval=TRUE, include=TRUE}
+# OK
+# lesson 6
+
+
+# fit an unweighted model using lm()
+fit.lm.ais.all.id.t <- lm(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id)
+fit.lm.ais.all.id.t
+
+```
+
+
+```{r, Lesson 6 improved predictor coefficients using Huber weights, echo=TRUE, eval=TRUE, include=TRUE}
+# OK
+# lesson 6
+# determine improved predictor coefficients using Huber weights for TRANSFORMED dataframe M+F
+
+# iteratively reweighted least squares regression with Huber weights, (WLS) = iteratively Weighted Least Squares
+
+
+fit.wls.ais.all.id.t = lm(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id)
+fit.wls.ais.all.id.t.old = fit.wls.ais.all.id.t
+oldcoef = rep(0, length(fit.wls.ais.all.id.t$coef))
+newcoef = fit.wls.ais.all.id.t$coef
+iter = 0
+
+constraint = oldcoef-newcoef
+while(sum(abs(constraint)) > .0001 & iter < 100){
+    iter = iter + 1
+    print(iter)
+    MAD = median(abs(fit.wls.ais.all.id.t$residuals))
+    k = 1.345*MAD/0.6745
+    w = pmin(k/abs(fit.wls.ais.all.id.t$residuals), 1) # use pmin to avoid infinite weights
+    fit.wls.ais.all.id.t = lm(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id, weights=w)
+    oldcoef = newcoef
+    newcoef = fit.wls.ais.all.id.t$coef
+    constraint = oldcoef-newcoef
+}
+
+# output revised coeficients
+fit.wls.ais.all.id.t.new = fit.wls.ais.all.id.t
+
+fit.wls.ais.all.id.t.old
+fit.wls.ais.all.id.t.new
+
+```
+
+
+```{r, Lesson 6 rlm() with Tukey Bisquare regression, echo=TRUE, eval=TRUE, include=TRUE}
+# OK
+# lesson 6
+# - Use rlm() to fit a robust regression model with Tukey Bisquare regression method for TRANSFORMED dataframe M+F
+
+
+# fit a robust regression model rlm() using Tukey Bisquare regression method
+if(!require(MASS)){install.packages("MASS")}
+library(MASS)
+fit.bisq.ais.all.id.t = rlm(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id, psi=psi.bisquare, maxit=50)
+fit.bisq.ais.all.id.t
+
+```
+
+
+```{r, Lesson 6 Generalized Least Squares gls(), echo=TRUE, eval=TRUE, include=TRUE}
+# OK
+# lesson 6
+
+
+# Use Generalized Least Squares gls() to fit a model with uncorrelated errors
+if(!require(nlme)){install.packages("nlme")}
+library(nlme)
+fit.gls.ais.all.id.t <- gls(Sport.label.id~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id)
+fit.gls.ais.all.id.t
+
+```
+
+
+```{r, Lesson 7-1a decision trees *Bfat*, echo=TRUE, eval=TRUE, include=TRUE}
+# OK 
+# lesson 7-1a
+# - use decision trees to analyze which quantative health predictors are associated with the categorical response variable *Sport.label.id*
+# - Speculation: Can the quanatative health attributes of sport players predict the categorical type-of-sport that a person will play?
+# - factor response variable: Sport.label  (textual identifier)
+# - quantative predictors: Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t + WCC.t + Hc.t + Hg.t + Ferr.t + BMI.t + SSF.t
+
+
+# remove factors and non-transformed predictors from the dataframe
+ais.all.id = subset(ais.all.id, select=-c(Sport.label.id,Bfat,Ht,Wt,LBM,RCC,WCC,Hc,Hg,Ferr,BMI,SSF,Sport,Sport.label,Sex))
+
+# question 7-1.1
+# - What is  the sample for the model?
+# set the random seed
+set.seed(2)                                                      
+
+# determine the number of observation
+n_observations = dim(ais.all.id)[1]
+
+# calculate the number of samples at 60%
+n_samples = floor(n_observations * 0.60)
+
+
+# question 7-1.2
+# - Which variables were used in constructing the tree?
+# load the library(tree)
+library(tree)                                                    
+
+# take a ~60% random sample of the data
+train = sample(1:dim(ais.all.id)[1], n_samples, replace=F)               
+
+# fit a tree to the training data
+mytree = tree(Sport.label~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id[train, ])  
+#mytree
+
+
+# question 7-1.3
+# - What is the error rate on the training set?
+summary(mytree)
+
+
+# question 7-1.4
+# - what does the plot of the decision tree with category labels look like?
+plot(mytree); text(mytree, pretty=0)                             
+
+
+# question 7-1.5
+# - What is the validation set error rate?
+# generate the predictions, use 'class' or 'vector
+item.pred = predict(mytree, ais.all.id[-train,], type="class")        
+
+# compute the confusion matrix for the validation set
+cm.tree.ais.all.id.t = table(item.pred, ais.all.id$Sport.label[-train])           
+cm.tree.ais.all.id.t
+
+# assess predictions
+if(!require(caret)){install.packages("caret")}
+library(caret) 
+cm.tree.ais.all.id = confusionMatrix(cm.tree.ais.all.id.t); cm.tree.ais.all.id
+
+```
+
+
+```{r, Lesson 7-1b CV10 tree(), echo=TRUE, eval=TRUE, include=TRUE}
+# OK 
+# lesson 7-1b
+# - Perform a 10-fold cross validation to determine the mean mean squared error in the prediction of decision trees that predict which quantative health predictors are associated with the categorical response variable *Sport.label.id*
+# - Speculation: Can the quanatative health attributes of sport players predict the categorical type-of-sport that a person will play?
+# - factor response variable: Sport.label  (textual identifier)
+# - quantative predictors: Bfat.t + Ht.t + Wt.t + LBM.t + RCC.t + WCC.t + Hc.t + Hg.t + Ferr.t + BMI.t + SSF.t
+
+
+# remove un-needed factors and non-transformed predictors from the dataframe
+ais.all.id = subset(ais.all.id, select=-c(Sport.label.id,Bfat,Ht,Wt,LBM,RCC,WCC,Hc,Hg,Ferr,BMI,SSF,Sport,Sex))
+
+# question 7-1.6 Code
+# - What are the optimal numbers of leaves?
+# - Use 10-fold cross-validation on the training data to choose the optimal number of leaves
+n = dim(ais.all.id)[1]
+k = 10                                              # using 10-fold cross-validation
+groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k))  # produce a list of group labels
+set.seed(7)                                         # set the random seed equal to 7
+cvgroups = sample(groups,n)
+predict.tree = rep(-1, n)
+MSE.tree.CV = 0
+MSE.tree.CV.sum = 0
+
+# fit the tree model, generate predictions & running MSE
+for(i in 1:k){
+    # create a set of indexes in the cvgroup vector for the value "i" in the cvgroup vector
+    groupi = (cvgroups == i)
+    
+    # fit a tree model to predict values for groupi
+    fit.tree = tree(Sport.label~Bfat.t+Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id[!groupi, ])  
+
+    # generate predictions
+    predict.tree = predict(fit.tree, ais.all.id[groupi,], type="class")
+
+    # calculate running MSE
+    MSE.tree.CV = mean( (predict.tree != (ais.all.id$Sport.label[groupi]))^2 )
+    print(MSE.tree.CV)
+    MSE.tree.CV.sum  = MSE.tree.CV.sum + MSE.tree.CV 
+}
+
+# calculate the mean of the MSEs
+MSE.tree.CV10.mean = MSE.tree.CV.sum/k; MSE.tree.CV10.mean  # [1]
+
+```
+
+
+```{r, Lesson 7-2 boost vs mlr, echo=TRUE, eval=TRUE, include=TRUE}
+# lesson 7-2
+# - perform a 10-fold cross validation to compare a boosting model to a multiple linear regression model that attempts to predict the level of body fat based on the health attributes of the players
+# - speculation: Can quantative health attributes of sports players predict the level of the quantative response variable body fat *Bfat*?
+# - speculation: Which is the better model?
+# - quantative response variable: Bfat.t
+# - quantative predictors: Ht.t + Wt.t + LBM.t + RCC.t + WCC.t + Hc.t + Hg.t + Ferr.t + BMI.t + SSF.t
+
+
+# remove un-needed factors and non-transformed predictors from the dataframe
+ais.all.id = subset(ais.all.id, select=-c(Sport.label.id,Bfat,Ht,Wt,LBM,RCC,WCC,Hc,Hg,Ferr,BMI,SSF,Sport,Sport.label,Sex))
+
+# Question 7-2.10
+# load library for boosting model algorithm
+if(!require(gbm)){install.packages("gbm")}
+library(gbm)
+
+# initialize model prediction attributes
+n = dim(ais.all.id)[1]; n
+predict.boost = rep(0, n)
+predict.lm    = rep(0, n)
+
+# create a sample set using 10-fold cross-validation
+k = 10
+groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k)) # produces list of group labels
+set.seed(2)
+cvgroups = sample(groups,n) 
+
+# initialize variables to calculate a running cv MSE
+MSE.boost.CV.MSE.sum = 0
+MSE.lm.CV.MSE.sum    = 0
+
+# fit the boosting model, generate predictions & running MSE
+for(i in 1:k){
+    # create a set of indexes in the cvgroup vector for the value "i" in the cvgroup vector
+    groupi = which(cvgroups == i)
+    
+    # fit a boosting gaussian model to predict values for groupi
+    fit.boost = gbm(Bfat.t~Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id[-groupi,], distribution="gaussian", n.trees=5000, shrinkage=.001,  interaction.depth=4)
+    
+    # fit a glm gaussian model to predict values for groupi
+    fit.lm = lm(Bfat.t~Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id[-groupi,])
+    
+    # generate predictions
+    predict.boost[groupi] = predict(fit.boost, newdata=ais.all.id[groupi,], n.trees = 5000)
+    predict.lm[groupi]    = predict(fit.lm,    newdata=ais.all.id[groupi,])
+    
+    # calculate running cv MSE
+    MSE.boost.CV.MSE.sum = MSE.boost.CV.MSE.sum + mean(predict.boost[groupi] - ais.all.id$Bfat.t[groupi])^2 
+    MSE.lm.CV.MSE.sum    = MSE.lm.CV.MSE.sum    + mean(predict.lm[groupi]    - ais.all.id$Bfat.t[groupi])^2 
+}
+
+# calculate and compare the sum of the MSEs for the 10 cross validations of the model
+MSE.boost.cv10 = MSE.boost.CV.MSE.sum; MSE.boost.cv10   # 3.605241
+MSE.lm.cv10    = MSE.lm.CV.MSE.sum; MSE.lm.cv10         # 1.794259
+
+```
+
+
+```{r, Lesson 7-3a test for normality, echo=TRUE, eval=TRUE, include=TRUE}
+# Lesson 7-3a
+
+# test for normality
+format(shapiro.test(ais.all.id$Bfat)$p.value, digits=8, nsmall=20,scientific=FALSE)
+format(shapiro.test(ais.all.id$Bfat.t)$p.value, digits=8, nsmall=20,scientific=FALSE)
+format(shapiro.test(log(ais.all.id$Bfat))$p.value, digits=8, nsmall=20,scientific=FALSE)
+
+format(shapiro.test(ais.all.id.f$Bfat)$p.value, nsmall=20, digits=8, scientific=FALSE)
+format(shapiro.test(ais.all.id.f$Bfat.t)$p.value, digits=8, nsmall=20,scientific=FALSE)
+
+format(shapiro.test(ais.all.id.m$Bfat)$p.value, nsmall=20, digits=8, scientific=FALSE)
+format(shapiro.test(ais.all.id.m$Bfat.t)$p.value, digits=8, nsmall=20,scientific=FALSE)
+
+
+# test for correlation
+format(cor.test(ais.all.id$Bfat.t, ais.all.id$Ht.t)$p.value, scientific=FALSE)
+
+
+
+
+
+```
+
+
+```{r, Multinomial-logistic-regression, echo=TRUE, eval=TRUE, include=TRUE}
+# https://stats.idre.ucla.edu/r/dae/multinomial-logistic-regression/
+
+# clear the R-Studio Console & workspace
+if(!require(mise)){install.packages("mise")}
+library(mise); mise()
+rm(list=ls())
+if(!is.null(dev.list())) dev.off()
+
+require(foreign)
+require(nnet)  # forf multinom()
+require(ggplot2)
+require(reshape2)
+
+ml <- read.dta("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/hsbdemo.dta")
+with(ml, table(ses, prog))
+with(ml, do.call(rbind, tapply(write, prog, function(x) c(M = mean(x), SD = sd(x)))))
+
+ml$prog2 <- relevel(ml$prog, ref = "academic")  # re-order the factor levels
+test <- multinom(prog2 ~ ses + write, data = ml)
+summary(test)
+
+z <- summary(test)$coefficients/summary(test)$standard.errors; z
+
+# 2-tailed z test
+p <- (1 - pnorm(abs(z), 0, 1)) * 2; p
+
+## extract the coefficients from the model and exponentiate
+exp(coef(test))
+
+# calculate predicted probabilities for each of our outcome levels using the fitted function
+head(pp <- fitted(test))
+
+```
+
+
+```{r, Multinomial-logistic-regression, echo=TRUE, eval=TRUE, include=TRUE}
+# https://stats.idre.ucla.edu/r/dae/multinomial-logistic-regression/
+
+# clear the R-Studio Console & workspace
+if(!require(mise)){install.packages("mise")}
+library(mise); mise()
+rm(list=ls())
+if(!is.null(dev.list())) dev.off()
+
+#require(foreign)
+require(nnet)  # for multinom()
+
+# load the dataset
+ais.t.id = read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais_t_id.csv")
+
+# drop row id column
+ais.t.id   = ais.t.id[-1]
+
+# subset by sex
+ais.t.id.m = subset(ais.t.id, ais.t.id$Sex==0)
+ais.t.id.f = subset(ais.t.id, ais.t.id$Sex==1)
+
+# male+female
+test<- multinom(Sport.label.id ~ .-Sport.label-Sex, data = ais.t.id)
+summary(test)
+z <- summary(test)$coefficients/summary(test)$standard.errors; z
+p <- (1 - pnorm(abs(z), 0, 1)) * 2; p  # 2-tailed z test
+exp(coef(test))  ## extract the coefficients from the model and exponentiate
+head(pp <- fitted(test)); pp  # calculate predicted probabilities for each of our outcome levels using the fitted fn
+
+# male
+test.m <- multinom(Sport.label.id ~ .-Sport.label-Sex, data = ais.t.id.m)
+summary(test.m)
+z.m <- summary(test.m)$coefficients/summary(test.m)$standard.errors; z.m
+p.m <- (1 - pnorm(abs(z.m), 0, 1)) * 2; p.m  # 2-tailed z test
+exp(coef(test.m))  ## extract the coefficients from the model and exponentiate
+head(pp.m <- fitted(test.m)); pp.m  # calculate predicted probabilities for each of our outcome levels using the fitted fn
+
+# female
+test.f <- multinom(Sport.label.id ~ .-Sport.label-Sex, data = ais.t.id.f)
+summary(test.f)
+z.f <- summary(test.f)$coefficients/summary(test.f)$standard.errors; z.f
+p.f <- (1 - pnorm(abs(z.f), 0, 1)) * 2; p.f  # 2-tailed z test
+exp(coef(test.f))  ## extract the coefficients from the model and exponentiate
+head(pp.f <- fitted(test.f)); pp.f  # calculate predicted probabilities for each of our outcome levels using the fitted fn
+
+# compare models
+summary(test)   # AIC:744
+summary(test.m) # AIC:334
+summary(test.f) # AIC:274
+```
+
+
+```{r, Multinomial-logistic-regression, echo=TRUE, eval=TRUE, include=TRUE}
+# https://stats.idre.ucla.edu/r/dae/multinomial-logistic-regression/
+
+# clear the R-Studio Console & workspace
+if(!require(mise)){install.packages("mise")}
+library(mise); mise()
+rm(list=ls())
+if(!is.null(dev.list())) dev.off()
+
+#require(foreign)
+require(nnet)  # forf multinom()
+
+# load the dataset
+ais.id = read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais_id.csv")
+
+# drop row id column
+ais.id   = ais.id[-1]
+
+# subset by sex
+ais.id.m = subset(ais.id, ais.id$Sex==0)
+ais.id.f = subset(ais.id, ais.id$Sex==1)
+
+# male+female
+test <- multinom(Sport.label.id ~ .-Sport.label-Sex, data = ais.id)
+test <- multinom(Sport ~ .-Sport.label.id-Sport.label, data = ais.id)
+summary(test)
+z <- summary(test)$coefficients/summary(test)$standard.errors; z
+p <- (1 - pnorm(abs(z), 0, 1)) * 2; p  # 2-tailed z test
+p <= 0.05
+exp(coef(test))  ## extract the coefficients from the model and exponentiate
+head(pp <- fitted(test)); pp  # calculate predicted probabilities for each of our outcome levels using the fitted fn
+
+# male
+test.m <- multinom(Sport.label.id ~ .-Sport.label-Sex, data = ais.id.m)
+summary(test.m)
+z.m <- summary(test.m)$coefficients/summary(test.m)$standard.errors; z.m
+p.m <- (1 - pnorm(abs(z.m), 0, 1)) * 2; p.m  # 2-tailed z test
+exp(coef(test.m))  ## extract the coefficients from the model and exponentiate
+head(pp.m <- fitted(test.m)); pp.m  # calculate predicted probabilities for each of our outcome levels using the fitted fn
+
+# female
+test.f <- multinom(Sport.label.id ~ .-Sport.label-Sex, data = ais.id.f)
+summary(test.f)
+z.f <- summary(test.f)$coefficients/summary(test.f)$standard.errors; z.f
+p.f <- (1 - pnorm(abs(z.f), 0, 1)) * 2; p.f  # 2-tailed z test
+exp(coef(test.f))  ## extract the coefficients from the model and exponentiate
+head(pp.f <- fitted(test.f)); pp.f  # calculate predicted probabilities for each of our outcome levels using the fitted fn
+
+# compare models
+summary(test)   # AIC:672
+summary(test.m) # AIC:266 NaNs produced
+summary(test.f) # AIC:320 NaNs produced
+```
+
+
+```{r, Lesson 4-1.6m classification of Body Fat (Bfat) from the LDA fit, echo=TRUE, eval=TRUE, include=TRUE}
+# lesson 4-1.6m
+# using the lda() model, predict the classification the sub-sport b_ball from the preditor *Ht*
+
+# clear the R-Studio Console & workspace
+if (!require(mise)) {
+  install.packages("mise")
+}
+library(mise)
+mise()
+rm(list = ls())
+if (!is.null(dev.list())) dev.off()
+
+# Load Dataset ----
+ais <- read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais.csv")
+
+# create a binary variable for the sub_sport 'b_ball'
+n_obs = dim(ais)[1]
+sub_sport = rep(0, n_obs)   
+sub_sport[ais$Sport == 'b_ball'] = 1
+
+
+####################################
+
+
+# Define model, Single Predictor, Binary classification using *Ht*
+library(MASS, quietly = TRUE)
+ldafit1 <- lda(sub_sport ~ Ht, data = ais)
+#ldafit1$means
+
+# generate predictions
+fittedclass_lda <- predict(ldafit1, data = ais)$class
+table(sub_sport, fittedclass_lda)
+
+# sub_sport sensitivity
+table(sub_sport, fittedclass_lda)[2,2]/sum(sub_sport == 1)
+
+# sub_sport specificity
+table(sub_sport, fittedclass_lda)[1,1]/sum(sub_sport == 0)
+
+
+####################################
+
+# clear the R-Studio Console & workspace
+if (!require(mise)) {
+  install.packages("mise")
+}
+library(mise)
+mise()
+rm(list = ls())
+if (!is.null(dev.list())) dev.off()
+
+# Load Dataset ----
+ais <- read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais.csv")
+
+# predict for each sub-sport
+factor_list <- levels(ais$Sport)
+sensitivity <- rep(0, length(factor_list))
+specificity <- rep(0, length(factor_list))
+library(MASS, quietly = TRUE)
+for (i in 1:length(factor_list)) {
+  # create a binary variable for the sub_sport 'b_ball'
+  n_obs <- dim(ais)[1]
+  sub_sport <- rep(0, n_obs)
+  sub_sport[ais$Sport == factor_list[i]] <- 1
+
+  # Define model, ALL Predictors, Binary classification, single sub-sport
+  ldafit1 <- lda(sub_sport ~ . -Sport-Bfat, data = ais)
+
+  # generate predictions
+  fittedclass_lda1 <- predict(ldafit1, data = ais)$class
+  table(sub_sport, fittedclass_lda1)
+
+  # calculate metrics
+  sensitivity[i] <- table(sub_sport, fittedclass_lda1)[2, 2] / sum(sub_sport == 1)
+  specificity[i] <- table(sub_sport, fittedclass_lda1)[1, 1] / sum(sub_sport == 0)
+}
+
+x <- matrix(rep(NA, (3 * length(factor_list))), nrow = length(factor_list))
+colnames(x) <- c("Sub_Sport", "sensitivity", "specificity")
+for (i in 1:length(factor_list)) {
+  # output metrics
+  x[i, ] <- c(factor_list[i], round(sensitivity[i], 4), round(specificity[i], 4))
+}
+x
+```
+
+
+```{r, stepAIC(glm(sub_sport ~ Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI+SSF, data = df)), echo=TRUE, eval=TRUE, include=TRUE}
+# Create a reduced M_F stepwise sub_stport model
+
+# clear the R-Studio Console & workspace
+if (!require(mise)) {
+  install.packages("mise")
+}
+library(mise)
+mise()
+rm(list = ls())
+if (!is.null(dev.list())) dev.off()
+
+# Load Dataset ----
+ais <- read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais.csv")
+
+# subset dataframe by sex
+if (!require(dplyr)) {
+  install.packages("dplyr")
+}
+library(dplyr, quietly = TRUE)
+ais.f <- dplyr::select(filter(ais, ais$Sex == 1), c(Sport, Ht:SSF))
+ais.m <- dplyr::select(filter(ais, ais$Sex == 0), c(Sport, Ht:SSF))
+
+# > Factorize *Sex* predictor ----
+ais$Sex <- factor(ais$Sex)
+
+# > Factorize *Sport* predictor ----
+ais.f$Sport <- factor(ais.f$Sport)
+ais.m$Sport <- factor(ais.m$Sport)
+
+
+# df = ais.f
+# fn = sub_sport ~ Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF
+# 1:"b_ball"    AIC: 54.663     BMI+Wt+LBM
+# 2:"field"     AIC: -54.695    Ht+Wt+RCC+Hc+Hg+BMI+SSF 
+# 3:"gym"       AIC: -108.74    Ht+Wt+BMI
+# 4:"netball"   AIC: 60.577     Wt+LBM+WCC+Hg+SSF
+# 5:"row"       AIC: 95.218     Wt+LBM+RCC+Hg+SSS 
+# 6:"swim"      AIC: 30.768     Wt+LBM+RCC
+# 7:"t_400m"    AIC: 36.962     Wt+RCC+Hc+Ferr
+# 8:"t_sprnt"   AIC: -54.855    RCC+Hc+Hg+BMI+SSF
+# 9:"tennis"    AIC: -3.3408    Wt+RCC+WCC+Hg+Ferr
+
+# df = ais.m
+# fn = sub_sport ~ Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF
+# 1:"b_ball"    AIC: 33.73      LBM+Hc+Hg+Ferr+BMI+SSF
+# 2:"field"     AIC: 27.204     Ht+LBM+BMI+SSF
+# 3:"row"       AIC: 80.749     LBM
+# 4:"swim"      AIC: 65.879     Wt+LBM+WC+SSF
+# 5:"t_400m"    AIC: 57.649     Ht+Wt+LBM+RCC+WCC+Hc+Ferr+BMI+SSF
+# 6:"t_sprnt"   AIC: 36.506     LBM+RCC+BMI+SSF
+# 7:"tennis"    AIC: -46        RCC+Hc
+# 8:"w_polo"    AIC: 63.344     WCC+BMI+SSF
+
+# df = ais
+# fn = sub_sport ~ Sex + Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF
+#  1:"b_ball"   AIC: 81.844     Wt+BMI+Hc+Ferr
+#  2:"field"    AIC: 2.6485     BMI+SSF+RCC+Sex1+Hc+LBM
+#  3:"gym"      AIC: -319.63    Ht+Wt+BMI
+#  4:"netball"  AIC: 22.449     SSF+Wt+LBM+Hg+WCC
+#  5:"row"      AIC: 187.21     Wt+SSF
+#  6:"swim"     AIC: 98.062     LBM+Wt+WCC+RCC+Hc+SSF+Sex1
+#  7:"t_400m"   AIC: 93.782     Sex1+RCC+SSF+Ferr+LBM+Hc+BMI+Ht
+#  8:"t_sprnt"  AIC: 6.1266     RCC+SSF+BMI+Wt+Ht+Hc
+#  9:"tennis"   AIC: -36.529    Wt+RCC+Hc+Ferr
+# 10:"w_polo"   AIC: 22.54      WCC+Sex1+LBM+Wt+BMI+Hc
+
+
+
+df = ais.f
+fn = sub_sport ~ Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF
+
+stepAIC(glm(sub_sport ~ Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF, data = df))
+        
+# i=1; 
+# n_obs <- dim(df)[1]; sub_sport <- rep(0, n_obs); sub_sport[df$Sport == factor_list[i]] <- 1; print(summary(stepAIC(glm(fn, data = df), direction = "both", trace = FALSE)))
+
+factor_list <- levels(df$Sport)
+for (i in 1:length(factor_list)) {
+  n_obs <- dim(df)[1]
+  sub_sport <- rep(0, n_obs)
+  sub_sport[df$Sport == factor_list[i]] <- 1
+  print(summary(stepAIC(glm(fn, data = df), direction = "both", trace = FALSE)))
+}
+
+
+# assess the VIF for using all predictors
+if (!require(car)) {
+ install.packages("car", quiet = TRUE)
+}
+library("car", quietly = TRUE)
+vif(fit.glm)
+
+# attempt to reduce the number of predictors via the stepwise algorithm
+summary(stepAIC(glm(fn, data = df), direction = "both", trace = FALSE))
+summary(step.fit.glm)
+
+
+# assess the VIF for using step predictors
+if (!require(car)) {
+ install.packages("car", quiet = TRUE)
+}
+library("car", quietly = TRUE)
+vif(fit.step.glm.ais.to_)
+
+
+# display the call to the revised model
+fit.step.glm.ais.to_$cal
+
+
+# detach(package:car, unload = TRUE)
+
+
+# FEMALE *Bfat* glm Model Predictors
+# ALL   MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t + RCC.t+WCC.t+Hc+Hg+Ferr.t, data = ais.f_) AIC: 172.67
+# STEP  MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t,                            data = ais.f_) AIC: 164.59
+# FINAL MODEL --> glm(Bfat ~ Ht.t+Wt+LBM+BMI.t+SSF.t,                            data = ais.f_) AIC: 164.59
+
+
+detachAllPackages()
+
+A_14_Reduced_M_F_stepwise_Bfat_model <- 1
+```
+
+
+```{r lda(Sport.id ~ Sex + Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF)}
+# clear the R-Studio Console & workspace
+if (!require(mise)) {
+  install.packages("mise")
+}
+library(mise)
+mise()
+rm(list = ls())
+if (!is.null(dev.list())) dev.off()
+
+# Load Dataset ----
+ais <- read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais.csv")
+
+# > Create *Sport.id*: a new response variable as a joint label between categorical variables Sex and Sport
+ais$Sport.id[ais$Sex == 0 & ais$Sport == "b_ball"] <- 1
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "b_ball"] <- 2
+ais$Sport.id[ais$Sex == 0 & ais$Sport == "field"] <- 3
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "field"] <- 4
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "gym"] <- 5
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "netball"] <- 6
+ais$Sport.id[ais$Sex == 0 & ais$Sport == "row"] <- 7
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "row"] <- 8
+ais$Sport.id[ais$Sex == 0 & ais$Sport == "swim"] <- 9
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "swim"] <- 10
+ais$Sport.id[ais$Sex == 0 & ais$Sport == "t_400m"] <- 11
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "t_400m"] <- 12
+ais$Sport.id[ais$Sex == 0 & ais$Sport == "t_sprnt"] <- 13
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "t_sprnt"] <- 14
+ais$Sport.id[ais$Sex == 0 & ais$Sport == "tennis"] <- 15
+ais$Sport.id[ais$Sex == 1 & ais$Sport == "tennis"] <- 16
+ais$Sport.id[ais$Sex == 0 & ais$Sport == "w_polo"] <- 17
+
+
+# subset dataframe by sex
+if (!require(dplyr)) {
+  install.packages("dplyr")
+}
+library(dplyr, quietly = TRUE)
+ais.f <- dplyr::select(filter(ais, ais$Sex == 1), c(Sport.id, Ht:SSF))
+ais.m <- dplyr::select(filter(ais, ais$Sex == 0), c(Sport.id, Ht:SSF))
+
+
+# use stepfn to predict 
+df = ais
+fn = Sport.id ~ Sex + Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF
+glm(fn, data = df)
+i = 1; 
+n_obs <- dim(df)[1]; sub_sport <- rep(0, n_obs); sub_sport[df$Sport == factor_list[i]] <- 1; print(summary(stepAIC(glm(fn, data = df), direction = "both", trace = FALSE)))
+
+# df = ais
+# Sport.id ~ Sex + Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF
+# stepfn = Sport.id ~ LBM + Ferr + Hc + SSF + Hg
+
+# predict for each sub-sport
+df = ais
+fn = Sport ~ Sex+Ferr+BMI+RCC+Ht
+factor_list <- levels(df$Sport)
+sensitivity <- rep(0, length(factor_list))
+specificity <- rep(0, length(factor_list))
+library(MASS, quietly = TRUE)
+for (i in 1:length(factor_list)) {
+  # create a binary variable for the sub_sport 'b_ball'
+  n_obs <- dim(df)[1]
+  sub_sport <- rep(0, n_obs)
+  sub_sport[df$Sport == factor_list[i]] <- 1
+
+  # Define model, ALL Predictors, Binary classification, single sub-sport
+  ldafit1 <- lda(fn, data = df)
+
+  # generate predictions
+  fittedclass_lda1 <- predict(ldafit1, data = df)$class
+  table(sub_sport, fittedclass_lda1)
+
+  # calculate metrics
+  sensitivity[i] <- table(sub_sport, fittedclass_lda1)[2, 2] / sum(sub_sport == 1)
+  specificity[i] <- table(sub_sport, fittedclass_lda1)[1, 1] / sum(sub_sport == 0)
+}
+
+x <- matrix(rep(NA, (3 * length(factor_list))), nrow = length(factor_list))
+colnames(x) <- c("Sub_Sport", "sensitivity(TP)", "specificity(TN)")
+for (i in 1:length(factor_list)) {
+  # output metrics
+  x[i, ] <- c(factor_list[i], round(sensitivity[i], 4), round(specificity[i], 4))
+}
+x
+
+# df = ais.f
+# fn = Sport.id ~ Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF
+#       Sub_Sport sensitivity(TP) specificity(TN)
+#  [1,] "b_ball"  "0.32"          "0.0226"       
+#  [2,] "field"   "0"             "0.071"        
+#  [3,] "gym"     "0"             "0.0657"       
+#  [4,] "netball" "0.1304"        "0.0726"       
+#  [5,] "row"     "0.0811"        "0.0667"       
+#  [6,] "swim"    "0.0455"        "0.0667"       
+#  [7,] "t_400m"  "0"             "0.0751"       
+#  [8,] "t_sprnt" "0"             "0.0695"       
+#  [9,] "tennis"  "0"             "0.0681"       
+# [10,] "w_polo"  "0"             "0.0649"   
+ 
+# stepfn = Sport.id ~ LBM + Ferr + Hc + SSF + Hg
+#       Sub_Sport sensitivity(TP) specificity(TN)
+#  [1,] "b_ball"  "0.04"          "0.0169"       
+#  [2,] "field"   "0"             "0.0492"       
+#  [3,] "gym"     "0"             "0.0505"       
+#  [4,] "netball" "0"             "0.0559"       
+#  [5,] "row"     "0.027"         "0.0545"       
+#  [6,] "swim"    "0.0455"        "0.0556"       
+#  [7,] "t_400m"  "0"             "0.0578"       
+#  [8,] "t_sprnt" "0"             "0.0481"       
+#  [9,] "tennis"  "0"             "0.0524"       
+# [10,] "w_polo"  "0"             "0.0541" 
+
+  
+```
+
+
+```{r qda(sub_sport ~ Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF)}
+# using the lda() model, predict the classification the sub-sport from ALL preditors
+
+
+# clear the R-Studio Console & workspace
+if (!require(mise)) {
+  install.packages("mise")
+}
+library(mise)
+mise()
+rm(list = ls())
+if (!is.null(dev.list())) dev.off()
+
+# Load Dataset ----
+ais <- read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais.csv")
+
+# subset dataframe by sex
+if (!require(dplyr)) {
+  install.packages("dplyr")
+}
+library(dplyr, quietly = TRUE)
+ais.f <- dplyr::select(filter(ais, ais$Sex == 1), c(Sport, Ht:SSF))
+ais.m <- dplyr::select(filter(ais, ais$Sex == 0), c(Sport, Ht:SSF))
+
+# > Factorize *Sport* predictor ----
+ais.f$Sport <- factor(ais.f$Sport)
+ais.m$Sport <- factor(ais.m$Sport)
+
+# predict for each sub-sport -- female
+df = ais.m
+#fn = sub_sport ~ Ht + Wt + LBM + RCC + WCC + Hc + Hg + Ferr + BMI + SSF
+fn = sub_sport ~ BMI+Wt+LBM
+factor_list <- levels(df$Sport)
+sensitivity <- rep(0, length(factor_list))
+specificity <- rep(0, length(factor_list))
+library(MASS, quietly = TRUE)
+for (i in 1:length(factor_list)) {
+  # create a binary variable for the sub_sport 'b_ball'
+  n_obs <- dim(df)[1]
+  sub_sport <- rep(0, n_obs)
+  sub_sport[df$Sport == factor_list[i]] <- 1
+
+  # Define model, ALL Predictors, Binary classification, single sub-sport
+  fit <-qda(fn, data = df)
+
+  # generate predictions
+  fittedclass <- predict(fit, data = df)$class
+  table(sub_sport, fittedclass)
+
+  # calculate metrics
+  sensitivity[i] <- table(sub_sport, fittedclass)[2, 2] / sum(sub_sport == 1)
+  specificity[i] <- table(sub_sport, fittedclass)[1, 1] / sum(sub_sport == 0)
+}
+
+x <- matrix(rep(NA, (3 * length(factor_list))), nrow = length(factor_list))
+colnames(x) <- c("Sub_Sport", "sensitivity(TP)", "specificity(TN)")
+for (i in 1:length(factor_list)) {
+  # output metrics
+  x[i, ] <- c(factor_list[i], round(sensitivity[i], 4), round(specificity[i], 4))
+}
+x
+
+
+# > lda(sub_sport ~ . -Sport, data = df)
+# 
+# > df = ais
+#       Sub_Sport sensitivity(TP) specificity(TN)
+#  [1,] "b_ball"  "0.4"           "0.9944"       
+#  [2,] "field"   "0.5789"        "0.9945"       
+#  [3,] "gym"     "1"             "0.9899"       
+#  [4,] "netball" "0.6957"        "0.9609"       
+#  [5,] "row"     "0.2432"        "0.9697"       
+#  [6,] "swim"    "0.0455"        "0.9944"       
+#  [7,] "t_400m"  "0.6207"        "0.9538"       
+#  [8,] "t_sprnt" "0.1333"        "0.9947"       
+#  [9,] "tennis"  "0.2727"        "0.9895"       
+# [10,] "w_polo"  "0.5294"        "0.9838"       
+#
+#
+#
+# > df = ais.f
+#       Sub_Sport sensitivity(TP) specificity(TN)
+#  [1,] "b_ball"  "0.4615"    "0.9885"   
+#  [2,] "field"   "0.8571"    "1"        
+#  [3,] "gym"     "1"         "0.9896"   
+#  [4,] "netball" "0.6957"    "0.9221"   
+#  [5,] "row"     "0.3182"    "0.9487"   
+#  [6,] "swim"    "0"         "1"        
+#  [7,] "t_400m"  "0.3636"    "0.9775"   
+#  [8,] "t_sprnt" "0.75"      "0.9896"   
+#  [9,] "tennis"  "0.5714"    "0.9785"   
+# [10,] "w_polo"
+#  
+#  
+#  
+# > df = ais.m
+#      Sub_Sport sensitivity(TP) specificity(TN)
+# [1,] "b_ball"  "0.5833"    "0.9889"   
+# [2,] "field"   "0.5"       "1"        
+# [3,] "row"     "0"         "0.9655"   
+# [4,] "swim"    "0.1538"    "0.9775"   
+# [5,] "t_400m"  "0.7222"    "0.9643"   
+# [6,] "t_sprnt" "0.3636"    "0.978"    
+# [7,] "tennis"  "0"         "0.9898"   
+# [8,] "w_polo"  "0.5294"    "0.9529"
+# [ ,] "gym"     
+# [ ,] "netball"
+
+
+
+
+
+
+```
+
+
+
+```{r, CV10 boosting vsd mlr, echo=TRUE, eval=TRUE, include=TRUE}
+# lesson 7-2
+# - perform a 10-fold cross validation to compare a boosting model to a multiple linear regression model that attempts to predict the level of body fat based on the health attributes of the players
+# - speculation: Can quantative health attributes of sports players predict the level of the quantative response variable body fat *Bfat*?
+# - speculation: Which is the better model?
+# - quantative response variable: Bfat.t
+# - quantative predictors: Ht.t + Wt.t + LBM.t + RCC.t + WCC.t + Hc.t + Hg.t + Ferr.t + BMI.t + SSF.t
+
+
+# remove un-needed factors and non-transformed predictors from the dataframe
+ais.all.id = subset(ais.all.id, select=-c(Sport.label.id,Bfat,Ht,Wt,LBM,RCC,WCC,Hc,Hg,Ferr,BMI,SSF,Sport,Sport.label,Sex))
+
+# Question 7-2.10
+# load library for boosting model algorithm
+if(!require(gbm)){install.packages("gbm")}
+library(gbm)
+
+# initialize model prediction attributes
+n = dim(ais.all.id)[1]; n
+predict.boost = rep(0, n)
+predict.lm    = rep(0, n)
+
+# create a sample set using 10-fold cross-validation
+k = 10
+groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k)) # produces list of group labels
+set.seed(2)
+cvgroups = sample(groups,n) 
+
+# initialize variables to calculate a running cv MSE
+MSE.boost.CV.MSE.sum = 0
+MSE.lm.CV.MSE.sum    = 0
+
+# fit the boosting model, generate predictions & running MSE
+for(i in 1:k){
+    # create a set of indexes in the cvgroup vector for the value "i" in the cvgroup vector
+    groupi = which(cvgroups == i)
+    
+    # fit a boosting gaussian model to predict values for groupi
+    fit.boost = gbm(Bfat.t~Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id[-groupi,], distribution="gaussian", n.trees=5000, shrinkage=.001,  interaction.depth=4)
+    
+    # fit a glm gaussian model to predict values for groupi
+    fit.lm = lm(Bfat.t~Ht.t+Wt.t+LBM.t+RCC.t+WCC.t+Hc.t+Hg.t+Ferr.t+BMI.t+SSF.t, data=ais.all.id[-groupi,])
+    
+    # generate predictions
+    predict.boost[groupi] = predict(fit.boost, newdata=ais.all.id[groupi,], n.trees = 5000)
+    predict.lm[groupi]    = predict(fit.lm,    newdata=ais.all.id[groupi,])
+    
+    # calculate running cv MSE
+    MSE.boost.CV.MSE.sum = MSE.boost.CV.MSE.sum + mean(predict.boost[groupi] - ais.all.id$Bfat.t[groupi])^2 
+    MSE.lm.CV.MSE.sum    = MSE.lm.CV.MSE.sum    + mean(predict.lm[groupi]    - ais.all.id$Bfat.t[groupi])^2 
+}
+
+# calculate and compare the sum of the MSEs for the 10 cross validations of the model
+MSE.boost.cv10 = MSE.boost.CV.MSE.sum; MSE.boost.cv10   # 3.605241
+MSE.lm.cv10    = MSE.lm.CV.MSE.sum; MSE.lm.cv10         # 1.794259
+
+```
+
+
+```{r, tree(Sport ~ Sex+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI+SSF, data=ais[!groupi, ]), echo=TRUE, eval=TRUE, include=TRUE}
+# OK 
+# lesson 7-1b
+# - Perform a 10-fold cross validation to determine the mean mean squared error in the prediction of decision trees that predict which quantative health predictors are associated with the categorical response variable *Sport*
+# - Speculation: Can the quanatative health attributes of sport players predict the categorical type-of-sport that a person will play?
+# - factor response variable: Sport
+# - quantative predictors: Sex+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI+SSF
+
+
+# clear the R-Studio Console & workspace
+if (!require(mise)) {
+  install.packages("mise")
+}
+library(mise)
+mise()
+rm(list = ls())
+if (!is.null(dev.list())) dev.off()
+
+# Load Dataset ----
+ais <- read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/08/ais.csv")
+
+# factorize *Sex*
+ais$Sex <- factor(ais$Sex)
+
+# question 7-1.6 Code
+# - What are the optimal numbers of leaves?
+# - Use 10-fold cross-validation on the training data to choose the optimal number of leaves
+n = dim(ais)[1]
+k = 10                                                # using 10-fold cross-validation
+groups = c(rep(1:k,floor(n/k)),1:(n - floor(n/k)*k))  # produce a list of group labels
+set.seed(7)                                           # set the random seed equal to 7
+cvgroups = sample(groups,n)
+predict.tree = rep(-1, n)
+MSE.tree.CV = 0
+MSE.tree.CV.sum = 0
+
+# fit the tree model, generate predictions & running MSE
+if (!require(tree)) {
+  install.packages("tree")
+}
+library(tree)
+for (i in 1:k) {
+    # create a set of indexes in the cvgroup vector for the value "i" in the cvgroup vector
+    groupi = (cvgroups == i)
+    
+    # fit a tree model to predict values for groupi
+    fit.tree = tree(Sport ~ Sex+Ht+Wt+LBM+RCC+WCC+Hc+Hg+Ferr+BMI+SSF, data=ais[!groupi, ])  # CV(10) = 0.6828571 
+    # fit.tree = tree(Sport ~ BMI+Wt+LBM, data=ais[!groupi, ])                              # CV(10) = 0.6740476
+    #fit.tree = tree(Sport ~ BMI+Ferr+Hc+Ht+RCC+SSF+WCC+Wt, data=ais[!groupi, ])            # CV(10) = 0.6580952
+    print(summary(fit.tree)[3]) # used predictors
+    #print(summary(fit.tree)[7]) # mis-classifications
+    #print("")
+    
+    # generate predictions
+    predict.tree = predict(fit.tree, ais[groupi,], type = "class")
+
+    # calculate running MSE
+    MSE.tree.CV = mean( (predict.tree != (ais$Sport[groupi]))^2 )
+    print(MSE.tree.CV)
+    MSE.tree.CV.sum  = MSE.tree.CV.sum + MSE.tree.CV 
+}
+
+# calculate the mean of the MSEs
+MSE.tree.CV10.mean = MSE.tree.CV.sum/k; MSE.tree.CV10.mean  # [1]
+
+plot(fit.tree); text(fit.tree, pretty = 0)
+
+# MSE	    BMI	Ferr	Hc	Hg	Ht	LBM	RCC	Sex	SSF	WCC	Wt
+# 0.5000	BMI	Ferr	Hc	NA	Ht	NA	RCC	NA	SSF	WCC	Wt
+# 0.6000	BMI	NA	    Hc	Hg	Ht	NA	RCC	NA	SSF	WCC	Wt
+# 0.6000	BMI	Ferr	Hc	NA	Ht	NA	RCC	NA	SSF	WCC	Wt
+# 0.6500	BMI	Ferr	Hc	Hg	Ht	LBM	RCC	NA	SSF	WCC	Wt
+# 0.7000	BMI	Ferr	Hc	NA	Ht	LBM	RCC	NA	SSF	WCC	Wt
+# 0.7143	BMI	Ferr	Hc	NA	Ht	NA	RCC	NA	SSF	WCC	Wt
+# 0.7143	BMI	Ferr	Hc	NA	Ht	NA	RCC	NA	SSF	WCC	Wt
+# 0.7500	BMI	Ferr	Hc	NA	NA	LBM	RCC	NA	SSF	WCC	Wt
+# 0.8000	BMI	Ferr	NA	Hg	Ht	LBM	NA	NA	SSF	WCC	Wt
+# 0.8000	BMI	NA	    Hc	Hg	Ht	LBM	RCC	NA	SSF	WCC	Wt
+
+
+    
+```
+
+
+
+```{r, OK Lession 1-2 KNN() DUMMY CATEGORICAL RESPONSE VARIABLE, echo=TRUE, eval=TRUE, include=TRUE}
+# lession 1-2
+# Use 25-nearest neighbor classification to predict whether the income of each individual in the validation set is >50K or <=50K
+
+
+# clear the R-Studio Console & workspace
+if (!require(mise)) {
+  install.packages("mise")
+}
+library(mise)
+mise()
+rm(list = ls())
+if (!is.null(dev.list())) dev.off()
+
+# load the Census_input.csv data file into a data set (ds)
+census <- read.csv("C:/_H/Personal/__UWLAX/DS740 Data Mining/Homework/01/Census_income.csv")
+
+attach(census)
+# You will need to account for the leading space when creating the variable Sex01.
+Sex01 <- rep(0, dim(census)[1])
+Sex01[which(Sex == " Female")] <- 1
+
+# Set R’s seed to 1 again and randomly sample 20,000 individuals to be in the training set
+set.seed(1)
+n_obs = dim(census)[1]
+train <- sample(1:n_obs, 20000, replace = F)
+
+# Create two new variables, *Educ.train.std*, and *Age.train.std*, which contain standardized versions of the *EducYears* and *Age* variables for the training data.  Combine these variables, along with the training-set values of variable *Sex01*, into a matrix or data frame *train.X.std*
+
+# create the training set
+# *EducYears* vs *Age* vs *Sex01*
+Educ.train.std <- scale(EducYears[train])
+Age.train.std  <- scale(Age[train])
+train.X.std <- cbind(Educ.train.std, Age.train.std, Sex01[train])
+head(train.X.std)
+
+# Use the same means and standard deviations (from the training data) to standardize the validation data, creating two more variables, *Educ.valid.std* and *Age.valid.std*. Combine these variables, along with the validation-set values of variable *Sex01*, into a matrix or data frame *valid.X.std*. This allows us to standardize the numeric variables *EducYears* and *Age*, without standardizing the indicator variable *Sex01*.
+
+# create the validation set
+# *EducYears* vs *Age* vs *Sex01*
+Educ.valid.std <- scale(EducYears[-train], 
+                        center = attr(Educ.train.std, "scaled:center"), 
+                        scale = attr(Educ.train.std, "scaled:scale"))
+Age.valid.std <- scale(Age[-train], 
+                       center = attr(Age.train.std, "scaled:center"), 
+                       scale = attr(Age.train.std, "scaled:scale"))
+valid.X.std <- cbind(Educ.valid.std, Age.valid.std, Sex01[-train])
+#head(valid.X.std)
+
+# use the knn() model to predict Income is >50K or <=50K
+# Use 25-nearest neighbor classification to predict whether the income of each individual in the validation set is >50K or <=50K
+if (!require(class)) {
+  install.packages("class")
+}
+library(class)
+classifications <- knn(train.X.std, valid.X.std, Income[train], k = 25)
+
+# generate a confusion matrix
+table(classifications, Income[-train])
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
