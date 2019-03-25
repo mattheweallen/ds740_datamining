@@ -15,6 +15,7 @@ summary(prob1)
 class(prob1$Y)# = as.factor(prob1$Y)
 attach(prob1)
 
+#install.packages("e1071")
 library(e1071)
 model = Y~x1+x2
 svmfit = svm(model, kernel="linear", cost=1, type="C-classification")
@@ -41,3 +42,24 @@ abline(b/w[2],-w[1]/w[2]) # support vector classifier
 # y intercept, slope
 abline((b+1)/w[2],-w[1]/w[2],lty=2) #margins
 abline((b-1)/w[2],-w[1]/w[2],lty=2)
+b/w[2]
+-w[1]/w[2]
+
+#
+plot(x1,x2,col=my.col,pch=my.pch)
+b = svmfit$rho #beta_0
+w = colSums(svmfit$coefs[,1]*svmfit$SV) # beta_1, ... beta_p
+abline(-.5,1)
+
+1*0.4444444
+.5*0.4444444
+1/2.25
+
+0.4444444 + 0.4444444 + 0.2222222
+sqrt(1/2.25)
+(.5*0.6666667)^2 + 2*(1*0.6666667)^2 
+.5*0.6666667
+
+.5/sqrt(2)
+-0.3535534+2*0.7071068 -0.7071068
+#0.3535534
