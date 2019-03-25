@@ -1,0 +1,268 @@
+---
+title: "Homework 8 R markdown"
+author: "(your name here)"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    fig_height: 4
+    fig_width: 4.5
+  pdf_document:
+    fig_height: 4
+    fig_width: 4.5
+  word_document:
+    fig_height: 4
+    fig_width: 4.5
+---
+
+
+```{r, setup, include=FALSE}
+require(mosaic)   # Load additional packages here 
+
+# Some customization.  You can alter or delete as desired (if you know what you are doing).
+trellis.par.set(theme=theme.mosaic()) # change default color scheme for lattice
+knitr::opts_chunk$set(
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+```
+
+#### <span style="color:Blue">**Intellectual Property:**</span>  
+These problems are the intellectual property of the instructors and may not be reproduced outside of this course.
+
+#### <span style="color:Crimson">**Due Date:**</span>  
+Tuesday, November 7, 2017 at 11:59 PM 
+
+***  
+***  
+
+
+##########################################################################
+## Problem 1: Using Support Vectors for Classification
+##########################################################################
+
+<span style="color:DarkViolet">In this problem, you will use a support vector classifier to categorize different species of oak trees to different regions (California vs. the Atlantic coast).  
+**Data Set**: Download the *Oak_log.csv* data set and load it into R.  </span>
+
+
+
+#####################################
+### <span style="color:DarkViolet">Question 1</span> **<span style="color:Crimson">(3 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Make a scatterplot that shows the region, standardized log(acorn size), and standardized log(range) all in the same plot.  Include a legend.  
+Enter your R code below.  </span>
+
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 2</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Comment on the appropriateness of a support vector classifier to categorize the regions of species of oak trees. </span>
+
+
+<span style="color:green">**Text Answer**: </span>
+
+
+#####################################
+### <span style="color:DarkViolet">Question 3</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Use a support vector classifier (a SVM with a linear kernel) to categorize the data points.  Use a cost of 1.  
+Enter your R code below. </span>
+
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 4</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Treating the entire data set as the training data, how many Atlantic species are incorrectly classified as California species?</span>
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+```{r}
+```
+
+#####################################
+### <span style="color:DarkViolet">Question 5</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+<span style="color:DarkViolet">How many California species are incorrectly classified as Atlantic species?</span>
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+
+
+#####################################
+### <span style="color:DarkViolet">Question 6</span> **<span style="color:Crimson">(3 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Plot the optimal hyperplane (line) with its margins on the same plot from the first question in this problem.  Upload your plot to the *Homework 8: Optimal Hyperplane* discussion board.   </span>
+
+<span style="color:green">**Graph Answer**  </span>: 
+  (post to discussion board on D2L)
+```{r,echo=FALSE}
+```
+
+
+
+***
+***
+
+##########################################################################
+## Problem 2:  Using Support Vector Machines for Classification
+##########################################################################
+
+<span style="color:DarkViolet">In this problem, you will use support vector machines with different kernels to classify the gas mileage of cars.  
+**Data Set**: Load the **Auto** data set, which is in the **ISLR** library.</span>
+
+
+
+
+#####################################
+### <span style="color:DarkViolet">Question 7</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Create a binary variable that equals 1 for cars with gas mileage above the median and a 0 for cars with gas mileage below the median.  Tell R to treat it as a factor.  
+Tell R to treat the origin variable as a factor.  
+Enter your R code below. </span>
+
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+#####################################
+### <span style="color:DarkViolet">Question 8</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Use a support vector classifier to model the binary variable gas mileage as a function of the other variables in Auto.
+ 
+* <span style="color:DarkViolet"> Do not include the continuous variable gas mileage.</span>
+* <span style="color:DarkViolet"> Do not include the car’s name.</span>
+* <span style="color:DarkViolet"> Use a cost of 1.</span> 
+
+<span style="color:DarkViolet"> Enter your R code below.  </span>
+
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+
+#####################################
+### <span style="color:DarkViolet">Question 9</span> **<span style="color:Crimson">(3 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Set your random seed equal to 9.  Use a built-in function to perform cross-validation to compare different values of cost:  .001, .01, .1, 1, 5, 10, 100.  
+Enter your R code below.  </span>
+
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+#####################################
+### <span style="color:DarkViolet">Question 10</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Which cost gave the lowest cross-validation error? </span>
+
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**: 
+
+
+#####################################
+### <span style="color:DarkViolet">Question 11</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+<span style="color:DarkViolet">What was the cross-validation error of the best model?</span>
+
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**: 
+  
+
+
+***
+
+#####################################
+### <span style="color:DarkViolet">Question 12</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Perform cross-validation to compare different values of cost and gamma for a radial model. Use the same values of cost as listed previously: .001, .01, .1, 1, 5, 10, 100. Use gamma =0.5, 1, 2, 3, and 4.  
+Enter your R code below.  </span>
+
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Questions 13-14 </span> **<span style="color:Crimson">(2 points, 1 each)</span>**:
+#####################################
+
+
+<span style="color:DarkViolet">Which combination of parameters gave the lowest cross-validation error?  </span>
+
+<span style="color:DarkViolet">Cost:  </span>  
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+
+
+<span style="color:DarkViolet">Gamma: </span>  
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+
+
+#####################################
+### <span style="color:DarkViolet">Question 15 </span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+<span style="color:DarkViolet">What was the cross-validation error of the best model? </span>  
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+
+
+#####################################
+### <span style="color:DarkViolet">Question 16</span> **<span style="color:Crimson">(3 points)</span>**:
+#####################################
+
+<span style="color:DarkViolet">Use the best model to predict whether the following car would have high or low gas mileage:  
+**1977 Chrysler Sunbeam**  
+**Cylinders**: 4  
+**Engine displacement**:  132.5 cubic inches  
+**Horsepower**:  155  
+**Weight**:  2,910 lbs  
+**Acceleration**:  8.3 seconds  
+**Origin**:  American (1)  
+Enter your R code below.  </span>
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 17</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+<span style="color:DarkViolet">What is your prediction?</span>
+
+
+<span style="color:green">**Multiple choice Answer** </span>
+  **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
+Low,  
+High  
