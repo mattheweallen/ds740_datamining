@@ -63,3 +63,6 @@ sqrt(1/2.25)
 .5/sqrt(2)
 -0.3535534+2*0.7071068 -0.7071068
 #0.3535534
+
+#web work 9 Prob 2
+bank = read.csv("bank-additional.csv")
