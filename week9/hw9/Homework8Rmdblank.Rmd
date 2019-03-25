@@ -240,7 +240,7 @@ summary(tune.out)$best.performance
 <span style="color:DarkViolet">What was the cross-validation error of the best model?</span>
 
 
-<span style="color:green">**Numeric Answer**  0.07628205</span> 
+<span style="color:green">**Numeric Answer**  0.08179487</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**: 
   
 
@@ -259,7 +259,7 @@ Enter your R code below.  </span>
 ```{r, echo=TRUE}
 #tune.out=tune(svm,y~x,kernel="radial",ranges=list(cost=c(.001,.01,.1,1,5,10,100),gamma=c(.5,1,2,3,4)), type="C-classification")
 
-#set.seed(9)
+set.seed(9)
 model=mpg_above_median~.
 tune.out=tune(svm,model,data=Auto,kernel="radial",ranges=list(cost=c(.001, .01, .1, 1, 5, 10, 100),gamma=c(.5,1,2,3,4)), type="C-classification")
 
@@ -285,7 +285,7 @@ summary(tune.out)$best.performance
 
 
 <span style="color:DarkViolet">Gamma: </span>  
-<span style="color:green">**Numeric Answer**  3</span> 
+<span style="color:green">**Numeric Answer**  1</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
 
@@ -295,7 +295,7 @@ summary(tune.out)$best.performance
 
 <span style="color:DarkViolet">What was the cross-validation error of the best model? </span>  
 
-<span style="color:green">**Numeric Answer**  0.07384615</span> 
+<span style="color:green">**Numeric Answer**  0.06108974</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 
 
@@ -333,5 +333,5 @@ predict(best.mod, newdata = newData)
 
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
-Low,  
-->High  
+->Low,  
+High  
