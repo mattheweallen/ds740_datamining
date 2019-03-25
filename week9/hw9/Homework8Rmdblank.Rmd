@@ -74,7 +74,7 @@ legend("topleft", legend = c("California", "Atlantic"), pch = c(21, 4), col = c(
 <span style="color:DarkViolet">Comment on the appropriateness of a support vector classifier to categorize the regions of species of oak trees. </span>
 
 
-<span style="color:green">**Text Answer**: A support vector classifier would work well with the oak log dataset, because the classes Atlantic and California are well separated. </span>
+<span style="color:green">**Text Answer**: A support vector classifier would work well with the oak log data set, because the classes Atlantic and California are well separated. </span>
 
 
 #####################################
@@ -98,7 +98,7 @@ svmfit = svm(Region~logSize+logRange, data = oaklog, kernel = "linear", cost = 1
 
 <span style="color:DarkViolet">Treating the entire data set as the training data, how many Atlantic species are incorrectly classified as California species?</span>
 
-<span style="color:green">**Numeric Answer**  0.07142857</span> 
+<span style="color:green">**Numeric Answer**2,  0.07142857</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r}
 summary(svmfit)
