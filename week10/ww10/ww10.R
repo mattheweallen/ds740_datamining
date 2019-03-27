@@ -22,3 +22,16 @@ fit2$convergence
 fit2 = nnet(y~x, size = 2, linout=T, maxit = 500)
 set.seed(16)
 fit2 = nnet(y~x, size = 2, linout=T, maxit = 500)
+
+#p4
+library(ISLR)
+data("Default")
+summary(Default)
+Default$student01=0
+Default$student01[which(Default$student=="Yes")] = 1
+Default=Default[,-2]
+
+library(nnet)
+set.seed(4)
+fit = nnet(default~., data=Default, size = 1)
+summary(fit$fitted.values)
