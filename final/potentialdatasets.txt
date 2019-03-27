@@ -1,0 +1,3 @@
+https://www.kaggle.com/ralle360/historic-tour-de-france-dataset#stages_TDF.csv
+
+https://www.kaggle.com/akkithetechie/new-york-city-bike-share-dataset
