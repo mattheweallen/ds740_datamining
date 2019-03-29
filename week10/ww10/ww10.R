@@ -66,3 +66,12 @@ axis(2)
 
 #p7
 fit$fitted.values[28]
+
+zH1 = fit$wts[1] + sum(fit$wts[2:4] * Default.std[28, 2:4])
+zH1 = 0.007841263
+sigmaH1 = 1/(1+exp(-zH1))
+sigmaH1
+zOut = fit$wts[5] + sigmaH1 * fit$wts[6]
+zOut = 13.68399 + sigmaH1 * -32.10247
+zOut
+1/(1+exp(-zOut))
