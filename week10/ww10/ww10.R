@@ -35,3 +35,34 @@ library(nnet)
 set.seed(4)
 fit = nnet(default~., data=Default, size = 1)
 summary(fit$fitted.values)
+
+#p5
+defaultcalc <- function(b,w,x) {
+  1/(1+exp(-(b+w*x)))
+}
+defaultcalc(.01,.02,10000)
+defaultcalc(.01,.02,100000)
+
+Default.std = data.frame(default = Default[ ,1],scale(Default[ ,2:4]))
+
+fit = nnet(default~., data=Default.std, size = 1, maxit = 200)
+
+#p6
+#install.packages("NeuralNetTools")
+library(NeuralNetTools)
+plotnet(fit)
+summary(fit)
+fit$wts
+
+text(-.2, .9, round(fit$wts[1], 2))
+text(-.6, .8, round(fit$wts[2], 2))
+text(-.6, .55, round(fit$wts[3], 2))
+text(-.6, .33, round(fit$wts[4], 2))
+text(.6, .9, round(fit$wts[5], 2))
+text(.15, .55, round(fit$wts[6], 2))
+
+axis(1)
+axis(2)
+
+#p7
+fit$fitted.values[28]
