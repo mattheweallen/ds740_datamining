@@ -75,3 +75,82 @@ zOut = fit$wts[5] + sigmaH1 * fit$wts[6]
 zOut = 13.68399 + sigmaH1 * -32.10247
 zOut
 1/(1+exp(-zOut))
+
+#p8
+DefaultClass = predict(fit, Default.std, type = "class")
+confusion = table(predicted=DefaultClass, actual=Default.std$default)
+(confusion[1,2] + confusion[2,1])/sum(confusion)
+confusion
+
+
+DefaultClass.8 = rep(NA, length(Default.std$default))
+DefaultClass.8[which(fit$fitted.values > .8)] = "Yes"
+DefaultClass.8[which(fit$fitted.values < .2)] = "No"
+
+confusion = table(predvals = DefaultClass.8, truth = Default.std$default)
+(confusion[1,2] + confusion[2,1])/sum(confusion)
+
+length(which(is.na(DefaultClass.8)))
+
+#problem 9
+garson(fit)
+
+lekprofile(fit)
+
+#p10
+# CV to choose # of hidden nodes
+n = dim(Default)[1]
+k = 10 #using 10-fold cross-validation
+groups = c(rep(1:k,floor(n/k)))
+sizes = 1:8
+misclassError = matrix( , nr = k, nc = length(sizes) )
+conv = matrix(, nr = k, nc = length(sizes) ) 
+set.seed(4)
+cvgroups = sample(groups,n) 
+for(i in 1:k){
+  groupi = (cvgroups == i)
+  myDefault.train = scale(Default[!groupi, 2:4])
+  myDefault.valid = scale(Default[groupi, 2:4], center = attr(myDefault.train, "scaled:center"), 
+                          scale = attr(myDefault.train, "scaled:scale"))
+  myDefault.train = data.frame(default=Default[!groupi, 1], myDefault.train)
+  myDefault.valid = data.frame(default=Default[groupi, 1], myDefault.valid)
+  for(j in 1:length(sizes)){
+    fit = nnet(default ~ ., data=myDefault.train, size = sizes[j], trace = F, maxit=1000) 
+    predictions = predict(fit, myDefault.valid, type = "class")
+    misclassError[i, j] = length(which(predictions != myDefault.valid[ , 1])) / length(predictions)
+    conv[i, j] = fit$convergence
+  } # end iteration over j
+} # end iteration over i
+
+#p12
+colSums(conv)
+misclassError
+error = apply(misclassError, 2, mean)
+plot(sizes, error, type = "l", lwd = 2, las = 1)
+min(error)
+which(error == min(error))
+error
+
+#p13
+set.seed(4)
+train = sample(1:10000, 8000, replace = F)
+myDefault.train = scale(Default[train, 2:4])
+myDefault.valid = scale(Default[-train, 2:4], center = attr(myDefault.train, "scaled:center"), 
+                        scale = attr(myDefault.train, "scaled:scale"))
+myDefault.train = data.frame(default=Default[train, 1], myDefault.train)
+myDefault.valid = data.frame(default=Default[-train, 1], myDefault.valid)
+
+fit = nnet(default ~ ., data=myDefault.train, size = 4, maxit=1000)
+train.predict = predict(fit, myDefault.train, type = "class")
+length(which(train.predict != myDefault.train[ , 1]))/length(train.predict)
+
+valid.predict = predict(fit, myDefault.valid, type = "class")
+length(which(valid.predict != myDefault.valid[ , 1]))/length(valid.predict)
+
+#p14
+fit2 = nnet(default ~ ., data=myDefault.train, size = 4, maxit=1000, decay = .5)
+valid.predict = predict(fit2, myDefault.valid, type = "class")
+length(which(valid.predict != myDefault.valid[ , 1]))/length(valid.predict)
+
+max(abs(fit$wts))
+max(abs(fit2$wts))
