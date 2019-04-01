@@ -86,7 +86,7 @@ plotnet(fit)
 **Note**: It may help to review the data dictionary using **?OJ**. </span>
 
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**: The predicted response is the probability of purchasing Minute Maid orange juice. Customer brand loyalty to Citrus Hill (LoyalCH) would be expected to have a negative impact on the probability of purchasing Minute Maid. The value of LoyalCH is between 0 and 1. Larger values indicate more loyalty to Citrus Hill and produce smaller values out of the hidden node once the sigmoid function is applied. </span>
 
 ***
 
@@ -97,9 +97,10 @@ plotnet(fit)
 
 <span style="color:DarkViolet">What is the predicted probability that the first person in the data set will purchase Minute Maid? </span>
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer**  0.3331203</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+predict(fit, OJ[1,])
 ```
 
 #####################################
@@ -108,9 +109,12 @@ plotnet(fit)
 
 <span style="color:DarkViolet">Compute $\sigma(z)$, the output of the hidden node, for the first person in the data set. </span>
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer**  0.5046999</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+OJ[1,c("LoyalCH","SalePriceMM","PriceDiff")]
+z=-1.63 + 4.22*OJ[1,"LoyalCH"] - 0.52*OJ[1,"SalePriceMM"] + 2.39*OJ[1,"PriceDiff"]
+1/(1+exp(-z))
 ```
 
 #####################################
@@ -122,6 +126,7 @@ plotnet(fit)
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+
 ```
 
 ***
