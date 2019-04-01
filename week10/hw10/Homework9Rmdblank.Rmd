@@ -55,6 +55,11 @@ Enter your R code below. </span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+library(ISLR)
+library(nnet)
+data(OJ)
+set.seed(10)
+fit = nnet(Purchase~LoyalCH+SalePriceMM+PriceDiff, data=OJ, size = 1)
 ```
 
 
@@ -67,6 +72,8 @@ Enter your R code below. </span>
 <span style="color:green">**Graph Answer**  </span>: 
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
+library(NeuralNetTools)
+plotnet(fit)
 ```
 
 
