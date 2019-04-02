@@ -112,7 +112,8 @@ predict(fit, OJ[1,])
 <span style="color:green">**Numeric Answer**  0.5046999</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
-OJ[1,c("LoyalCH","SalePriceMM","PriceDiff")]
+#OJ[1,c("LoyalCH","SalePriceMM","PriceDiff")]
+#summary(fit)
 z=-1.63 + 4.22*OJ[1,"LoyalCH"] - 0.52*OJ[1,"SalePriceMM"] + 2.39*OJ[1,"PriceDiff"]
 1/(1+exp(-z))
 ```
@@ -126,7 +127,20 @@ z=-1.63 + 4.22*OJ[1,"LoyalCH"] - 0.52*OJ[1,"SalePriceMM"] + 2.39*OJ[1,"PriceDiff
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+DefaultClass = predict(fit, Default.std, type = "class")
+confusion = table(predicted=DefaultClass, actual=Default.std$default)
+(confusion[1,2] + confusion[2,1])/sum(confusion)
+confusion
 
+
+DefaultClass.8 = rep(NA, length(Default.std$default))
+DefaultClass.8[which(fit$fitted.values > .8)] = "Yes"
+DefaultClass.8[which(fit$fitted.values < .2)] = "No"
+
+confusion = table(predvals = DefaultClass.8, truth = Default.std$default)
+(confusion[1,2] + confusion[2,1])/sum(confusion)
+
+length(which(is.na(DefaultClass.8)))
 ```
 
 ***
