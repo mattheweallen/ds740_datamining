@@ -124,23 +124,25 @@ z=-1.63 + 4.22*OJ[1,"LoyalCH"] - 0.52*OJ[1,"SalePriceMM"] + 2.39*OJ[1,"PriceDiff
 
 <span style="color:DarkViolet">If we use a probability threshold of .5 to classify predicted purchases, what is the classification error rate for this data set? </span>
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer**  0.1700935</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
-DefaultClass = predict(fit, Default.std, type = "class")
-confusion = table(predicted=DefaultClass, actual=Default.std$default)
+MMClass = predict(fit, OJ, type = "class")
+confusion = table(predicted=MMClass, actual=OJ$Purchase)
 (confusion[1,2] + confusion[2,1])/sum(confusion)
-confusion
-
-
-DefaultClass.8 = rep(NA, length(Default.std$default))
-DefaultClass.8[which(fit$fitted.values > .8)] = "Yes"
-DefaultClass.8[which(fit$fitted.values < .2)] = "No"
-
-confusion = table(predvals = DefaultClass.8, truth = Default.std$default)
-(confusion[1,2] + confusion[2,1])/sum(confusion)
-
-length(which(is.na(DefaultClass.8)))
+# confusion
+# 
+# 
+# 
+# 
+# DefaultClass.8 = rep(NA, length(OJ$Purchase))
+# DefaultClass.8[which(fit$fitted.values > .5)] = "MM"
+# DefaultClass.8[which(fit$fitted.values < .5)] = "CH"
+# 
+# confusion = table(predvals = DefaultClass.8, truth = OJ$Purchase)
+# (confusion[1,2] + confusion[2,1])/sum(confusion)
+# 
+# length(which(is.na(DefaultClass.8)))
 ```
 
 ***
@@ -152,9 +154,17 @@ length(which(is.na(DefaultClass.8)))
 <span style="color:DarkViolet">Suppose we classify predicted purchases as "MM"" if the probability of purchasing Minute Maid is > .9, as "CH" if the probability of purchasing Minute Maid is < .1, and NA otherwise. What is the classification error rate among purchases for which we make a (non-NA) prediction? </span>
 
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer**  0.04925054</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+PurchaseMM.9 = rep(NA, length(OJ$Purchase))
+PurchaseMM.9[which(fit$fitted.values > .9)] = "MM"
+PurchaseMM.9[which(fit$fitted.values < .1)] = "CH"
+
+confusion = table(predvals = PurchaseMM.9, truth = OJ$Purchase)
+(confusion[1,2] + confusion[2,1])/sum(confusion)
+
+#length(which(is.na(PurchaseMM.9)))
 ```
 
 #####################################
@@ -172,9 +182,10 @@ length(which(is.na(DefaultClass.8)))
 
 <span style="color:DarkViolet">If we use a probability threshold of .9 as in the previous two questions, for how many purchases do we fail to make a (non-NA) prediction? </span>
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer** 23 </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+14+9
 ```
 
 
@@ -184,6 +195,12 @@ length(which(is.na(DefaultClass.8)))
 
 <span style="color:DarkViolet">View the Lek profile of the model. Which of the following accurately describe the relationship among the variables? Select all that apply. </span>
 
+```{r,echo=FALSE}
+14+9
+
+lekprofile(fit)
+```
+
 <span style="color:green">**Multiple SELECT Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
   
@@ -191,7 +208,7 @@ The association between LoyalCH and Purchase is stronger for customers with Sale
 
 The association between SalePriceMM and Purchase is strongest for customers with LoyalCH in the 40th percentile.
 
-LoyalCH and Purchase are negatively associated.
+->LoyalCH and Purchase are negatively associated.
 
 PriceDiff and Purchase are positively associated.
 
@@ -223,6 +240,25 @@ Enter your R code below. </span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+library(ISLR)
+library(nnet)
+data("Hitters")
+Hitters = Hitters[which(!is.na(Hitters$Salary)),] #remove rows where salary is na
+
+#add columns League01, Division01, NewLeague01
+Hitters$League01 = rep(0,length(Hitters$League))
+Hitters$League01[which(Hitters$League == "N")] = 1 
+
+Hitters$Division01 = rep(0,length(Hitters$Division))
+Hitters$Division01[which(Hitters$Division == "W")] = 1
+
+Hitters$NewLeague01 = rep(0,length(Hitters$NewLeague))
+Hitters$NewLeague01[which(Hitters$NewLeague == "N")] = 1
+
+#remove columns League, Division, NewLeague
+Hitters = Hitters[,-c(14,15,20)] 
+
+#summary(Hitters)
 ```
 
 
@@ -249,6 +285,85 @@ Enter your R code below. </span>
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+
+# # CV to choose # of hidden nodes
+# n = dim(Hitters)[1]
+# k = 10 #using 10-fold cross-validation
+# groups = c(rep(1:k,floor(n/k)))
+# misclassError = rep(NA, k)
+# conv = rep(NA, k) 
+# set.seed(10)
+# cvgroups = sample(groups,n) 
+# for(i in 1:k){
+#     groupi = (cvgroups == i)
+#     myHitters.train = scale(Hitters[!groupi, -17])
+#     myHitters.valid = scale(Hitters[groupi, -17], center = attr(myHitters.train, "scaled:center"), 
+#             scale = attr(myHitters.train, "scaled:scale"))
+#     myHitters.train = data.frame(Salary=Hitters[!groupi, 17], myHitters.train)
+#     myHitters.valid = data.frame(Salary=Hitters[groupi, 17], myHitters.valid)
+#     
+#     fit = nnet(Salary ~ ., data=myHitters.train, size = 10, linout=T, maxit = 1000) 
+#     predictions = predict(fit, myHitters.valid)
+#     misclassError[i] = length(which(predictions != myHitters.valid[ , 17])) / length(predictions)
+#     conv[i] = fit$convergence
+#     
+# } # end iteration over i
+
+# CV to choose lambda
+n = dim(Default)[1]
+k = 10 #using 10-fold cross-validation
+groups = c(rep(1:k,floor(n/k)))
+decayRate = seq(.1, 3, by = .1)
+set.seed(10)
+cvgroups = sample(groups,n) 
+squaredError = matrix( , nr = k, nc = length(decayRate) ) 
+
+for(i in 1:k){
+  groupi = (cvgroups == i)
+  myHitters.train = scale(Hitters[!groupi, -17])
+  myHitters.valid = scale(Hitters[groupi, -17], center = attr(myHitters.train, "scaled:center"), 
+  scale = attr(myHitters.train, "scaled:scale"))
+  myHitters.train = data.frame(Salary=Hitters[!groupi, 17], myHitters.train)
+  myHitters.valid = data.frame(Salary=Hitters[groupi, 17], myHitters.valid)
+  
+  for(j in 1:length(decayRate)){
+    #fit = nnet(default ~ ., data=myDefault.train, size = sizes[j], trace = F, maxit=1000) 
+    #predictions = predict(fit, myDefault.valid, type = "class")
+    #misclassError[i, j] = length(which(predictions != myDefault.valid[ , 1])) / length(predictions)
+    #conv[i, j] = fit$convergence
+    
+    fit = nnet(Salary ~ ., data = myHitters.train, size = 10, maxit = 1000, linout = T, trace = F, decay =decayRate[j])
+    squaredError[groupi, j] = (Hitters$Salary[groupi] - predict(fit, myHitters.valid) )^2
+    
+  } # end iteration over j
+} # end iteration over i
+
+
+#################################
+
+
+# n = dim(Hitters)[1]
+# k = 10 #using 10-fold cross-validation
+# groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k))
+# decayRate = seq(.1, 3, by = .1)
+# set.seed(10)
+# cvgroups = sample(groups,n) 
+# squaredError = matrix( , nr = n, nc = length(decayRate) ) 
+# 
+# for(i in 1:k){
+#   groupi = (cvgroups == i)
+#   
+#   for(j in 1:length(decayRate)){
+#     fit = nnet(Salary ~ ., data = Hitters[!groupi,], size = 10, maxit = 1000, linout = T, trace = F, decay =decayRate[j])
+#     
+#     squaredError[groupi, j] = (Hitters$Salary[groupi] - predict(fit, Hitters[groupi,]) )^2
+#   } # end iteration over j
+# } # end iteration over i
+
+MSE = apply(squaredError, 2, mean)
+plot(decayRate,MSE,type="l",lwd=2,las=1)
+
+
 ```
 
 
@@ -312,7 +427,7 @@ No
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
 	
-Windows (PC),  
+->Windows (PC),  
 Virtual Lab (Windows/PC),  
 Mac,  
 Linux or other
