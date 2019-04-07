@@ -257,8 +257,6 @@ Hitters$NewLeague01[which(Hitters$NewLeague == "N")] = 1
 
 #remove columns League, Division, NewLeague
 Hitters = Hitters[,-c(14,15,20)] 
-
-#summary(Hitters)
 ```
 
 
@@ -286,84 +284,50 @@ Enter your R code below. </span>
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
 
-# # CV to choose # of hidden nodes
-# n = dim(Hitters)[1]
-# k = 10 #using 10-fold cross-validation
-# groups = c(rep(1:k,floor(n/k)))
-# misclassError = rep(NA, k)
-# conv = rep(NA, k) 
-# set.seed(10)
-# cvgroups = sample(groups,n) 
-# for(i in 1:k){
-#     groupi = (cvgroups == i)
-#     myHitters.train = scale(Hitters[!groupi, -17])
-#     myHitters.valid = scale(Hitters[groupi, -17], center = attr(myHitters.train, "scaled:center"), 
-#             scale = attr(myHitters.train, "scaled:scale"))
-#     myHitters.train = data.frame(Salary=Hitters[!groupi, 17], myHitters.train)
-#     myHitters.valid = data.frame(Salary=Hitters[groupi, 17], myHitters.valid)
-#     
-#     fit = nnet(Salary ~ ., data=myHitters.train, size = 10, linout=T, maxit = 1000) 
-#     predictions = predict(fit, myHitters.valid)
-#     misclassError[i] = length(which(predictions != myHitters.valid[ , 17])) / length(predictions)
-#     conv[i] = fit$convergence
-#     
-# } # end iteration over i
-
 # CV to choose lambda
-n = dim(Default)[1]
+n = dim(Hitters)[1]
 k = 10 #using 10-fold cross-validation
-groups = c(rep(1:k,floor(n/k)))
+groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k))
 decayRate = seq(.1, 3, by = .1)
+
 set.seed(10)
 cvgroups = sample(groups,n) 
-squaredError = matrix( , nr = k, nc = length(decayRate) ) 
+squaredError = matrix( , nr = n, nc = length(decayRate) ) 
 
 for(i in 1:k){
   groupi = (cvgroups == i)
-  myHitters.train = scale(Hitters[!groupi, -17])
-  myHitters.valid = scale(Hitters[groupi, -17], center = attr(myHitters.train, "scaled:center"), 
+  myHitters.train = scale(Hitters[!groupi,])
+  myHitters.valid = scale(Hitters[groupi,], center = attr(myHitters.train, "scaled:center"), 
   scale = attr(myHitters.train, "scaled:scale"))
-  myHitters.train = data.frame(Salary=Hitters[!groupi, 17], myHitters.train)
-  myHitters.valid = data.frame(Salary=Hitters[groupi, 17], myHitters.valid)
   
   for(j in 1:length(decayRate)){
-    #fit = nnet(default ~ ., data=myDefault.train, size = sizes[j], trace = F, maxit=1000) 
-    #predictions = predict(fit, myDefault.valid, type = "class")
-    #misclassError[i, j] = length(which(predictions != myDefault.valid[ , 1])) / length(predictions)
-    #conv[i, j] = fit$convergence
-    
     fit = nnet(Salary ~ ., data = myHitters.train, size = 10, maxit = 1000, linout = T, trace = F, decay =decayRate[j])
-    squaredError[groupi, j] = (Hitters$Salary[groupi] - predict(fit, myHitters.valid) )^2
-    
+    squaredError[groupi, j] = (myHitters.valid[ , 17] - predict(fit, myHitters.valid) )^2
   } # end iteration over j
 } # end iteration over i
 
-
-#################################
-
-
-# n = dim(Hitters)[1]
-# k = 10 #using 10-fold cross-validation
-# groups = c(rep(1:k,floor(n/k)),1:(n-floor(n/k)*k))
-# decayRate = seq(.1, 3, by = .1)
-# set.seed(10)
-# cvgroups = sample(groups,n) 
-# squaredError = matrix( , nr = n, nc = length(decayRate) ) 
-# 
-# for(i in 1:k){
-#   groupi = (cvgroups == i)
-#   
-#   for(j in 1:length(decayRate)){
-#     fit = nnet(Salary ~ ., data = Hitters[!groupi,], size = 10, maxit = 1000, linout = T, trace = F, decay =decayRate[j])
-#     
-#     squaredError[groupi, j] = (Hitters$Salary[groupi] - predict(fit, Hitters[groupi,]) )^2
-#   } # end iteration over j
-# } # end iteration over i
-
 MSE = apply(squaredError, 2, mean)
 plot(decayRate,MSE,type="l",lwd=2,las=1)
+min(MSE)
+which(MSE == min(MSE))
+decayRate[which(MSE == min(MSE))]
 
 
+
+
+set.seed(10)
+Hitters.std <- scale(Hitters)
+fit <- nnet(Salary ~ ., 
+            data=Hitters.std,
+            size=10,
+            decay=1.5,
+            linout=TRUE, 
+            trace=FALSE, 
+            maxit=300) 
+library(NeuralNetTools)
+garson(fit)
+
+fit$convergence
 ```
 
 
@@ -377,7 +341,7 @@ plot(decayRate,MSE,type="l",lwd=2,las=1)
 <span style="color:DarkViolet">What value of $\lambda$ minimizes the MSE? *Discuss* whether any other values of $\lambda$ appear reasonable, based on the observed values of MSE.</span>
 
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**: The value 1.5 for lambda minimizes the MSE. Lambda equal to 1.4 or 1.3 might also be a good choice, because they are close to the minimum.</span>
 
 
 
@@ -391,7 +355,7 @@ plot(decayRate,MSE,type="l",lwd=2,las=1)
 
 <span style="color:green">**Multiple choice Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  one of  
-Yes,  
+->Yes,  
 No
 
 #####################################
@@ -401,7 +365,7 @@ No
 <span style="color:DarkViolet">Apply Garson's algorithm to the model from the previous question. Which _two_ (standardized) variables are most important in predicting (standardized) **Salary**? </span>
 
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**: AtBat and Years are the two most important variables for predicting standardized Salary.</span>
 
 
 #####################################
@@ -411,7 +375,7 @@ No
 <span style="color:DarkViolet">If your goal was to optimize the performance of this model, what would you try next? Why? Explain in 1-2 sentences. </span>
 
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**:One thing to do would be to decrease the number of inputs to the model. Use the top 5 predictors based on Garson's algorithm for example. Another thing to do would be to find an optimal number of hidden layers through cross validation.</span>
 
 
 
