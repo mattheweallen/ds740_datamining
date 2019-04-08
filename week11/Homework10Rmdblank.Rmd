@@ -1,0 +1,316 @@
+---
+title: "Homework 10 R markdown"
+author: "(your name here)"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    fig_height: 4
+    fig_width: 4.5
+  pdf_document:
+    fig_height: 4
+    fig_width: 4.5
+  word_document:
+    fig_height: 4
+    fig_width: 4.5
+---
+
+
+```{r, setup, include=FALSE}
+require(mosaic)   # Load additional packages here 
+
+# Some customization.  You can alter or delete as desired (if you know what you are doing).
+trellis.par.set(theme=theme.mosaic()) # change default color scheme for lattice
+knitr::opts_chunk$set(
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+```
+
+#### <span style="color:Blue">**Intellectual Property:**</span>  
+These problems are the intellectual property of the instructors and may not be reproduced outside of this course.
+
+#### <span style="color:Crimson">**Due Date:**</span>  
+Tuesday, November 21, 2017 at 11:59 PM 
+
+***  
+***  
+
+##########################################################################
+## Problem 1: Mining Association Rules
+##########################################################################
+
+
+In this problem, you will mine association rules from groceries data.
+
+**Data Set**: Load the **arules** library and **Groceries** data set.  
+```{r,echo=FALSE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 1</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+How many products are represented in this data set?
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+```{r,echo=FALSE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 2</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+How many transactions (customers) are there?
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+```{r,echo=FALSE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 3</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+What is the largest number of items any customer purchased at one time?
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+```{r,echo=FALSE}
+```
+
+***
+
+#####################################
+### <span style="color:DarkViolet">Question 4</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+Make a barplot of the relative frequencies of each item, including all items that were purchased by at least 5% of the customers.  
+
+Enter your R code below.
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+
+#####################################
+### <span style="color:DarkViolet">Question 5</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Mine all simple association rules with at least .001 support and at least 0.5 confidence. Note:  A “simple” association rule is one with a single item in the consequent.
+
+Enter your R code below.
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 6</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Print the 10 rules with the highest lift values.
+
+Enter your R code below.
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 7</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+Use your answer to the previous question to answer the following: what is the lift value for the rule
+
+**{Instant food products, soda} => {hamburger meat}** ?
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+
+
+#####################################
+### <span style="color:DarkViolet">Question 8</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+Write a sentence interpreting the numerical value from the previous question.
+
+<span style="color:green">**Text Answer**: </span>
+
+***
+
+#####################################
+### <span style="color:DarkViolet">Question 9</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+
+How many customers in the data set purchased soda, popcorn, and a salty snack?
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+
+
+#####################################
+### <span style="color:DarkViolet">Question 10</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+If a customer purchases ham and processed cheese, what is the probability that he or she will also purchase white bread?
+
+<span style="color:green">**Numeric Answer**  </span> 
+
+***
+
+
+
+#####################################
+### <span style="color:DarkViolet">Question 11</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Return to working with the original set of rules from the third question in this problem.  Filter out any rules that have lower confidence than more general versions of the same rules.  How many rules remain?
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+```{r,echo=FALSE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 12</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Suppose that you work for a baking company, and you want to offer a coupon to customers who are likely to buy pastry.  Using your filtered rules from the previous question, identify combination(s) of items that are associated with an increased probability of buying “pastry”.  To whom would you offer your coupon?
+
+<span style="color:green">**Text Answer**: </span>
+
+
+#####################################
+### <span style="color:DarkViolet">Question 13</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Enter the R code you used to answer the previous question.
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+***  
+***  
+
+##########################################################################
+## Problem 2: Modeling with Association Rules
+##########################################################################
+
+In this problem, you will use association rules to model heart disease.  
+
+**Data Set**:  From D2L, Download *HeartDisease.csv* and load it into R.  The file *HeartDisease_data_dictionary.txt* contains information about the variables in the file.
+
+**Source**:  Robert Detrano, M.D., Ph.D. (1988). V.A. Medical Center, Long Beach and Cleveland Clinic Foundation.  Retrieved from the UCI Machine Learning Repository [http://archive.ics.uci.edu/ml]. Irvine, CA: University of California, School of Information and Computer Science.
+
+
+#####################################
+### <span style="color:DarkViolet">Question 14</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+A value of **ChestPain** equal to 4 indicates that the patient is asymptomatic (does not have any kind of chest pain).  Create a new variable, **hasCP**, which equals 1 for all individuals with chest pain, and which equals 0 otherwise.  
+
+Enter your R code below.
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+
+
+#####################################
+### <span style="color:DarkViolet">Question 15</span> **<span style="color:Crimson">(1 point)</span>**:
+#####################################
+
+Discretize **Age** into 3 ordered categories, using equal interval lengths. 
+
+Enter your R code below.
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+#####################################
+### <span style="color:DarkViolet">Question 16</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Discretize **BloodPressure** into 3 ordered categories with fixed boundaries determined by the first and third quartiles of the data.
+
+Enter your R code below.
+
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 17</span> **<span style="color:Crimson">(3 points)</span>**:
+#####################################
+
+Tell R to treat the other variables (which you didn’t create using $\texttt{discretize()}$ ) in **HeartDisease.csv** as discrete factors.  Create a data frame containing the discrete versions of all of the variables (it should have 14 columns).  Then convert the data frame to a format suitable for association rule mining.
+
+Enter your R code below.
+
+
+<span style="color:green">**Code Answer**: </span>
+```{r, echo=TRUE}
+```
+
+***
+
+#####################################
+### <span style="color:DarkViolet">Question 18</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Mine the data for association rules in which “hasHD=1” is the consequent.  Use a minimum support of .03 and a minimum confidence of 0.5.  How many rules are there?
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+```{r,echo=FALSE}
+```
+
+#####################################
+### <span style="color:DarkViolet">Question 19</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Find the subset of rules in which being female is an antecedent.  (Note that in this data set, **Sex** equal to 0 corresponds to female.)  How many such rules are there?
+
+<span style="color:green">**Numeric Answer**  </span> 
+**<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+```{r,echo=FALSE}
+```
+
+
+#####################################
+### <span style="color:DarkViolet">Question 20</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+Which **two** of the following risk factors, along with being female, are associated with the greatest elevation in probability of heart disease?
+
+<span style="color:green">**Multiple SELECT Answer** </span>
+  **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
+Blood pressure greater than 140,  
+Reversible defects on a thallium heart scan (**Thal** equal to 7),  
+A flat peak exercise ST segment (Slope equal to 2),  
+No chest pain,  
+Chest pain
+
+
+#####################################
+### <span style="color:DarkViolet">Question 21</span> **<span style="color:Crimson">(2 points)</span>**:
+#####################################
+
+There are 2340 rules in which being male is an antecedent.  Why are there fewer rules in which being female is an antecedent?  Give **two** reasons.
+
+<span style="color:green">**Text Answer**: </span>
