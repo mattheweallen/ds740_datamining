@@ -1,0 +1,41 @@
+.daylight .d2l-qc-controls-container {
+    line-height: normal;
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+    margin-top: calc(0.5em - ((1.1rem - 0.95rem) / 2)); /* (paragraph margin-top - ((~input control height - font size) / 2)) */
+}
+
+.daylight .d2l-qc-stats-container {
+    margin-top: 0.3em;
+}
+
+.daylight .d2l-quickedit-points-cell .vui-input[type="text"] {
+	min-width: 4rem;
+}
+
+.daylight .d2l-quiz-dropdown-container select {
+	max-width: calc(100vw - 80px);
+}
+
+@media(max-width: 993px) {
+	
+	.daylight .d2l-quiz-text-blank-container,
+	.daylight .d2l-quiz-answer-container p,
+	.daylight .d2l-quiz-textbox-container textarea,
+	.daylight .d2l-quiz-image-container img {
+		max-width: calc(100vw - 80px);
+	}
+
+	.daylight .d2l-quiz-textbox-html-container {
+		max-width: calc(100vw - 40px);
+		overflow: hidden;
+	}
+	.daylight .d2l-quiz-textbox-html-container .d2l-htmleditor,
+	.daylight .d2l-quiz-textbox-html-container .d2l-htmleditor-iframecontainer,
+	.daylight .d2l-quiz-textbox-html-container .d2l-htmleditor-header {
+		max-width: calc(100vw - 50px);
+	}
+}

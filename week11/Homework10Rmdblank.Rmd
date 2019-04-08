@@ -147,7 +147,7 @@ Use your answer to the previous question to answer the following: what is the li
 
 Write a sentence interpreting the numerical value from the previous question.
 
-<span style="color:green">**Text Answer**: Since the lift is much greater than one, there is a high probablity that a customer purchasing instant food products and soda will also purchase hamburger meat. </span>
+<span style="color:green">**Text Answer**: Since the lift is much greater than one, there is a high probability that a customer purchasing instant food products and soda will also purchase hamburger meat. </span>
 
 ***
 
@@ -309,7 +309,7 @@ transactions <- as(heart, 'transactions')
 
 Mine the data for association rules in which “hasHD=1” is the consequent.  Use a minimum support of .03 and a minimum confidence of 0.5.  How many rules are there?
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer**  5542</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
 rules3 = apriori(transactions, parameter=list(support=.03, confidence=0.5), appearance=list(rhs=c('hasHD=1'),default='lhs'))
