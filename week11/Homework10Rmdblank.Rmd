@@ -234,6 +234,10 @@ Enter your R code below.
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+heart = read.csv("HeartDisease.csv")
+heart$hasCP = rep(0, length(heart$ChestPain))
+heart$hasCP[which(heart$ChestPain == 4)] = 1
+heart$ChestPain = NULL
 ```
 
 
@@ -249,6 +253,8 @@ Enter your R code below.
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+heart$Age.disc = discretize(heart$Age, method = "interval", breaks=3, ordered=T)
+heart$Age = NULL
 ```
 
 #####################################
@@ -262,6 +268,11 @@ Enter your R code below.
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+boundaries = summary(heart$BloodPressure)[c('Min.', '1st Qu.', '3rd Qu.', 'Max.')]
+heart$BloodPressure.disc=discretize(heart$BloodPressure, method = "fixed", breaks=boundaries, ordered=T)
+heart$BloodPressure=NULL
+
+#summary(heart)
 ```
 
 
@@ -276,6 +287,18 @@ Enter your R code below.
 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
+colnames(heart)
+heart$Sex = as.factor(heart$Sex)
+heart$HighBloodSugar = as.factor(heart$HighBloodSugar)
+heart$ECG = as.factor(heart$ECG)
+heart$ExerAngina = as.factor(heart$ExerAngina)
+heart$Slope = as.factor(heart$Slope)
+heart$Fluoroscopy = as.factor(heart$Fluoroscopy)
+heart$Thal = as.factor(heart$Thal)
+heart$hasHD = as.factor(heart$hasHD)
+heart$hasCP = as.factor(heart$hasCP)
+
+transactions <- as(heart, 'transactions')
 ```
 
 ***
@@ -289,6 +312,7 @@ Mine the data for association rules in which “hasHD=1” is the consequent.  U
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+rules3 = apriori(transactions, parameter=list(support=.03, confidence=0.5), appearance=list(rhs=c('hasHD=1'),default='lhs'))
 ```
 
 #####################################
@@ -297,9 +321,13 @@ Mine the data for association rules in which “hasHD=1” is the consequent.  U
 
 Find the subset of rules in which being female is an antecedent.  (Note that in this data set, **Sex** equal to 0 corresponds to female.)  How many such rules are there?
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer**  37</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+females = which(lhs(rules3) %in% c('Sex=0'))
+rules4 = rules3[females]
+summary(rules4)
+inspect(head(rules4, n=10, by='lift'))
 ```
 
 
@@ -312,10 +340,10 @@ Which **two** of the following risk factors, along with being female, are associ
 <span style="color:green">**Multiple SELECT Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 Blood pressure greater than 140,  
-Reversible defects on a thallium heart scan (**Thal** equal to 7),  
+->Reversible defects on a thallium heart scan (**Thal** equal to 7),  
 A flat peak exercise ST segment (Slope equal to 2),  
 No chest pain,  
-Chest pain
+->Chest pain
 
 
 #####################################
@@ -324,4 +352,4 @@ Chest pain
 
 There are 2340 rules in which being male is an antecedent.  Why are there fewer rules in which being female is an antecedent?  Give **two** reasons.
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**: Women have different risk factors for heart disease which are not being measured. Women are more likely to get heart attacks when they are older versus men who are at risk at earlier ages.</span>
