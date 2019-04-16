@@ -45,6 +45,10 @@ In this problem, you will explore clustering methods.
 Description from the documentation for the R package **rattle**: “The wine dataset contains the results of a chemical analysis of wines grown in a specific area of Italy. Three types of wine are represented in the 178 samples, with the results of 13 chemical analyses recorded for each sample.” That is, we have n = 178 wine samples, each of which has p = 13 measured characteristics.
  
 ```{r,echo=FALSE}
+x = read.csv('wine.csv')
+stddevs = apply(x, 2, sd) 
+means = apply(x, 2, mean) 
+x.scale = scale(x)
 ```
 
 **Important Note**: It is carefully noted in each problem to standardize the data.  Attention to those instructions will help you obtain the correct answers.
@@ -58,7 +62,7 @@ After loading in the data from the *wine.csv* file, store the 13 numeric variabl
 Compute the means and standard deviations for all the variables.  Compare the means and standard deviations between the thirteen variables, using these values to explain why it is a good idea to standardize the variables before clustering.
 
 
-<span style="color:green">**Text Answer**: </span>
+<span style="color:green">**Text Answer**: There is significant variability of the standard deviations and means between the characteristics. It is a good idea to standardize before clustering, so that characteristics are compared on equal terms.</span>
 
 ***
 
@@ -75,6 +79,9 @@ Using Euclidean distance, fit the hierarchical model using complete linkage.  Pr
 <span style="color:green">**Graph Answer**  </span>: 
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
+x.scale.distance = dist(x.scale, method="euclidean")
+hc.model = hclust(x.scale.distance,method="complete")
+plot(hc.model,cex=0.5)
 ```
 
 
