@@ -1,0 +1,12 @@
+combine citi bike data and collision data. 
+
+where is the least safe area for pedestrians?
+
+can put lat lng coordinates into categories.
+
+predict riders age 
+
+predict riders gender
+
+
+decision tree to predict age and gender of citi bike rider
