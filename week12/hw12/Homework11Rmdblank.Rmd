@@ -80,8 +80,8 @@ Using Euclidean distance, fit the hierarchical model using complete linkage.  Pr
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
 x.scale.distance = dist(x.scale, method="euclidean")
-hc.model = hclust(x.scale.distance,method="complete")
-plot(hc.model,cex=0.5)
+hc.complete = hclust(x.scale.distance,method="complete")
+plot(hc.complete,cex=0.5)
 ```
 
 
@@ -154,7 +154,7 @@ Upload your plot to Homework 11: Alcohol versus Dilution.
 <span style="color:green">**Graph Answer**  </span>: 
   (post to discussion board on D2L)
 ```{r,echo=FALSE}
-memb = cutree(hc.model,k=3)
+memb = cutree(hc.complete,k=3)
 with(x, plot(Alcohol ~ Dilution, col=memb, pch=memb))
 ```
 
@@ -177,6 +177,7 @@ set.seed(2)
 memb2 <- kmeans(x.scale, 5)$cluster
 set.seed(3)
 memb3 <- kmeans(x.scale, 5)$cluster
+par(mfrow=c(1,3))
 with(x, plot(Alcohol ~ Dilution, col=memb1, pch=memb1))
 with(x, plot(Alcohol ~ Dilution, col=memb2, pch=memb2))
 with(x, plot(Alcohol ~ Dilution, col=memb3, pch=memb3))
@@ -186,21 +187,24 @@ make_cluster_graph <- function(df, x, y, number_clusters, seeds=c(1, 2, 3)) {
     for (seed in seeds) {
         set.seed(seed)
         members <- kmeans(df[, x], number_clusters)$cluster
-        #plot(df[, y] ~ df[, x], col=members, pch=members)
-        tables(member)
+        plot(df[, y] ~ df[, x], col=members, pch=members)
+        #table(members)
     } 
 }
 
-
+make_cluster_graph(x.scale,"Dilution","Alcohol",5)
+make_cluster_graph(x.scale,"Dilution","Alcohol",4)
+make_cluster_graph(x.scale,"Dilution","Alcohol",3)
+make_cluster_graph(x.scale,"Dilution","Alcohol",2)
 ```
 
 
 <span style="color:green">**Multiple SELECT Answer** </span>
   **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
-5,  
-4,  
-3,  
-2
+->5,  
+->4,  
+->3,  
+->2
 
 
 Starting with set.seed(12) to set the initial split, use nonhierarchical (K-means) clustering to determine cluster membership for three clusters (corresponding to the three types of wine).  How many wine samples are in each cluster?
@@ -211,11 +215,15 @@ Starting with set.seed(12) to set the initial split, use nonhierarchical (K-mean
 
 Wine samples in Cluster 1:
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer** 62 </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
-
-
+set.seed(12)
+memb12 <- kmeans(x.scale, 3)$cluster
+table(memb12)
+hc.complete.memb <- cutree(hc.complete, k=3)
+sum(diag(table(memb12, hc.complete.memb))) / sum(table(memb12, hc.complete.memb))
+table(memb12, hc.complete.memb)
 
 ```
 
@@ -227,7 +235,7 @@ Wine samples in Cluster 1:
 
 Wine samples in Cluster 2:
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer** 65 </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
 ```
@@ -239,7 +247,7 @@ Wine samples in Cluster 2:
 
 Wine samples in Cluster 3:
 
-<span style="color:green">**Numeric Answer**  </span> 
+<span style="color:green">**Numeric Answer**  51</span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
 ```
@@ -271,6 +279,7 @@ Load in the data from the *wine.csv* file.  Store the 13 numeric variables in a 
 We wish to use PCA to identify which variables are most meaningful for describing this dataset.  Use the **prcomp** function, with *scale=T*, to find the principal components. 
 
 ```{r,echo=FALSE}
+pr_comps <- prcomp(x, scale=TRUE)
 ```
 
 
@@ -300,7 +309,7 @@ Alcohol
 Malic
 
 	
-Ash
+->Ash
 
 	
 Alcalinity
@@ -341,6 +350,7 @@ What is the PVE for the first principal component?
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+summary(pr_comps)
 ```
 
 ***
@@ -371,6 +381,9 @@ Principal component 1 score value $\approx$
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+biplot(pr_comps, scale=0)
+pr_comps$x[,1][159]
+pr_comps$x[,2][159]
 ```
 
 
@@ -409,6 +422,11 @@ You should wind up with a data frame of size 40 rows (tissue samples) by 1000 co
 Using the properly prepared data, complete the following tasks.
  
 ```{r,echo=FALSE}
+df <- read.csv('GeneExpression.csv', header=FALSE)
+df <- t(df)
+df <- scale(df)
+means2 <- apply(df[21:40, ], 2, mean)
+hist(means2)
 ```
 
 
@@ -447,6 +465,10 @@ Use hierarchical clustering with Euclidean distance and complete linkage to spli
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+dist_df <- dist(df, method="euclidean")
+hc_complete <- hclust(dist_df,method="complete")
+hc_members <-cutree(hc_complete, k=2)
+table(hc_members)
 ```
 
 
@@ -482,6 +504,9 @@ What is the cumulative PVE explained by the first two principal components?
 <span style="color:green">**Numeric Answer**  </span> 
 **<span style="color:red">(AUTOGRADED on D2L)</span>**:  
 ```{r,echo=FALSE}
+pr_comps2 <- prcomp(df)
+summary(pr_comps2)
+biplot(pr_comps2)
 ```
 
 
