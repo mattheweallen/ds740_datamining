@@ -1,0 +1,33 @@
+google cloud
+https://www.kaggle.com/nycopendata/new-york
+big query
+https://cloud.google.com/bigquery/docs/quickstarts/quickstart-web-ui?hl=en_US&_ga=2.110825218.-604392262.1521205668
+
+use big query with R
+https://cloud.google.com/blog/products/gcp/google-cloud-platform-for-data-scientists-using-r-with-google-bigquery
+
+https://db.rstudio.com/databases/big-query/
+
+Data 
+https://www.citibikenyc.com/system-data
+https://s3.amazonaws.com/tripdata/index.html
+
+
+https://console.cloud.google.com/marketplace/details/city-of-new-york/nyc-citi-bike?filter=solution-type:dataset&q=citi%20bike&id=fcfc44d2-8502-4d73-ac4d-10030a80e48b
+
+#standardSQL
+SELECT
+  CONCAT(start_station_name, " to ", end_station_name) AS route,
+  COUNT(*) AS num_trips
+FROM
+  `bigquery-public-data.new_york.citibike_trips`
+WHERE
+  gender = "female"
+  AND CAST(starttime AS string) LIKE '2016%'
+GROUP BY
+  start_station_name,
+  end_station_name
+ORDER BY
+  num_trips DESC
+LIMIT
+  5
