@@ -10,3 +10,5 @@ library("readr")
 project <- "nyc-citibike-238810" # put your project ID here
 sql <- "select * FROM [bigquery-public-data.new_york.citibike_trips] LIMIT 5"
 df <- query_exec(sql, project = project)
+
+#write out example csv file for data
