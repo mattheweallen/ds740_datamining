@@ -31,3 +31,32 @@ ORDER BY
   num_trips DESC
 LIMIT
   5
+
+
+#query to get dataset
+SELECT
+  tripduration, starttime, stoptime, start_station_name, end_station_name, usertype, birth_year, gender
+FROM
+  `bigquery-public-data.new_york.citibike_trips`
+WHERE
+  gender in ("female","male")
+  AND CAST(starttime AS string) LIKE '2016%'
+
+
+https://drive.google.com/open?id=1vUKo8OyTMkaEH1hyrHtXKD81doXo1sVD
+
+
+SELECT
+  tripduration, starttime, stoptime, start_station_name, end_station_name, usertype, birth_year, gender
+FROM
+  `bigquery-public-data.new_york.citibike_trips`
+WHERE
+  gender in ("female","male")
+  AND DATE(starttime) > DATE(2016, 06, 01)
+  AND DATE(starttime) < DATE(2016, 07, 01)
+
+google:predict gender of nyc citi bike
+https://medium.com/greyatom/predicting-gender-of-the-riders-of-new-yorks-citi-bikes-with-decision-trees-dcb169caad85
+https://towardsdatascience.com/citi-bike-2017-analysis-efd298e6c22c
+
+
