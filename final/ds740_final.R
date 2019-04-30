@@ -116,6 +116,7 @@ specificity
 
 overallerror_lda = (confusion.matrix[1,2] + confusion.matrix[2,1])/sum(confusion.matrix)
 overallerror_lda
+#0.459318
 
 myroc = roc(response=biketripsJune2016$gender, predictor = biketripsJune2016$tripduration_minutes)
 myroc$auc
