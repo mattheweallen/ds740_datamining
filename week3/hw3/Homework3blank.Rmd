@@ -260,11 +260,13 @@ PERNP(Total person's earnings) = COW6(Class of worker) + MAR5(Marital status) + 
 <span style="color:green">**Code Answer**: </span>
 ```{r, echo=TRUE}
 # Question 12
+install.packages("ISLR")
 library(ISLR)
 data("Auto")
 Auto$mpg.bin = as.factor(ifelse(Auto$mpg >median(Auto$mpg), 1, 0))
 Auto$origin = as.factor(Auto$origin)
-
+summary(Auto)
+class(Auto$mpg.bin)
 pairs(Auto)
 ```
 
