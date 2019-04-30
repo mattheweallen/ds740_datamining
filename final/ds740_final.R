@@ -1,3 +1,5 @@
+#ds740 spring 2019 final project by Matt Allen
+
 #data used for this project can be downloaded from google drive at the link below.
 #https://drive.google.com/open?id=1T5SGdP_quLwlcIQQ8yKmhwkFLBsfYl3L
 
@@ -76,7 +78,15 @@ for(i in 1:k) {
   fit = glm(model, data=biketripsJune2016[!groupi,], family = "binomial")
   predictvals[groupi] = predict(fit, biketripsJune2016[groupi,], type = "response") #response indicates to give predicted probability vs logit or log odds
 }
-table(predictvals > .5, biketripsJune2016$gender)
+confusion.matrix = table(predictvals > .5, biketripsJune2016$gender)
+sensitivity = confusion.matrix[2,2]/(confusion.matrix[2,2] + confusion.matrix[1,2])
+sensitivity #true positive rate
+#0.5844636
+
+specificity = confusion.matrix[1,1]/(confusion.matrix[1,1] + confusion.matrix[2,1])
+specificity #true negative rate
+#0.5237246
+
 
 #create an ROC curve
 #install.packages("pROC")
@@ -104,6 +114,9 @@ specificity = confusion.matrix[1,1]/(confusion.matrix[1,1] + confusion.matrix[2,
 specificity
 #0.5488671
 
+overallerror_lda = (confusion.matrix[1,2] + confusion.matrix[2,1])/sum(confusion.matrix)
+overallerror_lda
+
 myroc = roc(response=biketripsJune2016$gender, predictor = biketripsJune2016$tripduration_minutes)
 myroc$auc
 #Area under the curve: 0.5594
@@ -121,3 +134,19 @@ n = dim(biketripsJune2016)[1]
 ErrorLDA = sum(biketripsJune2016$gender != fittedclass)/n
 ErrorLDA
 #0.4459437
+
+#do 10-fold cross validation on two lda models
+allpredictedCV1 = allpredictedCV2 = factor(rep(NA,n),levels=c("female","male"))
+cvk = 10
+
+for (i in 1:cvk)  {
+  ldafit1 = lda(gender~biketripsJune2016$tripduration_minutes, data=biketripsJune2016, subset=(cvgroups!=i))
+  newdata1 = data.frame(biketripsJune2016[cvgroups==i,c(1)])
+  allpredictedCV1[cvgroups==i] = predict(ldafit1,newdata1)$class
+  
+  ldafit2 = lda(model, data=biketripsJune2016, subset=(cvgroups!=i))
+  newdata2 = data.frame(biketripsJune2016[cvgroups==i,c(1,2,3)])
+  allpredictedCV2[cvgroups==i] = predict(ldafit2,newdata2)$class
+}
+CVmodel1 = sum(allpredictedCV1!= biketripsJune2016$gender)/n; CVmodel1 #0.5059761
+CVmodel2 = sum(allpredictedCV2!= biketripsJune2016$gender)/n; CVmodel2 #0.4459239
