@@ -7,6 +7,7 @@
 #data includes all citi bike trips from June 2016.
 #one month alone is 189 MB. an entire year's worth was over a gigabyte.
 #processing that much data is beyond the scope of the current study, so just one month was used.
+#data set originally found at https://www.kaggle.com/nycopendata/new-york
 
 #read in the csv file to a data frame
 biketripsJune2016 = read.csv("C:/Users/matt/Documents/201606NYCCitiBike/bq-results-20190429-085840-1bny7q8gd48j.csv")
